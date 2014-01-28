@@ -1,12 +1,10 @@
+# Unity .gitignore file.
+.DS_Store
+Library
+Library/*
+*.csproj
 *.sln
 *.userprefs
-*.csproj
+Temp
 *.pidb
-*.unityproj
-.DS_Store
-/Library/FailedAssetImports.txt
-/Library/cache/
-/Library/previews/
-/Library/ScriptAssemblies
-/obj
-/Temp
+Build
