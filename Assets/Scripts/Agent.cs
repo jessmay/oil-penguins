@@ -4,23 +4,22 @@ using System.Collections;
 public class Agent : MonoBehaviour {
 
 	protected double heading;
-	protected Vector3 velocity;
+	protected Vector2 velocity;
 
 	// Use this for initialization
-	void Start () {
+	void Start() {
 		heading = 0.0;
-		velocity = new Vector3 (0, 0, 0);
+		velocity = Vector2.zero;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		Move();
+	void Update() {
+		//Move();
 	}
 
 	protected void Move() {
-		rigidbody2D.
-		rigidbody2D.velocity = new Vector2 (velocity.x, velocity.y); 
+		rigidbody2D.velocity = velocity; 
 		//transform.position += velocity;
-		velocity = new Vector3(0, 0, 0);
+		velocity = Vector2.zero;
 	}
 }

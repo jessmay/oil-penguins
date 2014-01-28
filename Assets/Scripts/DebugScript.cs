@@ -3,6 +3,8 @@ using System.Collections;
 
 public class DebugScript : MonoBehaviour {
 
+	public GameObject Wall;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -10,7 +12,12 @@ public class DebugScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		//Vector3 mPos = Input.mousePosition;
+
+		if (Input.GetMouseButtonDown (0)) {
+			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			pos.z = 0;
+			Instantiate(Wall, pos, Wall.transform.rotation);
+		}
 
 	}
 }

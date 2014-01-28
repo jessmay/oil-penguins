@@ -30,12 +30,14 @@ public class Player : Agent {
 
 		//If moving forward
 		if (Input.GetKey(KeyCode.UpArrow)) {
-			velocity = transform.up * (float)moveStep;
+			Vector2 temp = new Vector2(transform.up.x, transform.up.y);
+			velocity = temp * (float)moveStep;
 		}
 
 		//If moving backward
 		if (Input.GetKey(KeyCode.DownArrow)) {
-			velocity = transform.up * (float)-moveStep;
+			Vector2 temp = new Vector2(transform.up.x, transform.up.y);
+			velocity = temp * (float)-moveStep;
 		}
 
 		Move();
