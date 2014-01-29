@@ -19,7 +19,6 @@ public class Agent : MonoBehaviour {
 
 	protected void Move() {
 		rigidbody2D.velocity = velocity; 
-		//transform.position += velocity;
 		velocity = Vector2.zero;
 	}
 }
