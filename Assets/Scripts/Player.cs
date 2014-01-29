@@ -40,6 +40,8 @@ public class Player : Agent {
 			velocity = temp * (float)-moveStep;
 		}
 
+		getLengthOfFeelers((int)(GetComponent<CircleCollider2D>().radius*3), 3);
+
 		Move();
 	}
 
