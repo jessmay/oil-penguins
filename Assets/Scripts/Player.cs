@@ -3,12 +3,17 @@ using System.Collections;
 
 public class Player : Agent {
 
-	private const double turnStep = 5.0;
-	private const double moveStep = 10.0;//0.15;
+	private const float turnStep = 5.0f;
+	private const float moveStep = 10.0f;//0.15f;
+
+	private int numFeelers = 3;
+	private float[] feelers;
+	private int feelerLength;
 
 	// Use this for initialization
 	void Start () {
-	
+		base.Start();
+		feelerLength = (int)(GetComponent<CircleCollider2D>().radius*3);
 	}
 	
 	// Update is called once per frame
@@ -18,14 +23,14 @@ public class Player : Agent {
 		if (Input.GetKey(KeyCode.LeftArrow)) {
 			heading+=turnStep;
 			if(heading >= 360) heading%=360;
-			transform.rotation = Quaternion.Euler (0,0, (float)heading);
+			transform.rotation *= Quaternion.Euler (0,0, turnStep);
 		}
 
 		//If turning CW, decrement heading
 		if (Input.GetKey(KeyCode.RightArrow)) {
 			heading-=turnStep;
 			if(heading < 0) heading = (heading+360)%360;
-			transform.rotation = Quaternion.Euler (0,0,(float)heading);
+			transform.rotation *= Quaternion.Euler (0,0,-turnStep);
 		}
 
 		//If moving forward
@@ -40,10 +45,11 @@ public class Player : Agent {
 			velocity = temp * (float)-moveStep;
 		}
 
-		getLengthOfFeelers((int)(GetComponent<CircleCollider2D>().radius*3), 3);
+		feelers = getLengthOfFeelers(feelerLength, numFeelers);
+
+		//displayFeelers(feelers);
 
 		Move();
 	}
-
 
 }
