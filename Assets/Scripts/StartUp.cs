@@ -21,20 +21,15 @@ public class StartUp : MonoBehaviour {
 		Vector3 c = renderer.bounds.center;
 
 		for (int i = -height/2; i <= height/2; ++i) {
-			GameObject tempWall = Instantiate (Wall, new Vector3(c.x+i*xSize, c.y-width/2*ySize, c.z), Wall.transform.rotation) as GameObject;
-			//tempWall.transform.localScale = new Vector3(wallX, wallY, 1);
+			Instantiate (Wall, new Vector3(c.x+i*xSize, c.y-width/2*ySize, c.z), Wall.transform.rotation);
 			
-			tempWall = Instantiate (Wall, new Vector3(c.x+i*xSize, c.y+width/2*ySize, c.z), Wall.transform.rotation) as GameObject;
-			//tempWall.transform.localScale = new Vector3(wallX, wallY, 1);
-
+			Instantiate (Wall, new Vector3(c.x+i*xSize, c.y+width/2*ySize, c.z), Wall.transform.rotation);
 		}
 
 		for (int j = -width/2 +1; j < width/2; ++j) {
-			GameObject tempWall = Instantiate (Wall, new Vector3(c.x-height/2*xSize, c.y+j*ySize, c.z), Wall.transform.rotation) as GameObject;
-			//tempWall.transform.localScale = new Vector3(wallX, wallY, 1);
+			Instantiate (Wall, new Vector3(c.x-height/2*xSize, c.y+j*ySize, c.z), Wall.transform.rotation);
 
-			tempWall = Instantiate (Wall, new Vector3(c.x+height/2*xSize, c.y+j*ySize, c.z), Wall.transform.rotation) as GameObject;
-			//tempWall.transform.localScale = new Vector3(wallX, wallY, 1);
+			Instantiate (Wall, new Vector3(c.x+height/2*xSize, c.y+j*ySize, c.z), Wall.transform.rotation);
 		}
 
 
