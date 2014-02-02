@@ -3,13 +3,21 @@ using System.Collections;
 
 public class Agent : MonoBehaviour {
 
+	public Background background;
+
 	protected float heading;
 	protected Vector2 velocity;
+
+	protected Vector2 cellIndex;
+
+	protected float radius;
 	
 	// Use this for initialization
 	protected void Start() {
 		heading = transform.rotation.z;
 		velocity = Vector2.zero;
+		radius = GetComponent<CircleCollider2D> ().radius;
+		cellIndex = Vector2.zero;
 	}
 	
 	// Update is called once per frame
@@ -18,8 +26,15 @@ public class Agent : MonoBehaviour {
 	}
 
 	protected void Move() {
+		Vector2 prevCell = cellIndex;
+
 		rigidbody2D.velocity = velocity; 
 		velocity = Vector2.zero;
+
+		cellIndex = background.grid.getCellIndex(renderer.bounds.center);
+		if (cellIndex != prevCell) {
+			background.grid.move(gameObject, prevCell, cellIndex);
+		}
 	}
 
 	protected Vector2[] getLengthOfFeelers(int range, int amount, int viewAngle = 180) {
@@ -36,7 +51,6 @@ public class Agent : MonoBehaviour {
 
 		Vector2[] feelers =  new Vector2[amount];
 		float spaceBetween = viewAngle/(amount+1);
-		float radius = GetComponent<CircleCollider2D>().radius;
 
 		for (int currentFeeler = 0; currentFeeler < amount; ++currentFeeler) {
 
@@ -57,4 +71,7 @@ public class Agent : MonoBehaviour {
 		return feelers;
 	}
 
+	public Vector2 getCellIndex () {
+		return cellIndex;
+	}
 }

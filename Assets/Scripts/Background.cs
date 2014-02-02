@@ -1,14 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class StartUp : MonoBehaviour {
+public class Background : MonoBehaviour {
 
 	public GameObject Wall;
+	public GameObject Agent;
+
 	private int width = 20;
 	private int height = 20;
 
+	private int gridWidth = 10;
+	private int gridHeight = 10;
+
+
+	public Grid grid;
+
 	// Use this for initialization
 	void Start () {
+
+		grid = new Grid (gridWidth, gridHeight, renderer.bounds);
 
 		float xSize = renderer.bounds.size.x/width;
 		float ySize = renderer.bounds.size.y/height;
@@ -37,6 +47,19 @@ public class StartUp : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+
+		if (Input.GetMouseButtonDown (0)) {
+			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			pos.z = 0;
+			Instantiate(Wall, pos, Wall.transform.rotation);
+		}
+		if (Input.GetMouseButtonDown (1)) {
+			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			pos.z = 0;
+			GameObject a = Instantiate(Agent, pos, Wall.transform.rotation) as GameObject;
+			grid.add(a);
+		}
 	}
+
+
 }

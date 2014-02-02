@@ -4,7 +4,7 @@ using System.Collections;
 public class Player : Agent {
 
 	private const float turnStep = 5.0f;
-	private const float moveStep = 10.0f;//0.15f;
+	private const float moveStep = 10.0f;
 
 	private int numFeelers = 3;
 	private Vector2[] feelers;
@@ -18,9 +18,9 @@ public class Player : Agent {
 	public Texture feelerTex;
 
 	// Use this for initialization
-	void Start () {
+	new void Start () {
 		base.Start();
-		feelerLength = (int)(GetComponent<CircleCollider2D>().radius*3);
+		feelerLength = (int)(radius*3);
 	}
 	
 	// Update is called once per frame
@@ -62,6 +62,9 @@ public class Player : Agent {
 		//displayFeelers(feelers);
 
 		Move();
+		ArrayList near = background.grid.getNear (gameObject, feelerLength+radius);
+		for (int i = 0; i < near.Count; ++i)
+			print (near [i]);
 	}
 
 	void OnGUI(){
@@ -74,14 +77,14 @@ public class Player : Agent {
 			Vector2 pivot = (Vector2)Camera.main.WorldToScreenPoint(center);
 			
 			float spaceBetween = viewAngle/(feelers.Length+1);
-			Vector2 radius = new Vector2(GetComponent<CircleCollider2D>().radius, 0);
-			radius = (Camera.main.WorldToScreenPoint(radius) - Camera.main.WorldToScreenPoint(Vector2.zero));
+			Vector2 radiusV = new Vector2(radius, 0);
+			radiusV = (Camera.main.WorldToScreenPoint(radiusV) - Camera.main.WorldToScreenPoint(Vector2.zero));
 			
 			Vector2 width = new Vector2(feelerWidth, 0);
 			width = (Camera.main.WorldToScreenPoint(width) - Camera.main.WorldToScreenPoint(Vector2.zero));
 			
 			for (int currentFeeler = 0; currentFeeler < feelers.Length; ++currentFeeler) {
-				//int currentFeeler = 1; {	
+
 				int angle = (int) (heading - viewAngle/2 + spaceBetween*(currentFeeler+1));
 				angle = (angle + 360) % 360;
 				
@@ -89,12 +92,16 @@ public class Player : Agent {
 				feelerVec = (Camera.main.WorldToScreenPoint(feelerVec) - Camera.main.WorldToScreenPoint(Vector2.zero));
 				
 				GUIUtility.RotateAroundPivot(-angle+180, pivot);
-				//GUI.Box(new Rect(pivot.x-width.x/2, pivot.y+radius.x, width.x, feelerVec.x), "");//feelers[i].magnitude
-				GUI.DrawTexture(new Rect(pivot.x-width.x/2, pivot.y+radius.x, width.x, feelerVec.x), feelerTex, ScaleMode.StretchToFill);//feelers[i].magnitude
+
+				GUI.DrawTexture(new Rect(pivot.x-width.x/2, pivot.y+radiusV.x, width.x, feelerVec.x), feelerTex, ScaleMode.StretchToFill);//feelers[i].magnitude
 				GUIUtility.RotateAroundPivot(+angle-180, pivot);
 				
 			}
 		}
+
+		//TODO draw circle for nearest agents
+
+		//TODO draw pie slices
 	}
 
 }
