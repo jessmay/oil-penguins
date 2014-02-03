@@ -57,7 +57,7 @@ public class Background : MonoBehaviour {
 			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			pos.z = 0;
 			GameObject a = Instantiate(Agent, pos, Wall.transform.rotation) as GameObject;
-			grid.add(a);
+			grid.add(a.GetComponent<Agent>());
 		}
 	}
 

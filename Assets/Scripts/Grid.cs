@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Grid {
 
@@ -10,17 +11,22 @@ public class Grid {
 	private float xSize;
 	private float ySize;
 
-	ArrayList[,] grid;
+	private float maxAgentRadius;
+
+	List<Agent>[,] grid;
 
 	public Grid(int w, int h, Bounds b){
 		width = w;
 		height = h;
 		bounds = b;
 
-		grid = new ArrayList[height,width];
+
+		maxAgentRadius = 0;
+
+		grid = new List<Agent>[height,width];
 		for (int i = 0; i < height; i++) {
 			for(int j = 0; j < height; j++){
-				grid[i,j] = new ArrayList();
+				grid[i,j] = new List<Agent>();
 			}
 		}
 
@@ -38,30 +44,35 @@ public class Grid {
 	}
 
 
-	public void add(GameObject a, Vector2 to){
+	public void add(Agent a, Vector2 to){
+		maxAgentRadius = Mathf.Max(maxAgentRadius, a.getRadius());
+
 		grid [(int)to.y,(int)to.x].Add (a);
 	}
 
-	public void add (GameObject a) {
+	public void add (Agent a) {
 		add (a, getCellIndex (a.renderer.bounds.center));
 	}
 
-	public void remove (GameObject a, Vector2 from) {
+	public void remove (Agent a, Vector2 from) {
 		grid [(int)from.y, (int)from.x].Remove (a);
 	}
 
-	public void remove (GameObject a) {
+	public void remove (Agent a) {
 		remove (a, getCellIndex (a.renderer.bounds.center));
 	}
 
-	public void move (GameObject a, Vector2 from, Vector2 to) {
+	public void move (Agent a, Vector2 from, Vector2 to) {
 		remove (a, from);
 		add (a, to);
 	}
 
-	//TODO fix range
-	public ArrayList getNear (GameObject a, float radius) {
-		ArrayList near = new ArrayList ();
+	public List<Agent> getNear (Agent a, float radius) {
+		List<Agent> near = new List<Agent> ();
+
+		float myRadius = a.getRadius();
+		radius += myRadius + maxAgentRadius;
+
 		Vector2 lower = getCellIndex (a.renderer.bounds.center - new Vector3 (radius, radius, 0));
 		Vector2 upper = getCellIndex (a.renderer.bounds.center + new Vector3 (radius, radius, 0));
 
@@ -69,12 +80,12 @@ public class Grid {
 			for (int j = (int)lower.x; j <= (int)upper.x; ++j) {
 				for (int k = 0; k < grid[i,j].Count; ++k) {
 
-					GameObject b = grid[i,j][k] as GameObject;
+					Agent b = grid[i,j][k];
 					if (b.Equals(a)) continue;
 
 					float dist = Vector3.Distance(a.renderer.bounds.center, b.renderer.bounds.center);
 
-					if(dist <= radius ) {
+					if(dist <= radius) {
 						near.Add(b);
 					}
 				}

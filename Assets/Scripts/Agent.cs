@@ -33,7 +33,7 @@ public class Agent : MonoBehaviour {
 
 		cellIndex = background.grid.getCellIndex(renderer.bounds.center);
 		if (cellIndex != prevCell) {
-			background.grid.move(gameObject, prevCell, cellIndex);
+			background.grid.move(this, prevCell, cellIndex);
 		}
 	}
 
@@ -73,5 +73,9 @@ public class Agent : MonoBehaviour {
 
 	public Vector2 getCellIndex () {
 		return cellIndex;
+	}
+
+	public float getRadius () {
+		return radius;
 	}
 }
