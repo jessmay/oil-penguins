@@ -71,10 +71,10 @@ public class Grid {
 		List<Agent> near = new List<Agent> ();
 
 		float myRadius = a.getRadius();
-		radius += myRadius + maxAgentRadius;
+		radius += myRadius;
 
-		Vector2 lower = getCellIndex (a.renderer.bounds.center - new Vector3 (radius, radius, 0));
-		Vector2 upper = getCellIndex (a.renderer.bounds.center + new Vector3 (radius, radius, 0));
+		Vector2 lower = getCellIndex (a.renderer.bounds.center - new Vector3 (radius+ maxAgentRadius, radius+ maxAgentRadius, 0));
+		Vector2 upper = getCellIndex (a.renderer.bounds.center + new Vector3 (radius+ maxAgentRadius, radius+ maxAgentRadius, 0));
 
 		for (int i = (int)lower.y; i <= (int)upper.y; ++i) {
 			for (int j = (int)lower.x; j <= (int)upper.x; ++j) {
@@ -83,9 +83,10 @@ public class Grid {
 					Agent b = grid[i,j][k];
 					if (b.Equals(a)) continue;
 
+					float theirRadius = b.getRadius();
 					float dist = Vector3.Distance(a.renderer.bounds.center, b.renderer.bounds.center);
 
-					if(dist <= radius) {
+					if(dist <= radius + theirRadius) {
 						near.Add(b);
 					}
 				}

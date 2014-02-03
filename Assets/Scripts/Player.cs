@@ -108,6 +108,7 @@ public class Player : Agent {
 		}
 		
 		//TODO draw circle for nearest agents
+		//Draw lable for each agent within the circle
 		
 		//TODO draw pie slices
 		if(dispSlices) {
@@ -133,14 +134,14 @@ public class Player : Agent {
 
 				drawBox (pivot.x-width.x/2, pivot.y+radiusV.x, width.x, length.x, -angle+180, pivot);
 			}
-			
+			//Draw lable for each agent within a pie slice
 		}
 	}
 
 	void drawBox(float x, float y, float width, float height, float angle, Vector2 pivot){
+
 		GUIUtility.RotateAroundPivot(angle, pivot);
-		
-		GUI.DrawTexture(new Rect(x, y, width, height), feelerTex, ScaleMode.StretchToFill);//feelers[i].magnitude
+		GUI.DrawTexture(new Rect(x, y, width, height), feelerTex, ScaleMode.StretchToFill);
 		GUIUtility.RotateAroundPivot(-angle, pivot);
 	}
 
