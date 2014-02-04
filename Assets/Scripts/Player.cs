@@ -176,16 +176,13 @@ public class Player : Agent {
 					agentAngle = 360-agentAngle;
 				}
 
-				print (agentAngle);
 				int j;
 				for(j = 0; j < numSlices; j++){
 					if((agentAngle < angles[(j+1)%numSlices] && agentAngle >= angles[j])){
-						print ("Agent found at " + (j+1));
 						break;
 					}
 				}
 				if(agentAngle >= angles[numSlices-1] || agentAngle < angles[0]){
-					print ("Agent found at " + (numSlices));
 					j = numSlices-1;
 				}
 
