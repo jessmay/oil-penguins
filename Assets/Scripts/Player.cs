@@ -154,13 +154,29 @@ public class Player : Agent {
 			Vector2 length = new Vector2(adjRadius, 0);
 			length = (Camera.main.WorldToScreenPoint(length) - Camera.main.WorldToScreenPoint(Vector2.zero));
 
+			int[] angles = new int[numSlices];
 			for(int currSlice = 0; currSlice < numSlices; currSlice++){
-				int angle = (int) ((heading-spaceBetween/2)+(currSlice*spaceBetween));
+				int angle = (int) ((heading-spaceBetween/2)+((currSlice-1)*spaceBetween));
+				angles[currSlice] = (spaceBetween/2)+(currSlice*spaceBetween);
 				angle = (angle+360)%360;
 
 				drawBox (pivot.x-width.x/2, pivot.y+radiusV.x, width.x, length.x, -angle+180, pivot);
 			}
-			//Draw lable for each agent within a pie slice
+
+			//TODO Draw lable for each agent within a pie slice
+			/*for(int i = 0; i < agents.size; i++){// need the list of all adjacent agents
+				Vector2 playerToAgent = new Vector2(agent[i]-center);
+
+				//get angle between center and playerToAgent, this code is somewhere
+				int agentAngle = ;
+
+				for(int j = 0; j < numSlices; j++){
+					if(agentAngle < angles[(j+1)%numSlices] && agentAngle >= angles[j]){
+						GUI.Label(new Rectangle(), j+1);
+					}
+				}	
+			}
+			*/
 		}
 	}
 
