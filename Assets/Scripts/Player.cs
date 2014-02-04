@@ -83,12 +83,8 @@ public class Player : Agent {
 
 		feelers = getLengthOfFeelers(feelerLength, numFeelers, viewAngle);
 
-		//displayFeelers(feelers);
-
 		Move();
 		near = background.grid.getNear (this, adjRadius);
-		for (int i = 0; i < near.Count; ++i)
-			print (near [i]);
 	}
 
 	void OnGUI(){
@@ -157,26 +153,45 @@ public class Player : Agent {
 			int[] angles = new int[numSlices];
 			for(int currSlice = 0; currSlice < numSlices; currSlice++){
 				int angle = (int) ((heading-spaceBetween/2)+((currSlice-1)*spaceBetween));
-				angles[currSlice] = (spaceBetween/2)+(currSlice*spaceBetween);
+				angles[currSlice] = (int)((spaceBetween/2)+(currSlice*spaceBetween));
 				angle = (angle+360)%360;
 
 				drawBox (pivot.x-width.x/2, pivot.y+radiusV.x, width.x, length.x, -angle+180, pivot);
 			}
 
+			int labelWidth = 20;
 			//TODO Draw lable for each agent within a pie slice
-			/*for(int i = 0; i < agents.size; i++){// need the list of all adjacent agents
-				Vector2 playerToAgent = new Vector2(agent[i]-center);
+			for(int i = 0; i < near.Count; i++){// need the list of all adjacent agents
+				Vector3 currAgent = new Vector3(near[i].renderer.bounds.center.x, near[i].renderer.bounds.center.y);
+				currAgent.Scale(new Vector3(1, -1, 1));
+				Vector2 pivotAgent = (Vector2)Camera.main.WorldToScreenPoint(currAgent);
+
+				Vector2 playerToAgent = near[i].renderer.bounds.center-renderer.bounds.center;
+				Vector2 headingVec = new Vector2(-Mathf.Sin(Mathf.Deg2Rad*heading), Mathf.Cos(Mathf.Deg2Rad*heading));
 
 				//get angle between center and playerToAgent, this code is somewhere
-				int agentAngle = ;
+				float agentAngle = Mathf.Acos(Vector2.Dot(headingVec.normalized, playerToAgent.normalized));
+				agentAngle*=Mathf.Rad2Deg;
+				if(Vector3.Cross(headingVec, playerToAgent).z > 0){
+					agentAngle = 360-agentAngle;
+				}
 
-				for(int j = 0; j < numSlices; j++){
-					if(agentAngle < angles[(j+1)%numSlices] && agentAngle >= angles[j]){
-						GUI.Label(new Rectangle(), j+1);
+				print (agentAngle);
+				int j;
+				for(j = 0; j < numSlices; j++){
+					if((agentAngle < angles[(j+1)%numSlices] && agentAngle >= angles[j])){
+						print ("Agent found at " + (j+1));
+						break;
 					}
-				}	
+				}
+				if(agentAngle >= angles[numSlices-1] || agentAngle < angles[0]){
+					print ("Agent found at " + (numSlices));
+					j = numSlices-1;
+				}
+
+				GUI.Label(new Rect(pivotAgent.x-4-(labelWidth/2), pivotAgent.y-(labelWidth/2), labelWidth, labelWidth), (j+1).ToString());
 			}
-			*/
+
 		}
 	}
 
