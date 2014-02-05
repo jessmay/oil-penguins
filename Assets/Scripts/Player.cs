@@ -23,7 +23,6 @@ public class Player : Agent {
 	private bool dispSlices = false;
 	private int pieAngle = 360;
 
-
 	private float lineWidth = .5f;
 
 	public Texture lineTexture;
@@ -129,10 +128,10 @@ public class Player : Agent {
 
 			GUI.DrawTexture(new Rect(pivot.x-width.x/2, pivot.y-width.x/2, width.x, width.x), circle, ScaleMode.ScaleToFit);
 
-			//Draw lable for each agent within the circle
+			//TODO Draw lable for each agent within the circle
 		}
 		
-		//TODO draw pie slices
+		//draw pie slices
 		if(dispSlices) {
 			
 			Vector3 center = new Vector3(renderer.bounds.center.x, renderer.bounds.center.y);
@@ -160,7 +159,7 @@ public class Player : Agent {
 			}
 
 			int labelWidth = 50;
-			//TODO Draw lable for each agent within a pie slice
+			//Draw lable for each agent within a pie slice
 			for(int i = 0; i < near.Count; i++){// need the list of all adjacent agents
 				Vector3 currAgent = new Vector3(near[i].renderer.bounds.center.x, near[i].renderer.bounds.center.y);
 				currAgent.Scale(new Vector3(1, -1, 1));
