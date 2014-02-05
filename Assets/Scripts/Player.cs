@@ -159,7 +159,7 @@ public class Player : Agent {
 				drawBox (pivot.x-width.x/2, pivot.y+radiusV.x, width.x, length.x, -angle+180, pivot);
 			}
 
-			int labelWidth = 20;
+			int labelWidth = 50;
 			//TODO Draw lable for each agent within a pie slice
 			for(int i = 0; i < near.Count; i++){// need the list of all adjacent agents
 				Vector3 currAgent = new Vector3(near[i].renderer.bounds.center.x, near[i].renderer.bounds.center.y);
@@ -186,7 +186,10 @@ public class Player : Agent {
 					j = numSlices-1;
 				}
 
-				GUI.Label(new Rect(pivotAgent.x-4-(labelWidth/2), pivotAgent.y-(labelWidth/2), labelWidth, labelWidth), (j+1).ToString());
+				GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
+				centeredStyle.alignment = TextAnchor.MiddleCenter;
+				GUI.Label(new Rect(pivotAgent.x-(labelWidth/2), pivotAgent.y-(labelWidth/2), labelWidth, labelWidth), (j+1).ToString(), centeredStyle);
+
 			}
 
 		}
