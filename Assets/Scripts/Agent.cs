@@ -19,11 +19,6 @@ public class Agent : MonoBehaviour {
 		radius = GetComponent<CircleCollider2D> ().radius;
 		cellIndex = Vector2.zero;
 	}
-	
-	// Update is called once per frame
-	void Update() {
-
-	}
 
 	protected void Move() {
 		Vector2 prevCell = cellIndex;
