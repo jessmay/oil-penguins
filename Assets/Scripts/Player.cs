@@ -9,18 +9,18 @@ public class Player : Agent {
 
 	private int viewAngle = 180;
 
+	private bool dispFeelers = false;
 	private int numFeelers = 3;
 	private Vector2[] feelers;
 	private int feelerLength;
-	private bool dispFeelers = false;
 
 	private bool dispAdjAgent = false;
 	private int adjRadius;
 	public Texture circle;
 	private Texture adjCircle;
 
-	private int numSlices = 4;
 	private bool dispSlices = false;
+	private int numSlices = 4;
 	private int pieAngle = 360;
 
 	private float lineWidth = .5f;
@@ -40,12 +40,12 @@ public class Player : Agent {
 	void Update () {
 
 		//display feelers
-		if (Input.GetKeyDown(KeyCode.F)) {
+		if (Input.GetKeyDown(KeyCode.Z)) {
 			dispFeelers = !dispFeelers;
 		}
 
 		//display pie slices
-		if(Input.GetKeyDown(KeyCode.P)){
+		if(Input.GetKeyDown(KeyCode.X)){
 			dispSlices = !dispSlices;
 		}
 
@@ -80,120 +80,131 @@ public class Player : Agent {
 			velocity = temp * (float)-moveStep;
 		}
 
+		//Move player based off velocity and heading
+		Move();
+
+		//Get length of feelers
 		feelers = getLengthOfFeelers(feelerLength, numFeelers, viewAngle);
 
-		Move();
+		//Get list of nearest agents
 		near = background.grid.getNear (this, adjRadius);
 	}
 
 	void OnGUI(){
 
-		//Draw feelers
-		if (dispFeelers) {
-			
+		if(dispFeelers || dispAdjAgent || dispSlices){
+
+			//Center of player object in local world space
 			Vector3 center = new Vector3(renderer.bounds.center.x, renderer.bounds.center.y);
 			center.Scale(new Vector3(1, -1, 1));
-			
-			Vector2 pivot = (Vector2)Camera.main.WorldToScreenPoint(center);
-			
-			float spaceBetween = viewAngle/(feelers.Length+1);
-			Vector2 radiusV = new Vector2(radius, 0);
-			radiusV = (Camera.main.WorldToScreenPoint(radiusV) - Camera.main.WorldToScreenPoint(Vector2.zero));
-			
-			Vector2 width = new Vector2(lineWidth, 0);
-			width = (Camera.main.WorldToScreenPoint(width) - Camera.main.WorldToScreenPoint(Vector2.zero));
-			
-			for (int currentFeeler = 0; currentFeeler < feelers.Length; ++currentFeeler) {
 
-				int angle = (int) (heading - viewAngle/2 + spaceBetween*(currentFeeler+1));
-				angle = (angle + 360) % 360;
-				
-				Vector2 feelerVec = new Vector2(feelers[currentFeeler].magnitude, 0);
-				feelerVec = (Camera.main.WorldToScreenPoint(feelerVec) - Camera.main.WorldToScreenPoint(Vector2.zero));
-
-				drawBox (pivot.x-width.x/2, pivot.y+radiusV.x, width.x, feelerVec.x, -angle+180, pivot);
-			}
-		}
-		
-		//Draw circle for nearest agents
-		if (dispAdjAgent) {
-
-			Vector3 center = new Vector3(renderer.bounds.center.x, renderer.bounds.center.y);
-			center.Scale(new Vector3(1, -1, 1));
-			
+			//Player's center in camera space
 			Vector2 pivot = (Vector2)Camera.main.WorldToScreenPoint(center);
 
-			Vector2 width = new Vector2((adjRadius + radius)*2, 0);
-			width = (Camera.main.WorldToScreenPoint(width) - Camera.main.WorldToScreenPoint(Vector2.zero));
-
-			GUI.DrawTexture(new Rect(pivot.x-width.x/2, pivot.y-width.x/2, width.x, width.x), circle, ScaleMode.ScaleToFit);
-
-			//TODO Draw lable for each agent within the circle
-		}
-		
-		//draw pie slices
-		if(dispSlices) {
+			//Radius length in camera space
+			float radiusV = (Camera.main.WorldToScreenPoint(new Vector2(radius, 0)) - Camera.main.WorldToScreenPoint(Vector2.zero)).x;
 			
-			Vector3 center = new Vector3(renderer.bounds.center.x, renderer.bounds.center.y);
-			center.Scale(new Vector3(1, -1, 1));
-			
-			Vector2 pivot = (Vector2)Camera.main.WorldToScreenPoint(center);
-			
-			float spaceBetween = pieAngle/numSlices;
-			Vector2 radiusV = new Vector2(radius, 0);
-			radiusV = (Camera.main.WorldToScreenPoint(radiusV) - Camera.main.WorldToScreenPoint(Vector2.zero));
-			
+			//line width length in camera space
 			Vector2 width = new Vector2(lineWidth, 0);
 			width = (Camera.main.WorldToScreenPoint(width) - Camera.main.WorldToScreenPoint(Vector2.zero));
 
+			//Size of the adjacent agent sensor in camera space
 			Vector2 length = new Vector2(adjRadius, 0);
 			length = (Camera.main.WorldToScreenPoint(length) - Camera.main.WorldToScreenPoint(Vector2.zero));
+			
+			//Draw feelers
+			if (dispFeelers) {
+				
+				float spaceBetween = viewAngle/(feelers.Length+1);
+				for (int currentFeeler = 0; currentFeeler < feelers.Length; ++currentFeeler) {
 
-			int[] angles = new int[numSlices];
-			for(int currSlice = 0; currSlice < numSlices; currSlice++){
-				int angle = (int) ((heading-spaceBetween/2)+((currSlice-1)*spaceBetween));
-				angles[currSlice] = (int)((spaceBetween/2)+(currSlice*spaceBetween));
-				angle = (angle+360)%360;
+					int angle = (int) (heading - viewAngle/2 + spaceBetween*(currentFeeler+1));
+					angle = (angle + 360) % 360;
+					
+					Vector2 feelerVec = new Vector2(feelers[currentFeeler].magnitude, 0);
+					feelerVec = (Camera.main.WorldToScreenPoint(feelerVec) - Camera.main.WorldToScreenPoint(Vector2.zero));
 
-				drawBox (pivot.x-width.x/2, pivot.y+radiusV.x, width.x, length.x, -angle+180, pivot);
+					drawBox (pivot.x-width.x/2, pivot.y+radiusV, width.x, feelerVec.x, -angle+180, pivot);
+				}
 			}
 
-			int labelWidth = 50;
-			//Draw lable for each agent within a pie slice
-			for(int i = 0; i < near.Count; i++){// need the list of all adjacent agents
-				Vector3 currAgent = new Vector3(near[i].renderer.bounds.center.x, near[i].renderer.bounds.center.y);
-				currAgent.Scale(new Vector3(1, -1, 1));
-				Vector2 pivotAgent = (Vector2)Camera.main.WorldToScreenPoint(currAgent);
+			if(dispAdjAgent || dispSlices) {
 
-				Vector2 playerToAgent = near[i].renderer.bounds.center-renderer.bounds.center;
-				Vector2 headingVec = new Vector2(-Mathf.Sin(Mathf.Deg2Rad*heading), Mathf.Cos(Mathf.Deg2Rad*heading));
+				//Draw circle for nearest agents
+				if (dispAdjAgent) {
 
-				//get angle between center and playerToAgent, this code is somewhere
-				float agentAngle = Mathf.Acos(Vector2.Dot(headingVec.normalized, playerToAgent.normalized));
-				agentAngle*=Mathf.Rad2Deg;
-				if(Vector3.Cross(headingVec, playerToAgent).z > 0){
-					agentAngle = 360-agentAngle;
+					float circleSize = 2*(width.x + length.x + radiusV);
+					GUI.DrawTexture(new Rect(pivot.x-circleSize/2, pivot.y-circleSize/2, circleSize, circleSize), circle, ScaleMode.ScaleToFit);
 				}
+				
+				int[] angles = new int[numSlices+1];
+				//Draw pie slices
+				if(dispSlices) {
+					
+					float spaceBetween = pieAngle/numSlices;
 
-				int j;
-				for(j = 0; j < numSlices; j++){
-					if((agentAngle < angles[(j+1)%numSlices] && agentAngle >= angles[j])){
-						break;
+					for(int currSlice = 0; currSlice < numSlices; currSlice++){
+						int angle = (int) ((heading-spaceBetween/2)+((currSlice-1)*spaceBetween));
+						angles[currSlice] = (int)((spaceBetween/2)+(currSlice*spaceBetween));
+						angle = (angle+360)%360;
+
+						drawBox (pivot.x-width.x/2, pivot.y+radiusV, width.x, length.x, -angle+180, pivot);
 					}
-				}
-				if(agentAngle >= angles[numSlices-1] || agentAngle < angles[0]){
-					j = numSlices-1;
+
+					angles[numSlices] = 360;
 				}
 
-				GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
-				centeredStyle.alignment = TextAnchor.MiddleCenter;
-				GUI.Label(new Rect(pivotAgent.x-(labelWidth/2), pivotAgent.y-(labelWidth/2), labelWidth, labelWidth), (j+1).ToString(), centeredStyle);
+				//Draw lable for each agent within a pie slice or circle
+				for(int i = 0; i < near.Count; i++){
 
+					string lableText = null;
+					
+					if (dispAdjAgent) 
+						lableText = "Within";
+
+
+					Vector3 currAgent = new Vector3(near[i].renderer.bounds.center.x, near[i].renderer.bounds.center.y);
+					currAgent.Scale(new Vector3(1, -1, 1));
+					Vector2 pivotAgent = (Vector2)Camera.main.WorldToScreenPoint(currAgent);
+
+					if(dispSlices) {
+
+						Vector2 playerToAgent = near[i].renderer.bounds.center-renderer.bounds.center;
+						Vector2 headingVec = new Vector2(-Mathf.Sin(Mathf.Deg2Rad*heading), Mathf.Cos(Mathf.Deg2Rad*heading));
+
+						//get angle between heading and playerToAgent
+						float agentAngle = Mathf.Acos(Vector2.Dot(headingVec.normalized, playerToAgent.normalized));
+						agentAngle*=Mathf.Rad2Deg;
+						if(Vector3.Cross(headingVec, playerToAgent).z > 0){
+							agentAngle = 360-agentAngle;
+						}
+
+						int j;
+
+						for(j = 0; j < numSlices; j++){
+							if((agentAngle < angles[(j+1)%numSlices] && agentAngle >= angles[j])){
+								break;
+							}
+						}
+						if(agentAngle >= angles[numSlices-1] || agentAngle < angles[0]){
+							j = numSlices-1;
+						}
+
+						j = numSlices - j;
+
+						lableText += (lableText == null?"":"\n") + (j).ToString();
+					}
+					
+					GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
+					centeredStyle.alignment = TextAnchor.MiddleCenter;
+					int labelSize = 50;
+					GUI.Label(new Rect(pivotAgent.x-(labelSize/2), pivotAgent.y-(labelSize/2), labelSize, labelSize), lableText, centeredStyle);
+				}
 			}
-
 		}
 	}
 
+	//Draw a box
 	void drawBox(float x, float y, float width, float height, float angle, Vector2 pivot){
 
 		GUIUtility.RotateAroundPivot(angle, pivot);

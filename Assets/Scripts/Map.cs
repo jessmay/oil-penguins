@@ -86,12 +86,16 @@ public class Map {
 		return worldPoint;
 	}
 
-	//Add a wall at the given world coordinate
+	//Add a wall at the given world coordinate.
+	//Returns true if the wall was added.
+	//Returns false if location is out of bounds or a wall has already been placed.
 	public bool addWall(Vector3 coord) {
 		return addWall(getCellIndex(coord));
 	}
 
-	//Add a wall at the given cell index
+	//Add a wall at the given cell index.
+	//Returns true if the wall was added.
+	//Returns false if location is out of bounds or a wall has already been placed.
 	public bool addWall(Vector2 coord) {
 
 		//Location out of bounds or already has a wall placed.
@@ -102,19 +106,23 @@ public class Map {
 		return true;
 	}
 
-	//place a wall at the given cell index
+	//Create and place a wall at the given cell index
 	private void placeWall(Vector2 coord) {
 		Vector3 placeLocation = cellIndexToWorld(coord);
 		GameObject w = GameObject.Instantiate (wall, placeLocation, wall.transform.rotation) as GameObject;
 		board[(int)coord.y,(int)coord.x] = w;
 	}
 
-	//Remove a wall at the given world coordinate
+	//Remove a wall at the given world coordinate.
+	//Returns true if the wall was removed.
+	//Returns false if the location is out of bonds or there is no wall at the location.
 	public bool removeWall(Vector3 coord) {
 		return removeWall(getCellIndex(coord));
 	}
 
 	//Remove a wall at the given cell index
+	//Returns true if the wall was removed.
+	//Returns false if the location is out of bonds or there is no wall at the location.
 	public bool removeWall(Vector2 coord) {
 
 		//Location out of bounds or does not contain a wall
