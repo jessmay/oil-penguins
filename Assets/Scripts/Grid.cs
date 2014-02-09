@@ -1,4 +1,10 @@
-﻿using UnityEngine;
+﻿/*
+Jessica May
+Joshua Linge
+Grid.cs
+ */
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 

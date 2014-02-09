@@ -1,3 +1,9 @@
+/*
+Jessica May
+Joshua Linge
+Agent.cs
+ */
+
 using UnityEngine;
 using System.Collections;
 

@@ -1,4 +1,10 @@
-﻿using UnityEngine;
+﻿/*
+Jessica May
+Joshua Linge
+Map.cs
+ */
+
+using UnityEngine;
 using System.Collections;
 
 public class Map {
