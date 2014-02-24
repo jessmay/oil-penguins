@@ -10,9 +10,6 @@ using System.Collections.Generic;
 
 public class Player : Agent {
 
-	private const float turnStep = 5.0f;
-	private const float moveStep = 10.0f;
-
 	private int viewAngle = 180;
 
 	private bool dispFeelers = false;
@@ -69,28 +66,22 @@ public class Player : Agent {
 
 		//if turning CCW, increment heading
 		if (Input.GetKey(KeyCode.LeftArrow)) {
-			heading+=turnStep;
-			if(heading >= 360) heading%=360;
-			transform.rotation *= Quaternion.Euler (0,0, turnStep);
+			lookLeft();
 		}
 
 		//If turning CW, decrement heading
 		if (Input.GetKey(KeyCode.RightArrow)) {
-			heading-=turnStep;
-			if(heading < 0) heading = (heading+360)%360;
-			transform.rotation *= Quaternion.Euler (0,0,-turnStep);
+			lookRight();
 		}
 
 		//If moving forward
 		if (Input.GetKey(KeyCode.UpArrow)) {
-			Vector2 temp = new Vector2(transform.up.x, transform.up.y);
-			velocity = temp * (float)moveStep;
+			moveForward();
 		}
 
 		//If moving backward
 		if (Input.GetKey(KeyCode.DownArrow)) {
-			Vector2 temp = new Vector2(transform.up.x, transform.up.y);
-			velocity = temp * (float)-moveStep;
+			moveBackward();
 		}
 
 		//Move player based off velocity and heading

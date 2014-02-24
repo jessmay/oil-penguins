@@ -17,6 +17,11 @@ public class Agent : MonoBehaviour {
 	protected Vector2 cellIndex;
 
 	protected float radius;
+
+	
+	private float turnStep = 5.0f;
+	private float moveStep = 10.0f;
+
 	
 	// Use this for initialization
 	protected void Start() {
@@ -24,6 +29,28 @@ public class Agent : MonoBehaviour {
 		velocity = Vector2.zero;
 		radius = GetComponent<CircleCollider2D> ().radius;
 		cellIndex = Vector2.zero;
+	}
+
+	protected void moveForward() {
+		Vector2 temp = new Vector2(transform.up.x, transform.up.y);
+		velocity = temp * (float)moveStep;
+	}
+
+	protected void moveBackward() {
+		Vector2 temp = new Vector2(transform.up.x, transform.up.y);
+		velocity = temp * (float)-moveStep;
+	}
+	
+	protected void lookRight() {
+		heading-=turnStep;
+		if(heading < 0) heading = (heading+360)%360;
+		transform.rotation *= Quaternion.Euler (0,0,-turnStep);
+	}
+	
+	protected void lookLeft() {
+		heading+=turnStep;
+		if(heading >= 360) heading%=360;
+		transform.rotation *= Quaternion.Euler (0,0, turnStep);
 	}
 
 	protected void Move() {
