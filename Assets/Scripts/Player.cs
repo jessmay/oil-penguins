@@ -15,6 +15,7 @@ public class Player : Agent {
 		base.Start();
 		feelerLength = (int)(radius*3);
 		adjRadius = (int)(radius*3);
+		getPieSliceAngles ();
 	}
 	
 	// Update is called once per frame
@@ -65,12 +66,12 @@ public class Player : Agent {
 
 		//Get length of feelers
 		getLengthOfFeelers(feelerLength, numFeelers, viewAngle);
-		
-		//Get pie slice angles
-		getPieSliceAngles ();
 
 		//Get list of nearest agents
 		near = background.grid.getNear (this, adjRadius);
+
+		//Get agents in pie slice angles
+		findPieSlices ();
 	}
 
 	void OnGUI(){

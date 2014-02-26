@@ -179,65 +179,11 @@ public class Agent : MonoBehaviour {
 		//Draw pie slices
 		if (dispSlices){
 			drawPieSlices(pivot, radiusV, width,length);
-			//TODO draw agent labels
 		}
-		/*int[] numAgentsInSlices = new int[numSlices];
-		
-		//Draw lable for each agent within a pie slice or circle
-		for(int i = 0; i < near.Count; i++){
-			
-			//string lableText = null;
-			
-			if (dispAdjAgent) 
-				lableText = "Within";
-			
-			
-			Vector3 currAgent = new Vector3(near[i].renderer.bounds.center.x, near[i].renderer.bounds.center.y);
-			currAgent.Scale(new Vector3(1, -1, 1));
-			Vector2 pivotAgent = (Vector2)Camera.main.WorldToScreenPoint(currAgent);
-			
-			Vector2 playerToAgent = near[i].renderer.bounds.center-renderer.bounds.center;
-			Vector2 headingVec = new Vector2(-Mathf.Sin(Mathf.Deg2Rad*heading), Mathf.Cos(Mathf.Deg2Rad*heading));
-			
-			//get angle between heading and playerToAgent
-			float agentAngle = Mathf.Acos(Vector2.Dot(headingVec.normalized, playerToAgent.normalized));
-			agentAngle*=Mathf.Rad2Deg;
-			if(Vector3.Cross(headingVec, playerToAgent).z > 0){
-				agentAngle = 360-agentAngle;
-			}
-			
-			int j;
-			
-			for(j = 0; j < numSlices; j++){
-				if((agentAngle < sliceAngles[(j+1)%numSlices] && agentAngle >= sliceAngles[j])){
-					break;
-				}
-			}
-			if(agentAngle >= sliceAngles[numSlices-1] || agentAngle < sliceAngles[0]){
-				j = numSlices-1;
-			}
-			
-			j = numSlices - j;
-			
-			++numAgentsInSlices[j-1];
-			
-			if(dispSlices) 
-				lableText += (lableText == null?"":"\n") + (j).ToString();
-			
-			agentSensors += "Agent at location ("+near[i].renderer.bounds.center.x +", "+ near[i].renderer.bounds.center.y+"):\n  "
-				+playerToAgent.magnitude +" units away from player\n  " 
-					+(360-agentAngle) +" degrees from heading\n  "
-					+"In pie slice " +j +"\n\n"; 
-			
-			//Draw labels for pie slices and adjacent agent sensors.
-			if(dispAdjAgent || dispSlices) {				
-				GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
-				centeredStyle.alignment = TextAnchor.MiddleCenter;
-				GUI.color = Color.white;
-				int labelSize = 50;
-				GUI.Label(new Rect(pivotAgent.x-(labelSize/2), pivotAgent.y-(labelSize/2), labelSize, labelSize), lableText, centeredStyle);
-			}
-		}*/
+
+		if (dispSlices || dispAdjAgent) {
+			drawAgentLabels();
+		}
 		
 		/*string sliceText = "";
 		for(int k = 0; k < numSlices; k++) {
@@ -253,7 +199,36 @@ public class Agent : MonoBehaviour {
 			GUI.Label(new Rect(0, 0, 300, 800), debugText);
 		}*/
 	}
-	
+
+	//Draw agent labels
+	protected void drawAgentLabels(){
+		for (int i = 0; i < numSlices; i++) {
+
+			for(int j = 0; j < slicesOfAgents[i].Count; j++){
+
+				string lableText = null;
+				
+				if (dispAdjAgent) 
+					lableText = "Within";
+
+				Vector3 currAgent = new Vector3(slicesOfAgents[i][j].renderer.bounds.center.x, slicesOfAgents[i][j].renderer.bounds.center.y);
+				currAgent.Scale(new Vector3(1, -1, 1));
+				Vector2 pivotAgent = (Vector2)Camera.main.WorldToScreenPoint(currAgent);
+
+				if(dispSlices) 
+					lableText += (lableText == null?"":"\n") + (i+1).ToString();
+
+							
+				GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
+				centeredStyle.alignment = TextAnchor.MiddleCenter;
+				GUI.color = Color.white;
+				int labelSize = 50;
+				GUI.Label(new Rect(pivotAgent.x-(labelSize/2), pivotAgent.y-(labelSize/2), labelSize, labelSize), lableText, centeredStyle);
+			}
+
+		}
+	}
+
 	//Draws the agents feelers given the number of feelers
 	protected void drawFeelers(Vector2 pivot, float radiusV, Vector2 width){
 		float spaceBetween = viewAngle/(feelers.Length+1);
