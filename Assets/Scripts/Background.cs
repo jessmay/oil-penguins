@@ -23,7 +23,7 @@ public class Background : MonoBehaviour {
 	public Map map;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 
 		grid = new Grid (gridWidth, gridHeight, renderer.bounds);
 		map = new Map(Wall,mapWidth, mapHeight, renderer.bounds);
@@ -48,7 +48,11 @@ public class Background : MonoBehaviour {
 			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			pos.z = 0;
 			GameObject a = Instantiate(Agent, pos, Wall.transform.rotation) as GameObject;
-			grid.add(a.GetComponent<Agent>());
+
+			Agent agentScript = a.GetComponent<Agent>();
+			agentScript.background = this;
+
+			grid.add(agentScript);
 		}
 	}
 
