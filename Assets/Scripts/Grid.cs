@@ -100,6 +100,8 @@ public class Grid {
 		add (a, to);
 	}
 
+	// This gets the adjacent agents within a given radius of Agent A
+	// If looking for adjacent node sensor, it will be in Map.cs
 	public List<Agent> getNear (Agent a, float radius) {
 		List<Agent> near = new List<Agent> ();
 

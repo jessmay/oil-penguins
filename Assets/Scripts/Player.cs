@@ -61,8 +61,70 @@ public class Player : Agent {
 			moveBackward();
 		}
 
-		//Move player based off velocity and heading
-		Move();
+		//Assignment 2
+		// If the source node or target node change, the aStar path needs to be updated
+		bool sourceChange = false;
+		bool targetChange = false;
+
+		//Assignment 2
+		//Designate source location; shift + left click
+		if (Input.GetKey (KeyCode.LeftShift) && Input.GetMouseButtonDown (0)) {
+			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			
+			//if new source location, sets values of source to mouse position
+			if((int)pos.x != source.x || (int)pos.y != source.y){
+				source = pos;
+				sourceCell = background.grid.getCellIndex(source);
+				sourceChange = true;
+			}
+		}
+
+		//Assignment 2
+		//Designate target location; left control+right click
+		if(Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(1)){
+			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			
+			//if new target location, sets values of target to mouse position
+			if((int)pos.x != target.x || (int)pos.y != target.y){
+				target = pos;
+				targetCell = background.grid.getCellIndex(target);
+				targetChange = true;
+			}
+			
+		}
+
+		//Assignment 2
+		//if there has been a change in the findTarget value during this call of update
+		bool findChange = false;
+		//tells the player whether or not to perform A* and seek the target
+		if(Input.GetKeyDown(KeyCode.F1)){
+			findTarget = !findTarget;
+			findChange = true;
+		}
+
+		// Assignment 2
+		// tells the player whether or not to display the source node for debugging purposes
+		if (Input.GetKeyDown (KeyCode.U)) {
+			drawSource = !drawSource;
+		}
+
+		//Assignment 2
+		// tells the player whether or not to display the target node for debugging purposes
+		if (Input.GetKeyDown (KeyCode.I)) {
+            drawTarget = !drawTarget;
+        }
+        
+		//Assignment 2
+		// tells the player whether or not to display the nav graph for debugging purposes
+        if (Input.GetKeyDown (KeyCode.O)) {
+            drawNodes = !drawNodes;
+        }
+        
+		//Assignment 2
+		// tells the player whether or not to display the A* path for debugging purposes
+        if (Input.GetKeyDown (KeyCode.P)) {
+            drawPath = !drawPath;
+        }
 
 		//Get length of feelers
 		getLengthOfFeelers(feelerLength, numFeelers, viewAngle);
@@ -72,10 +134,66 @@ public class Player : Agent {
 
 		//Get agents in pie slice angles
 		findPieSlices ();
-	}
 
-	void OnGUI(){
-		DrawOnGUI ();
-	}
+		//Assignment 2
+		//Get list of close nodes, gets the closest, seeks, and calculates astar path
+		if((findChange || targetChange || sourceChange) && findTarget && source != target){
+			//Gets list of close nodes within one cell of the agent
+			closeNodes = new List<Vector2>();
+			closeNodes = background.map.getNearNodes(this);
 
+			// Gets the closest node from the list of close nodes and sets it as the source node and the currGoal
+			currGoal = new Vector2();
+			currGoal = closestUnobstructed();
+			source = new Vector2();
+			source = background.map.cellIndexToWorld(currGoal);
+
+			//gets aStar path if there is one, otherwise turns target seeking off
+			if(!aStar(source)){
+				findTarget = false;
+			}
+
+			pathIndex = 0;
+		}
+
+		//Assignment 2
+		//Seeks along A* path if findTarget is true
+		if(findTarget){
+
+			//If the player is at the target, no more need to find the target
+			if(background.map.getCellIndex(renderer.bounds.center) == background.map.getCellIndex(target)){
+				pathIndex = 0;
+				findTarget = false;
+			}
+			//Otherwise seek towards the current goal location in the aStar path
+			else {
+
+				//If in the cell index of current goal and not on target, close enough, check next location to seek
+				if (background.map.getCellIndex(renderer.bounds.center) == currGoal && pathIndex < currPath.Count-1)
+	            {
+					pathIndex++;
+					currGoal = new Vector2();
+					currGoal = (Vector2)currPath[pathIndex];
+					seek ();
+					moveForward();
+				}
+				//If not in the cell index of current goal, keep seeking to that current goal
+				else if (background.map.getCellIndex(renderer.bounds.center) != currGoal)
+				{
+					seek();
+					moveForward();
+	            }
+			}
+        }
+
+		//Move player based off velocity and heading
+        Move ();
+    }
+    
+	//Calls the DrawOnGUI() method from the agent class in order to draw debugging output on the screen
+    void OnGUI(){
+        DrawOnGUI ();
+    }
+    
+   
 }

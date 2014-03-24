@@ -18,7 +18,6 @@ public class Background : MonoBehaviour {
 	private int gridWidth = 10;
 	private int gridHeight = 10;
 
-
 	public Grid grid;
 	public Map map;
 
@@ -31,10 +30,11 @@ public class Background : MonoBehaviour {
 	}
 
 	// Update is called once per frame
+	// Main game loop
 	void Update () {
 
 		//Place/remove wall at the given mouse location
-		if (Input.GetMouseButtonDown (0)) {
+		if (!Input.GetKey (KeyCode.LeftShift) && Input.GetMouseButtonDown (0)) {
 			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			pos.z = 0;
 
@@ -44,13 +44,15 @@ public class Background : MonoBehaviour {
 		}
 
 		//Place agent at the given mouse location
-		if (Input.GetMouseButtonDown (1)) {
+		if (!Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown (1)) {
 			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 			pos.z = 0;
 			GameObject a = Instantiate(Agent, pos, Wall.transform.rotation) as GameObject;
+			a.GetComponent<Agent>().background = this;
 			grid.add(a.GetComponent<Agent>());
 		}
-	}
 
+
+	}
 
 }

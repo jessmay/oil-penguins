@@ -6,6 +6,7 @@ Map.cs
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Map {
 
@@ -21,6 +22,7 @@ public class Map {
 	private Vector3 center;
 
 	private GameObject[,] board;
+	public bool[,] canMove;
 
 	public Map(GameObject w, int width, int height, Bounds b) {
 
@@ -45,6 +47,14 @@ public class Map {
 		
 		//Board to hold all walls
 		board = new GameObject[mapHeight,mapWidth];
+
+		//contains whether or not a cell can be moved into based on walls
+		canMove = new bool[mapWidth, mapHeight];
+		for (int i = 0; i < mapWidth; i++) {
+			for(int j = 0; j < mapHeight; j++){
+				canMove[i,j] = true;
+			}
+		}
 		
 		createBorder();
 	}
@@ -117,6 +127,8 @@ public class Map {
 		Vector3 placeLocation = cellIndexToWorld(coord);
 		GameObject w = GameObject.Instantiate (wall, placeLocation, wall.transform.rotation) as GameObject;
 		board[(int)coord.y,(int)coord.x] = w;
+		canMove [(int)coord.x, (int)coord.y] = false;
+        //Debug.Log((int)coord.y + " " + (int)coord.x);
 	}
 
 	//Remove a wall at the given world coordinate.
@@ -139,6 +151,48 @@ public class Map {
 		GameObject.Destroy(w);
 
 		board[(int)coord.y,(int)coord.x] = null;
+		canMove [(int)coord.x, (int)coord.y] = true;
 		return true;
+	}
+
+	public int getMapWidth(){
+		return mapWidth;
+	}
+
+	public int getMapHeight(){
+		return mapHeight;
+	}
+
+
+	// Assignment 2 adjacent node sensor
+	// adjacent node sensor will detect nearby nodes (those nodes within one cell of the given agent)
+	public List<Vector2> getNearNodes(Agent a){
+		List<Vector2> nearNodes = new List<Vector2> ();
+
+		Vector2 myCell = getCellIndex (a.renderer.bounds.center);
+		
+		for (int i = -1; i < 2; i++) {
+			for(int j = -1; j < 2; j++){
+				Vector2 newVec = new Vector2(myCell.x+i, myCell.y+j);
+
+				//if the location is not inbounds, ignore it
+				if(!inBounds(newVec))
+					continue;
+
+				//if the location is moveable to, add it to the nearNodes list
+				if(canMove[(int)newVec.x, (int)newVec.y]){
+
+					//Corner case!
+					if(Mathf.Abs(i) == Mathf.Abs(j) && !canMove[(int)newVec.x,(int)myCell.y] && !canMove[(int)myCell.x,(int)newVec.y]){
+						continue;
+					}
+
+					nearNodes.Add(newVec);
+
+				}
+			}
+		}
+		
+		return nearNodes;
 	}
 }

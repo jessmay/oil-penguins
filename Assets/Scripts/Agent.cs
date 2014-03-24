@@ -48,18 +48,68 @@ public class Agent : MonoBehaviour {
 	private float turnStep = 5.0f;
 	private float moveStep = 10.0f;
 
-	
+	protected Vector2 target;
+	protected Vector2 targetCell;
+	protected Vector2 source;
+	protected Vector2 sourceCell;
+	protected bool findTarget;
+
+	protected List<Vector2> currPath;
+	protected int pathIndex;
+
+	protected bool drawSource;
+	protected bool drawTarget;
+	protected bool drawPath;
+	protected bool drawNodes;
+
+    protected Vector2 currGoal;
+
+	protected List<Vector2> closeNodes;
+	protected Vector2 closestN;
+
 	// Use this for initialization
 	protected void Start() {
 		heading = transform.rotation.z;
 		velocity = Vector2.zero;
 		radius = GetComponent<CircleCollider2D> ().radius;
 		cellIndex = Vector2.zero;
+
+		target = new Vector2 (0, 0);
+		targetCell = new Vector2();
+		source = new Vector2 ();
+		sourceCell = new Vector2(0, 0);
+		findTarget = false;
+
+		drawSource = false;
+		drawTarget = false;
+		drawPath = false;
+		drawNodes = false;
+
+        currGoal = background.map.getCellIndex(renderer.bounds.center);
+	}
+
+	//Assignment 2 Seek
+	//turns agent towards the current goal node
+	protected void seek(){
+
+		//calculate new heading based on current heading and target location
+		Vector2 agentToTarget = (Vector2)background.map.cellIndexToWorld(currGoal)- (Vector2)renderer.bounds.center;
+		Vector2 headingVec = new Vector2(-Mathf.Sin(Mathf.Deg2Rad*heading), Mathf.Cos(Mathf.Deg2Rad*heading));
+
+		//get angle between agent heading and target
+		float targetAngle = Mathf.Acos(Vector2.Dot(headingVec.normalized, agentToTarget.normalized));
+
+		//set new heading
+		if (targetAngle > .5) {
+			turn (Mathf.Rad2Deg*targetAngle);
+		}
 	}
 
 	protected void moveForward() {
+
 		Vector2 temp = new Vector2(transform.up.x, transform.up.y);
 		velocity = temp * (float)moveStep;
+
 	}
 
 	protected void moveBackward() {
@@ -71,6 +121,14 @@ public class Agent : MonoBehaviour {
 		heading-=turnStep;
 		if(heading < 0) heading = (heading+360)%360;
 		transform.rotation *= Quaternion.Euler (0,0,-turnStep);
+	}
+
+	//Assignment 2
+	// Turns the agent to the given angle
+	protected void turn(float angle){
+		heading-=angle;
+		if(heading < 0) heading = (heading+360)%360;
+		transform.rotation *= Quaternion.Euler (0,0,-angle);
 	}
 	
 	protected void lookLeft() {
@@ -86,6 +144,7 @@ public class Agent : MonoBehaviour {
 		velocity = Vector2.zero;
 
 		cellIndex = background.grid.getCellIndex(renderer.bounds.center);
+
 		if (cellIndex != prevCell) {
 			background.grid.move(this, prevCell, cellIndex);
 		}
@@ -143,10 +202,7 @@ public class Agent : MonoBehaviour {
 	}
 
 	protected void DrawOnGUI(){
-		
-		//string debugText = "";
-		//string agentSensors = "";
-		
+
 		//Center of player object in local world space
 		Vector3 center = new Vector3(renderer.bounds.center.x, renderer.bounds.center.y);
 		center.Scale(new Vector3(1, -1, 1));
@@ -170,7 +226,6 @@ public class Agent : MonoBehaviour {
 			drawFeelers (pivot, radiusV, width);
 		}
 		
-		
 		//Draw circle for nearest agents
 		if (dispAdjAgent) {
 			drawAdjAgent(pivot, radiusV, width, length);
@@ -184,23 +239,60 @@ public class Agent : MonoBehaviour {
 		if (dispSlices || dispAdjAgent) {
 			drawAgentLabels();
 		}
-		
-		/*string sliceText = "";
-		for(int k = 0; k < numSlices; k++) {
-			sliceText += "Activation level for slice " + (k+1) +": "+numAgentsInSlices[k] +"\n";
-		}
-		debugText += sliceText +"\n";*/
-		
-		//Draw debug text for the player
-		/*if (debug) {
-			
-			debugText = "Coordinates: " +"("+renderer.bounds.center.x +", "+ renderer.bounds.center.y+")" +"\nHeading: " + heading + ".\n\n" + debugText + agentSensors;
-			GUI.color = Color.black;
-			GUI.Label(new Rect(0, 0, 300, 800), debugText);
-		}*/
-	}
 
-	//Draw agent labels
+		//Assignment 2
+		//Debug code, if drawSource is true, an 'S' will be drawn on the background where the source node is located
+		if (drawSource) {
+			GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
+			centeredStyle.alignment = TextAnchor.MiddleCenter;
+			GUI.color = Color.black;
+            source.y*=-1; // WorldToScreenPoint inverts the y values for some reason
+			int labelSize = 50;
+			GUI.Label(new Rect(Camera.main.WorldToScreenPoint(source).x-(labelSize/2), Camera.main.WorldToScreenPoint(source).y-(labelSize/2),labelSize, labelSize), "S", centeredStyle);
+			source.y*=-1;
+		}
+
+		//Assignment 2
+		//Debug code, if drawTarget is true, a 'T' will be drawn on the background where the target node is located
+		if (drawTarget)
+		{
+			GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
+			centeredStyle.alignment = TextAnchor.MiddleCenter;
+			GUI.color = Color.black;
+            target.y*=-1;
+			int labelSize = 50;
+			//DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(target), 5.0f);
+			GUI.Label(new Rect(Camera.main.WorldToScreenPoint(target).x-(labelSize/2), Camera.main.WorldToScreenPoint(target).y-(labelSize/2),labelSize, labelSize), "T", centeredStyle);
+			target.y*=-1;
+		}
+
+		//Assignment 2
+		// Debug code, draws the current moveable nodes in the nav graph onto the screen
+		if (drawNodes) {
+			for(int i = 0; i < background.map.getMapWidth(); i++){
+				for(int j = 0; j < background.map.getMapHeight(); j++){
+					Vector2 node = background.map.cellIndexToWorld(new Vector2(i, j));
+					node.y*=-1;
+					if(background.map.canMove[i, j]){
+						DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(node), 5.0f);
+					}
+				}
+			}
+		}
+
+		//Assignment 2
+		// Debug code, if there exists an A* path currently and drawPath is true, will draw the nodes of the path on screen
+		if (drawPath && currPath != null) {
+			for(int i = 0; i < currPath.Count; i++){
+                Vector2 node = background.map.cellIndexToWorld(currPath[i]);
+                node.y*=-1;
+                DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(node), 5.0f);
+                node.y*=-1;
+            }
+        }
+    }
+    
+    //Draw agent labels
 	protected void drawAgentLabels(){
 		for (int i = 0; i < numSlices; i++) {
 
@@ -241,10 +333,7 @@ public class Agent : MonoBehaviour {
 			feelerVec = (Camera.main.WorldToScreenPoint(feelerVec) - Camera.main.WorldToScreenPoint(Vector2.zero));
 			
 			drawBox (pivot.x-width.x/2, pivot.y+radiusV, width.x, feelerVec.x, -angle+180, pivot);
-			
-			//debugText += "Feeler["+currentFeeler+"]: "+ feelers[currentFeeler].magnitude +"\n";
 		}
-		//debugText += "\n";
 	}
 	
 	//Draws adjacent agent circle based on a specified radius range
@@ -273,7 +362,6 @@ public class Agent : MonoBehaviour {
 		for(int i = 0; i < near.Count; i++){
 			Vector3 currAgent = new Vector3(near[i].renderer.bounds.center.x, near[i].renderer.bounds.center.y);
 			currAgent.Scale(new Vector3(1, -1, 1));
-			//Vector2 pivotAgent = (Vector2)Camera.main.WorldToScreenPoint(currAgent);
 			
 			Vector2 playerToAgent = near[i].renderer.bounds.center-renderer.bounds.center;
 			Vector2 headingVec = new Vector2(-Mathf.Sin(Mathf.Deg2Rad*heading), Mathf.Cos(Mathf.Deg2Rad*heading));
@@ -312,4 +400,141 @@ public class Agent : MonoBehaviour {
 		GUI.DrawTexture(new Rect(x, y, width, height), lineTexture, ScaleMode.StretchToFill);
 		GUIUtility.RotateAroundPivot(-angle, pivot);
 	}
+
+	public Vector2 getTarget(){
+		return target;
+	}
+
+	public void setTarget(Vector2 t){
+		target = t;
+	}
+
+	//Assignment 2
+	// Not using a priority queue, using a hash table, so have to find the node with the min f value each round
+	private Vector2 findMin(Hashtable l, List<Vector2> curr){
+		float min = -1.0f;
+		Vector2 minVec = new Vector2 (0, 0);
+
+		foreach (DictionaryEntry d in l) {
+			if((((float)d.Value) < min || min == -1) && curr.Contains((Vector2)d.Key)){
+				min = (float)d.Value;
+				minVec = (Vector2)d.Key;
+			}
+		}
+
+		return minVec;
+	}
+
+
+	// A* algorithm
+	// Uses map cells to detect where walls are
+	// If there is a path, it will be reconstructed at the end of this function
+	// and it will contain the locations of nodes in Map Cell space to follow
+	// Source node is in world coords
+	protected bool aStar(Vector2 sourceNode){
+
+		Vector2 mapCellIndex = background.map.getCellIndex (sourceNode);
+
+		List<Vector2> visited = new List<Vector2> ();
+		List<Vector2> curr = new List<Vector2> ();
+		curr.Add (mapCellIndex);
+		Hashtable from = new Hashtable ();
+
+		Hashtable gVals = new Hashtable ();
+		gVals.Add (mapCellIndex, 0.0f);
+		Hashtable fVals = new Hashtable ();
+		fVals.Add (mapCellIndex, ((float)gVals [mapCellIndex]) + Vector2.Distance (mapCellIndex, background.map.getCellIndex(target)));
+
+		while (curr.Count != 0) {
+
+			Vector2 currNode = findMin(fVals, curr);
+
+			// Arrived at the target? Great! Make the path list.
+			if(currNode == background.map.getCellIndex(target)){
+				//reconstruct path with the from list
+				currPath = new List<Vector2>();
+				currPath = createPath(from, currNode);
+
+				return true; 
+			}
+
+			curr.Remove(currNode);
+			visited.Add(currNode);
+
+			//for each neighbor node, add to curr if unvisited and calculate f and g values
+			for(int i = -1; i < 2; i++){
+				for(int j = -1; j < 2; j++){
+
+					int x = (int)currNode.x+i;
+					int y = (int)currNode.y+j;
+
+					//currnode not inbounds, or not moveable to
+					if(!background.map.inBounds(new Vector2(x, y)) || !background.map.canMove[x,y])
+						continue;
+
+					//corner case:if node to move to is diagonal, but perp nodes are nonmoveable, can't go there
+					if(Mathf.Abs(i) == Mathf.Abs(j) && !background.map.canMove[x,(int)currNode.y] && !background.map.canMove[(int)currNode.x,y]){
+						continue;
+					}
+
+					Vector2 neighbor = new Vector2(x, y);
+					if(visited.Contains(neighbor)){//also covers 0,0 case
+						continue;
+					}
+
+					float tempG = (float)gVals[currNode] + Vector2.Distance(currNode, neighbor);
+
+					if(!curr.Contains(neighbor) || tempG < (float)gVals[currNode]){
+
+						from.Add(neighbor, currNode);
+						gVals.Add(neighbor, tempG);
+						fVals.Add(neighbor, tempG + Vector2.Distance(neighbor, background.map.getCellIndex(target)));
+
+						if(!curr.Contains(neighbor))
+							curr.Add(neighbor);
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+
+	// If aStar() finds a path, this function creates a List for that path
+	// that the agent can then access
+	private List<Vector2> createPath(Hashtable path,  Vector2 node){
+
+		if (path.Contains (node)) {
+			List<Vector2> p = new List<Vector2>();
+			p = createPath(path, (Vector2)path[node]);
+			p.Add(node);
+			return p;
+		}
+		else{
+			List<Vector2> p = new List<Vector2>();
+			p.Add(node);
+			return p;
+		}
+
+	}
+
+	//returns the closest unobstructed node in the navgraph
+	//the node coordinates will be in map cell space
+	protected Vector2 closestUnobstructed(){
+		
+		Vector2 cNode = closeNodes[0];
+		float minDist = Vector2.Distance (cNode, renderer.bounds.center);
+		
+		for (int i = 1; i < closeNodes.Count; i++) {
+			Vector2 currNode = closeNodes[i];
+			
+			if(Vector2.Distance(currNode, renderer.bounds.center) < minDist){
+				cNode = currNode;
+				minDist = Vector2.Distance(cNode, renderer.bounds.center);
+            }
+        }
+        
+        return cNode;
+    }
+
 }
