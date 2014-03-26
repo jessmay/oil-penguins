@@ -66,7 +66,7 @@ public abstract class Agent : MonoBehaviour {
 
 		heading = transform.rotation.z;
 		velocity = Vector2.zero;
-		radius = GetComponent<CircleCollider2D> ().radius;
+		radius = GetComponent<CircleCollider2D> ().radius * transform.localScale.x;
 		gridCellIndex = Vector2.zero;
 
 		//Debug
@@ -133,12 +133,15 @@ public abstract class Agent : MonoBehaviour {
 		//Get the distance to the target.
 		double distance = distanceBetweenPoint(target);
 
-		//If far from the target, move towards the target.
-		if (distance > .1) {
+		//Turn to the target if not facing.
+		if(Math.Abs(angle) > .0) {
+			turn(Mathf.Clamp((float)angle, -turnStep, turnStep));
+			if (Math.Abs(angle) > 30)
+				return;
+		}
 
-			//Turn to the target if not facing.
-			if(Math.Abs(angle) > .0)
-				turn(Mathf.Clamp((float)angle, -turnStep, turnStep));
+		//If far from the target, move towards the target.
+		if (distance > .1 * transform.localScale.x) {//
 
 			//If arrive, slow the approach as the agent gets closer to the target.
 			if(arrive)
@@ -296,7 +299,7 @@ public abstract class Agent : MonoBehaviour {
 
 	//Gets the radius of this agent in camera space coordinates.
 	public float getRadiusCameraSpace() {
-		return DebugRenderer.worldToCameraLength(radius);
+		return DebugRenderer.worldToCameraLength(radius);// * transform.localScale.x
 	}
 
 	//Draw debug information to the screen.
@@ -416,7 +419,7 @@ public abstract class Agent : MonoBehaviour {
 						continue;
 					
 					//corner case:if node to move to is diagonal, but perp nodes are nonmoveable, can't go there
-					if(Mathf.Abs(i) == Mathf.Abs(j) && !map.canMove[x,(int)currNode.y] && !map.canMove[(int)currNode.x,y]){
+					if(Mathf.Abs(i) == Mathf.Abs(j) && (!map.canMove[x,(int)currNode.y] || !map.canMove[(int)currNode.x,y])){
 						continue;
 					}
 					

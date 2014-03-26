@@ -188,7 +188,7 @@ public class AStarAgent : Agent {
 			else {
 				
 				//If in the cell index of current goal and not on target, close enough, check next location to seek
-				if (Vector2.Distance(map.getCellIndex(renderer.bounds.center), currGoal) <= .1 && pathIndex < currPath.Count-1)
+				if (distanceBetweenPoint(map.cellIndexToWorld(currGoal)) <= (.5 * transform.localScale.x) && pathIndex < currPath.Count-1)//Vector2.Distance(map.getCellIndex(renderer.bounds.center), currGoal)
 				{
 					pathIndex++;
 					currGoal = new Vector2();
@@ -196,7 +196,7 @@ public class AStarAgent : Agent {
 					seek (map.cellIndexToWorld(currGoal));
 				}
 				//If not in the cell index of current goal, keep seeking to that current goal
-				else if (Vector2.Distance(map.getCellIndex(renderer.bounds.center), currGoal) > .1)
+				else if (distanceBetweenPoint(map.cellIndexToWorld(currGoal)) > (.5 * transform.localScale.x))//(Vector2.Distance(map.getCellIndex(renderer.bounds.center), currGoal) > 0)
 				{
 					seek(map.cellIndexToWorld(currGoal));
 				}
