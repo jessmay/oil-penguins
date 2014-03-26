@@ -11,20 +11,20 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-public class MainPauseMenu : PauseMenu {
+public class TrainingAIPauseMenuOld : PauseMenuOld {
 	
 	public enum MenuItem {Main, LoadMap, SaveMap, LoadGA, SaveGA}
 	private MenuItem currentMenu;
 	private Dictionary<string, MenuItem> dictionary;
 
-	private EnvironmentManager background;
+	private AITrainingEnvironmentManager background;
 	
 	private int width = 200;
 	private int height = 50;
 	
 
 	//Initialize
-	public MainPauseMenu() {
+	public TrainingAIPauseMenuOld() {
 		
 		dictionary = new Dictionary<string, MenuItem>();
 		
@@ -41,7 +41,7 @@ public class MainPauseMenu : PauseMenu {
 	//Initialize
 	public override void setUp() {
 
-		background = GetComponent<EnvironmentManager>();
+		background = GetComponent<AITrainingEnvironmentManager>();
 	}
 
 

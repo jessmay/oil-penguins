@@ -10,17 +10,16 @@ using UnityEngine;
 using System.IO;
 using System.Collections;
 
-public class EnvironmentManager : MonoBehaviour {
+public class AITrainingEnvironmentManager : MonoBehaviour {
 
 	public GameObject Wall;
-	public GameObject Agent;
 	public GameObject TestSubject;
 
 	public GameObject player;
 
 	private GameObject currPlayer;
 
-	private PauseMenu pauseMenu;
+	private PauseMenuOld pauseMenu;
 
 	private int mapWidth = 20;
 	private int mapHeight = 20;
@@ -40,7 +39,7 @@ public class EnvironmentManager : MonoBehaviour {
 
 	void Start() {
 
-		pauseMenu = GetComponent<PauseMenu>();
+		pauseMenu = GetComponent<PauseMenuOld>();
 		pauseMenu.TogglePause();
 
 		//(Instantiate(player, Vector3.zero, player.transform.rotation) as GameObject ).GetComponent<Agent>().grid = grid;
@@ -59,7 +58,7 @@ public class EnvironmentManager : MonoBehaviour {
 
 		Agent agentScript = currPlayer.GetComponent<Agent>();
 		agentScript.grid = grid;
-
+		agentScript.map = map;
 	}
 
 

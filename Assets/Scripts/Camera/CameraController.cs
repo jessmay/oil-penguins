@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 	
 		zoom();
 
@@ -35,7 +35,7 @@ public class CameraController : MonoBehaviour {
 	private void zoom () {
 		
 		if(Input.GetAxis("Mouse ScrollWheel") != 0) {
-			float size = camera.orthographicSize + (invertedScroll? -1:1) * Input.GetAxis("Mouse ScrollWheel");
+			float size = camera.orthographicSize + (invertedScroll? 1:-1) * Input.GetAxis("Mouse ScrollWheel");
 			camera.orthographicSize = Mathf.Clamp(size, minCameraSize, maxCameraSize);
 		}
 
