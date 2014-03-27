@@ -189,8 +189,8 @@ public abstract class PauseMenu : MonoBehaviour {
 
 	private void setSkinTextures() {
 		Texture2D defaultTexture = createDefaultGUITexture(30, 30, 10);
-		Texture2D normalTexture = colorizeTexture(defaultTexture, skinNormalColor);
-		Texture2D highlightTexture = colorizeTexture(defaultTexture, skinHighlightColor);
+		Texture2D normalTexture = DebugRenderer.colorizeTexture(defaultTexture, skinNormalColor);
+		Texture2D highlightTexture = DebugRenderer.colorizeTexture(defaultTexture, skinHighlightColor);
 
 		button.normal.background = normalTexture;
 		button.hover.background = highlightTexture;
@@ -220,23 +220,5 @@ public abstract class PauseMenu : MonoBehaviour {
 		texture.filterMode = FilterMode.Point;
 
 		return texture;
-	}
-
-	private static Texture2D colorizeTexture(Texture2D originalTexture, Color color) {
-
-		int width = originalTexture.width;
-		int height = originalTexture.height;
-		Texture2D colorizedTexture = new Texture2D(width, height);
-
-		for (int x = 0; x < width; ++x) {
-			for (int y = 0; y < height; ++y) {
-				colorizedTexture.SetPixel(x, y, originalTexture.GetPixel(x,y) * color);
-			}
-		}
-
-		colorizedTexture.Apply();
-		colorizedTexture.filterMode = originalTexture.filterMode;
-
-		return colorizedTexture;
 	}
 }

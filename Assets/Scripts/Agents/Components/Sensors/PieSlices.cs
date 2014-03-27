@@ -70,8 +70,11 @@ public class PieSlices : Sensor {
 		Vector2 center = me.getCenterCameraSpace();
 		float radius = me.getRadiusCameraSpace();
 
+		Color color = Color.blue;
+		color.a = .5f;
+		
 		for (int i = 0; i < numSlices; i++) {
-			DebugRenderer.drawBox (center.x-width/2, center.y+radius, width, length, -heading+(0.5f + i)*sliceAngle, center);
+			DebugRenderer.drawBox (center.x-width/2, center.y+radius, width, length, -heading+(0.5f + i)*sliceAngle, center, color);
 		}
 	}
 }

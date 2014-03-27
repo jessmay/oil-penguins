@@ -11,10 +11,12 @@ public class CameraController : MonoBehaviour {
 	private const float CameraMovementSpeed = 5.0f;
 
 	public bool invertedScroll = false;
+	public bool frozen = false;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 
+		DebugRenderer.updateCamera(camera);
 		//Initialize variables from file/options?
 
 		//Set camera location and zoom based on map
@@ -24,6 +26,9 @@ public class CameraController : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 	
+		if(frozen)
+			return;
+
 		zoom();
 
 		pan();

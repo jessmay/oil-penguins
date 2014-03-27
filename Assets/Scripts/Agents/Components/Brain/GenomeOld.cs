@@ -9,7 +9,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-public class Genome : IComparable<Genome> {
+public class GenomeOld : IComparable<GenomeOld> {
 
 	public double[][][] weights;
 	public double fitness;
@@ -17,7 +17,7 @@ public class Genome : IComparable<Genome> {
 
 
 	//One individual in the genetic algorithm population.
-	public Genome (double[][][] w) {
+	public GenomeOld (double[][][] w) {
 
 		weights = copyWeights(w);
 		fitness = 0;
@@ -26,7 +26,7 @@ public class Genome : IComparable<Genome> {
 
 
 	//Copy constructor.
-	public Genome(Genome g) {
+	public GenomeOld(GenomeOld g) {
 
 		weights = copyWeights(g.weights);
 		fitness = 0;
@@ -35,7 +35,7 @@ public class Genome : IComparable<Genome> {
 
 
 	//Sort genomes in decreasing fitness (highest first)
-	public int CompareTo(Genome other) 
+	public int CompareTo(GenomeOld other) 
 	{
 		return other.fitness.CompareTo(fitness);
 	}
@@ -79,11 +79,11 @@ public class Genome : IComparable<Genome> {
 
 	//Given two parents, return a child that is a cross of these two genomes.
 	//Multi point crossover.
-	public static Genome[] multiPointCrossover (Genome g1, Genome g2, double crossoverRate) {
+	public static GenomeOld[] multiPointCrossover (GenomeOld g1, GenomeOld g2, double crossoverRate) {
 
 		//Return parents if over crossover rate.
 		if(UnityEngine.Random.value > crossoverRate) {
-			Genome[] ret = { new Genome(g1), new Genome(g2)};
+			GenomeOld[] ret = { new GenomeOld(g1), new GenomeOld(g2)};
 			
 			return ret;
 		}
@@ -114,18 +114,18 @@ public class Genome : IComparable<Genome> {
 			}
 		}
 
-		Genome[] genomes = { new Genome(weights1), new Genome(weights2)};
+		GenomeOld[] genomes = { new GenomeOld(weights1), new GenomeOld(weights2)};
 		
 		return genomes;
 	}
 
 	//Given two parents, return two children that are crosses of these two genomes.
 	//Single point crossover.
-	public static Genome[] singlePointCrossover (Genome g1, Genome g2, double crossoverRate) {
+	public static GenomeOld[] singlePointCrossover (GenomeOld g1, GenomeOld g2, double crossoverRate) {
 
 		
 		if(UnityEngine.Random.value > crossoverRate) {
-			Genome[] ret = { new Genome(g1), new Genome(g2)};
+			GenomeOld[] ret = { new GenomeOld(g1), new GenomeOld(g2)};
 			
 			return ret;
 		}
@@ -158,7 +158,7 @@ public class Genome : IComparable<Genome> {
 			}
 		}
 
-		Genome[] genomes = { new Genome(weights1), new Genome(weights2)};
+		GenomeOld[] genomes = { new GenomeOld(weights1), new GenomeOld(weights2)};
 
 		return genomes;
 	}

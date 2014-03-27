@@ -31,6 +31,10 @@ public class AdjacentAgents : Sensor {
 
 	//Draws adjacent agent circle based on a specified radius range
 	public override void drawDebugInformation() {
-		DebugRenderer.drawCircle(me.getCenterCameraSpace(), adjAgentsTotalRadiusCameraSpace);
+
+		Color color = Color.yellow;
+		color.a = .5f;
+		
+		DebugRenderer.drawCircle(me.getCenterCameraSpace(), adjAgentsTotalRadiusCameraSpace, color);
 	}
 }

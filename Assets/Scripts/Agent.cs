@@ -209,18 +209,18 @@ public class Agent : MonoBehaviour {
 		center.Scale(new Vector3(1, -1, 1));
 		
 		//Player's center in camera space
-		Vector2 pivot = (Vector2)Camera.main.WorldToScreenPoint(center);
+		Vector2 pivot = (Vector2)DebugRenderer.currentCamera.WorldToScreenPoint(center);
 		
 		//Radius length in camera space
-		float radiusV = (Camera.main.WorldToScreenPoint(new Vector2(radius, 0)) - Camera.main.WorldToScreenPoint(Vector2.zero)).x;
+		float radiusV = (DebugRenderer.currentCamera.WorldToScreenPoint(new Vector2(radius, 0)) - DebugRenderer.currentCamera.WorldToScreenPoint(Vector2.zero)).x;
 		
 		//line width length in camera space
 		Vector2 width = new Vector2(lineWidth, 0);
-		width = (Camera.main.WorldToScreenPoint(width) - Camera.main.WorldToScreenPoint(Vector2.zero));
+		width = (DebugRenderer.currentCamera.WorldToScreenPoint(width) - DebugRenderer.currentCamera.WorldToScreenPoint(Vector2.zero));
 		
 		//Size of the adjacent agent sensor in camera space
 		Vector2 length = new Vector2(adjRadius, 0);
-		length = (Camera.main.WorldToScreenPoint(length) - Camera.main.WorldToScreenPoint(Vector2.zero));
+		length = (DebugRenderer.currentCamera.WorldToScreenPoint(length) - DebugRenderer.currentCamera.WorldToScreenPoint(Vector2.zero));
 		
 		// Draw feelers
 		if (dispFeelers) {
@@ -249,7 +249,7 @@ public class Agent : MonoBehaviour {
 			GUI.color = Color.black;
             source.y*=-1; // WorldToScreenPoint inverts the y values for some reason
 			int labelSize = 50;
-			GUI.Label(new Rect(Camera.main.WorldToScreenPoint(source).x-(labelSize/2), Camera.main.WorldToScreenPoint(source).y-(labelSize/2),labelSize, labelSize), "S", centeredStyle);
+			GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(source).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(source).y-(labelSize/2),labelSize, labelSize), "S", centeredStyle);
 			source.y*=-1;
 		}
 
@@ -262,8 +262,8 @@ public class Agent : MonoBehaviour {
 			GUI.color = Color.black;
             target.y*=-1;
 			int labelSize = 50;
-			//DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(target), 5.0f);
-			GUI.Label(new Rect(Camera.main.WorldToScreenPoint(target).x-(labelSize/2), Camera.main.WorldToScreenPoint(target).y-(labelSize/2),labelSize, labelSize), "T", centeredStyle);
+			//DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(target), 5.0f);
+			GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(target).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(target).y-(labelSize/2),labelSize, labelSize), "T", centeredStyle);
 			target.y*=-1;
 		}
 
@@ -275,7 +275,7 @@ public class Agent : MonoBehaviour {
 					Vector2 node = background.map.cellIndexToWorld(new Vector2(i, j));
 					node.y*=-1;
 					if(background.map.canMove[i, j]){
-						DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(node), 5.0f);
+						DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
 					}
 				}
 			}
@@ -287,7 +287,7 @@ public class Agent : MonoBehaviour {
 			for(int i = 0; i < currPath.Count; i++){
                 Vector2 node = background.map.cellIndexToWorld(currPath[i]);
                 node.y*=-1;
-                DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(node), 5.0f);
+                DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
                 node.y*=-1;
             }
         }
@@ -306,7 +306,7 @@ public class Agent : MonoBehaviour {
 
 				Vector3 currAgent = new Vector3(slicesOfAgents[i][j].renderer.bounds.center.x, slicesOfAgents[i][j].renderer.bounds.center.y);
 				currAgent.Scale(new Vector3(1, -1, 1));
-				Vector2 pivotAgent = (Vector2)Camera.main.WorldToScreenPoint(currAgent);
+				Vector2 pivotAgent = (Vector2)DebugRenderer.currentCamera.WorldToScreenPoint(currAgent);
 
 				if(dispSlices) 
 					lableText += (lableText == null?"":"\n") + (i+1).ToString();
@@ -331,7 +331,7 @@ public class Agent : MonoBehaviour {
 			angle = (angle + 360) % 360;
 			
 			Vector2 feelerVec = new Vector2(feelers[currentFeeler].magnitude, 0);
-			feelerVec = (Camera.main.WorldToScreenPoint(feelerVec) - Camera.main.WorldToScreenPoint(Vector2.zero));
+			feelerVec = (DebugRenderer.currentCamera.WorldToScreenPoint(feelerVec) - DebugRenderer.currentCamera.WorldToScreenPoint(Vector2.zero));
 			
 			drawBox (pivot.x-width.x/2, pivot.y+radiusV, width.x, feelerVec.x, -angle+180, pivot);
 		}

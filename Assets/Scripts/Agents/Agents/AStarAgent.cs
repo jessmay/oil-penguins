@@ -15,6 +15,9 @@ public class AStarAgent : Agent {
 	protected AdjacentAgents adjAgents;
 	protected PieSlices pieSlices;
 
+	
+	public override float getTurnStep() { return turnStep; }
+	public override float getMoveStep() { return moveStep*transform.localScale.x;}
 
 	// Use this for initialization
 	protected override void initializeAgent () {
@@ -42,13 +45,9 @@ public class AStarAgent : Agent {
 		
 		//act
 		checkButtons();
-		
-
-
 
 	}
-	
-	
+
 	//Get information about the environment.
 	private void sense() {
 		
@@ -91,7 +90,7 @@ public class AStarAgent : Agent {
 		//Assignment 2
 		//Designate source location; shift + left click
 		if (Input.GetKey (KeyCode.LeftShift) && Input.GetMouseButtonDown (0)) {
-			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			
 			//if new source location, sets values of source to mouse position
 			if((int)pos.x != source.x || (int)pos.y != source.y){
@@ -104,7 +103,7 @@ public class AStarAgent : Agent {
 		//Assignment 2
 		//Designate target location; left control+right click
 		if(Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(1)){
-			Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			Vector2 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			
 			//if new target location, sets values of target to mouse position
 			if((int)pos.x != target.x || (int)pos.y != target.y){
@@ -180,7 +179,7 @@ public class AStarAgent : Agent {
 		if(findTarget){
 			
 			//If the player is at the target, no more need to find the target
-			if(map.getCellIndex(renderer.bounds.center) == map.getCellIndex(target)){
+			if(map.getCellIndex(renderer.bounds.center) == map.getCellIndex(target)){//distanceBetweenPoint(map.cellIndexToWorld(target)) <= (.5 * transform.localScale.x)
 				pathIndex = 0;
 				findTarget = false;
 			}
@@ -244,7 +243,7 @@ public class AStarAgent : Agent {
 			GUI.Label(new Rect(0, 0, 300, 800), debugText);
 		}
 
-		Vector2 goal = Camera.main.WorldToScreenPoint (map.cellIndexToWorld(currGoal));
+		Vector2 goal = DebugRenderer.currentCamera.WorldToScreenPoint (map.cellIndexToWorld(currGoal));
 		DebugRenderer.drawCircle (new Vector2 (goal.x, Screen.height - goal.y), 2 * getRadiusCameraSpace ());
 	}
 }

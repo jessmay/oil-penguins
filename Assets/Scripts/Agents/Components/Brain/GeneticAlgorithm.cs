@@ -1,4 +1,4 @@
-﻿/*
+/*
 Joshua Linge
 GeneticAlgorithm.cs
 
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 public class GeneticAlgorithm {
 
-	public Genome[] population {get; private set;}
+	public GenomeOld[] population {get; private set;}
 	public int populationSize {get; private set;}
 
 	public const double mutationRate = 0.2;
@@ -27,7 +27,7 @@ public class GeneticAlgorithm {
 	public int currTarget {get; private set;}
 
 	public double bestFitness {get; private set;}
-	public Genome mostFit {get; private set;}
+	public GenomeOld mostFit {get; private set;}
 
 
 	public const int TICKS_PER_GENOME = 500;
@@ -35,11 +35,11 @@ public class GeneticAlgorithm {
 	public GeneticAlgorithm (int populationSize, int numInputs, int numOutputs, int numLayers, int numNeuronsPerLayer) {
 
 		this.populationSize = populationSize;
-		population = new Genome[populationSize];
+		population = new GenomeOld[populationSize];
 
 		for (int currGenome = 0; currGenome < populationSize; ++currGenome) {
 
-			population[currGenome] = new Genome(NeuralNet.createRandomWeights(numInputs, numOutputs, numLayers, numNeuronsPerLayer));
+			population[currGenome] = new GenomeOld(NeuralNet.createRandomWeights(numInputs, numOutputs, numLayers, numNeuronsPerLayer));
 		}
 
 		generation = 0;
@@ -47,7 +47,7 @@ public class GeneticAlgorithm {
 		initialize();
 	}
 
-	public GeneticAlgorithm (int populationSize, int generation, Genome[] population) {
+	public GeneticAlgorithm (int populationSize, int generation, GenomeOld[] population) {
 
 		this.populationSize = populationSize;
 		this.generation = generation;
@@ -70,7 +70,7 @@ public class GeneticAlgorithm {
 
 
 	//Get the genome that is currently being tested.
-	public Genome getCurrentGenome() {
+	public GenomeOld getCurrentGenome() {
 		return population[populationIndex];
 	}
 
@@ -149,10 +149,10 @@ public class GeneticAlgorithm {
 		Array.Sort(population);
 
 		//Save the fittests genome
-		mostFit = new Genome(population[0]);
+		mostFit = new GenomeOld(population[0]);
 
 		//Create a new population.
-		Genome[] newPopulation = new Genome[populationSize];
+		GenomeOld[] newPopulation = new GenomeOld[populationSize];
 
 		//Save the top genomes from the previous population.
 		int keepBestNum = 5;
@@ -162,7 +162,7 @@ public class GeneticAlgorithm {
 		for (int currGenome = keepBestNum; currGenome < populationSize; ++currGenome) {
 
 			//Select two parents at random through a roulette wheel and cross them.
-			Genome[] children = Genome.singlePointCrossover(rouletteWheelSelection(), rouletteWheelSelection(), crossoverRate);
+			GenomeOld[] children = GenomeOld.singlePointCrossover(rouletteWheelSelection(), rouletteWheelSelection(), crossoverRate);
 
 			//Add first child to the population and mutate.
 			newPopulation[currGenome] = children[0];
@@ -183,13 +183,13 @@ public class GeneticAlgorithm {
 
 
 	//Save the top genomes from the previous population into the new population.
-	private void elitism(Genome[] newPopulation, int topBest) {
+	private void elitism(GenomeOld[] newPopulation, int topBest) {
 
 		string fittest = "";
 
 		for (int currBest = 0; currBest < topBest; ++currBest) {
 			fittest += population[currBest].fitness +" ";
-			newPopulation[currBest] = new Genome(population[currBest]); 
+			newPopulation[currBest] = new GenomeOld(population[currBest]); 
 		}
 
 		Debug.Log ("Saving these fitness values: "+fittest);
@@ -197,7 +197,7 @@ public class GeneticAlgorithm {
 
 
 	//Select a genome at random
-	private Genome rouletteWheelSelection() {
+	private GenomeOld rouletteWheelSelection() {
 
 		//Select random value.
 		double loc = UnityEngine.Random.value * totalFitness;
@@ -210,7 +210,7 @@ public class GeneticAlgorithm {
 		}
 
 		//Return selected individual.
-		return new Genome(population[index%populationSize]);
+		return new GenomeOld(population[index%populationSize]);
 	}
 
 
@@ -246,10 +246,10 @@ public class GeneticAlgorithm {
 		int populationSize = Convert.ToInt32(init[0]);
 		int generationNumber = Convert.ToInt32(init[1]);
 
-		Genome[] population = new Genome[populationSize];
+		GenomeOld[] population = new GenomeOld[populationSize];
 
 		for (int currGenome = 0; currGenome < populationSize; ++currGenome) {
-			population[currGenome] = new Genome(Genome.createWeightsFromString(c[1+currGenome].Split(separators2)));
+			population[currGenome] = new GenomeOld(GenomeOld.createWeightsFromString(c[1+currGenome].Split(separators2)));
 		}
 
 		return new GeneticAlgorithm(populationSize, generationNumber, population);

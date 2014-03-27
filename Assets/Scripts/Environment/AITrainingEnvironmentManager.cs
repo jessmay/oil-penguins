@@ -171,7 +171,7 @@ public class AITrainingEnvironmentManager : MonoBehaviour {
 
 		//Place/remove wall at the given mouse location
 		if (Input.GetMouseButtonDown (0)) {
-			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			pos.z = 0;
 
 			//If wall already exists at the location, remove it
@@ -182,7 +182,7 @@ public class AITrainingEnvironmentManager : MonoBehaviour {
 		/*
 		//Place agent at the given mouse location
 		if (Input.GetMouseButtonDown (1)) {
-			Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			pos.z = 0;
 			GameObject a = Instantiate(Agent, pos, Agent.transform.rotation) as GameObject;
 

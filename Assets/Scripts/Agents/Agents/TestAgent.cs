@@ -51,6 +51,9 @@ public class TestAgent : Agent {
 	private Vector2 startLocation;
 	private Quaternion startRotation;
 
+	
+	public override float getTurnStep() { return turnStep; }
+	public override float getMoveStep() { return moveStep*transform.localScale.x;}
 
 	// Use this for initialization
 	protected override void initializeAgent () {
@@ -308,7 +311,7 @@ public class TestAgent : Agent {
 		//If the mouse cursor location is the target, 
 		//return the position of the mouse cursor.
 		if(mouseIsTarget) {
-			Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			Vector3 mousePos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			mousePos.z = 0;
 			return mousePos;
 		}
@@ -487,7 +490,7 @@ public class TestAgent : Agent {
 		//Draw current target if target is enabled.
 		if (targetsEnabled){
 			Vector3 t = getCurrentTargetVector();
-			Vector3 cst = Camera.main.WorldToScreenPoint(t);
+			Vector3 cst = DebugRenderer.currentCamera.WorldToScreenPoint(t);
 			cst.y = Screen.height - cst.y;
 
 			DebugRenderer.drawCircle(cst, DebugRenderer.worldToCameraLength(1));

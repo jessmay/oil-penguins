@@ -72,7 +72,10 @@ public class Feelers : Sensor {
 
 			float feelerLengthCameraSpace = DebugRenderer.worldToCameraLength(feelers[currentFeeler].magnitude);
 
-			DebugRenderer.drawBox (center.x-width/2, center.y+radius, width, feelerLengthCameraSpace, -angle+180, center);
+			Color color = Color.red;
+			color.a = .5f;
+
+			DebugRenderer.drawBox (center.x-width/2, center.y+radius, width, feelerLengthCameraSpace, -angle+180, center, color);
 		}
 	}
 }

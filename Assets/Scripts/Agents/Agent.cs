@@ -50,7 +50,8 @@ public abstract class Agent : MonoBehaviour {
 
 
 
-
+	public abstract float getTurnStep();
+	public abstract float getMoveStep();
 	
 	//Initilize the agent
 	protected abstract void initializeAgent();
@@ -70,7 +71,7 @@ public abstract class Agent : MonoBehaviour {
 		gridCellIndex = Vector2.zero;
 
 		//Debug
-		updateCenterInCameraSpace();
+		//updateCenterInCameraSpace();
 
 		initializeAgent();
 
@@ -125,7 +126,7 @@ public abstract class Agent : MonoBehaviour {
 	}
 
 	//Seek to the desired location.
-	protected void seek (Vector2 target, bool arrive = false) {
+	public void seek (Vector2 target, bool arrive = false) {
 
 		//Get the angle to the target.
 		double angle = getAngleToPoint(target);
@@ -135,7 +136,7 @@ public abstract class Agent : MonoBehaviour {
 
 		//Turn to the target if not facing.
 		if(Math.Abs(angle) > .0) {
-			turn(Mathf.Clamp((float)angle, -turnStep, turnStep));
+			turn(Mathf.Clamp((float)angle, -getTurnStep(), getTurnStep()));
 			if (Math.Abs(angle) > 30)
 				return;
 		}
@@ -145,23 +146,23 @@ public abstract class Agent : MonoBehaviour {
 
 			//If arrive, slow the approach as the agent gets closer to the target.
 			if(arrive)
-				moveTo(Mathf.Clamp((float)(distance), 0.0f, moveStep));
+				moveTo(Mathf.Clamp((float)(distance), 0.0f, getMoveStep()));
 
 			//Else, move to target at set speed.
 			else
-				moveTo (moveStep);
+				moveTo (getMoveStep());
 			return;
 		}
 	}
 
 	//Update the agent's velocity by the given move amount.
-	protected void moveTo(float moveStep) {
+	public void moveTo(float moveStep) {
 		Vector2 temp = new Vector2(transform.up.x, transform.up.y);
 		velocity = temp * moveStep;
 	}
 
 	//Rotate the agent by the given angle (in degrees).
-	protected void turn(float turnStep) {
+	public void turn(float turnStep) {
 		heading+=turnStep;
 		if(heading >= 360) heading%=360;
 		if(heading < 0) heading = (heading+360)%360;
@@ -187,7 +188,7 @@ public abstract class Agent : MonoBehaviour {
 		}
 
 		//Update debug information
-		updateCenterInCameraSpace();
+		//updateCenterInCameraSpace();
 	}
 
 	//Given a point, returns the distance from the agent to the point.
@@ -214,6 +215,7 @@ public abstract class Agent : MonoBehaviour {
 	void OnGUI(){
 
 		if(debug) {
+			updateCenterInCameraSpace();
 
 			DrawDebugInformation ();
 
@@ -230,7 +232,7 @@ public abstract class Agent : MonoBehaviour {
 				GUI.color = Color.black;
 				source.y*=-1; // WorldToScreenPoint inverts the y values for some reason
 				int labelSize = 50;
-				GUI.Label(new Rect(Camera.main.WorldToScreenPoint(source).x-(labelSize/2), Camera.main.WorldToScreenPoint(source).y-(labelSize/2),labelSize, labelSize), "S", centeredStyle);
+				GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(source).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(source).y-(labelSize/2),labelSize, labelSize), "S", centeredStyle);
 				source.y*=-1;
 			}
 			
@@ -243,8 +245,8 @@ public abstract class Agent : MonoBehaviour {
 				GUI.color = Color.black;
 				target.y*=-1;
 				int labelSize = 50;
-				//DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(target), 5.0f);
-				GUI.Label(new Rect(Camera.main.WorldToScreenPoint(target).x-(labelSize/2), Camera.main.WorldToScreenPoint(target).y-(labelSize/2),labelSize, labelSize), "T", centeredStyle);
+				//DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(target), 5.0f);
+				GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(target).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(target).y-(labelSize/2),labelSize, labelSize), "T", centeredStyle);
 				target.y*=-1;
 			}
 			
@@ -256,7 +258,7 @@ public abstract class Agent : MonoBehaviour {
 						Vector2 node = map.cellIndexToWorld(new Vector2(i, j));
 						node.y*=-1;
 						if(map.canMove[i, j]){
-							DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(node), 5.0f);
+							DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
 						}
 					}
 				}
@@ -268,7 +270,7 @@ public abstract class Agent : MonoBehaviour {
 				for(int i = 0; i < currPath.Count; i++){
 					Vector2 node = map.cellIndexToWorld(currPath[i]);
 					node.y*=-1;
-					DebugRenderer.drawCircle(Camera.main.WorldToScreenPoint(node), 5.0f);
+					DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
 					node.y*=-1;
 				}
 			}
@@ -288,7 +290,7 @@ public abstract class Agent : MonoBehaviour {
 		//Vector3 center = new Vector3(renderer.bounds.center.x, -renderer.bounds.center.y);
 		
 		//Player's center in camera space
-		centerCameraSpace = (Vector2)Camera.main.WorldToScreenPoint(renderer.bounds.center);
+		centerCameraSpace = (Vector2)DebugRenderer.currentCamera.WorldToScreenPoint(renderer.bounds.center);
 		centerCameraSpace.y = Screen.height - centerCameraSpace.y;
 	}
 
@@ -324,22 +326,22 @@ public abstract class Agent : MonoBehaviour {
 
 			//Turn counter clockwise
 			if (Input.GetKey(KeyCode.LeftArrow)) {
-				turn(turnStep);
+				turn(getTurnStep());
 			}
 			
 			//Turn clockwise
 			if (Input.GetKey(KeyCode.RightArrow)) {
-				turn(-turnStep);
+				turn(-getTurnStep());
 			}
 			
 			//Move forward
 			if (Input.GetKey(KeyCode.UpArrow)) {
-				moveTo(moveStep);
+				moveTo(getMoveStep());
 			}
 			
 			//Move backward
 			if (Input.GetKey(KeyCode.DownArrow)) {
-				moveTo(-moveStep);
+				moveTo(-getMoveStep());
 			}
 		}
 	}

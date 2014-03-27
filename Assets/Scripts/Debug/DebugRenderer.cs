@@ -14,17 +14,26 @@ public class DebugRenderer {
 	private static Texture2D lineTexture;
 	private static Dictionary<float, Texture2D> circleTextures;
 
+	public static Camera currentCamera {get; private set;}
+
+	public static float worldLineWidth = 0.5f;
 	public static float lineWidth;
 
 	//Initialize
 	static DebugRenderer() {
 		lineTexture = new Texture2D(1, 1);
-		lineTexture.SetPixel(0,0, Color.black);
+		lineTexture.SetPixel(0,0, Color.white);
 		lineTexture.Apply();
 
 		circleTextures = new Dictionary<float, Texture2D>();
 
-		lineWidth = DebugRenderer.worldToCameraLength(0.5f);
+
+	}
+
+	public static void updateCamera(Camera camera) {
+
+		currentCamera = camera;
+		lineWidth = DebugRenderer.worldToCameraLength(worldLineWidth);
 	}
 
 	//Retrives a circle of the given radius. 
@@ -67,19 +76,47 @@ public class DebugRenderer {
 
 	//Convert the given length from world space to camera space
 	public static float worldToCameraLength(float length) {
-		return (Camera.main.WorldToScreenPoint(new Vector2(length, 0)) - Camera.main.WorldToScreenPoint(Vector2.zero)).x;
+
+		Camera camera = currentCamera;
+
+		//Camera camera = c.HasValue? c.Value: DebugRenderer.currentCamera;
+		return (camera.WorldToScreenPoint(new Vector2(length, 0)) - camera.WorldToScreenPoint(Vector2.zero)).x;
 	}
 
 	//Draw a circle at the given point. All in camera space.
-	public static void drawCircle(Vector2 center, float radius) {
+	public static void drawCircle(Vector2 center, float radius, Color? c = null) {
+
+		//Color color = c.HasValue ? c.Value : Color.black;
+
 		GUI.DrawTexture(new Rect(center.x-radius, center.y-radius, radius*2, radius*2), getCircle(radius), ScaleMode.ScaleToFit);
 	}
 	
 	//Draw a box
-	public static void drawBox(float x, float y, float width, float height, float angle, Vector2 pivot){
+	public static void drawBox(float x, float y, float width, float height, float angle, Vector2 pivot, Color? c = null){
 
+		Color color = c.HasValue ? c.Value : Color.black;
+		
 		GUIUtility.RotateAroundPivot(angle, pivot);
-		GUI.DrawTexture(new Rect(x, y, width, height), lineTexture, ScaleMode.StretchToFill);
+		GUI.DrawTexture(new Rect(x, y, width, height), colorizeTexture(lineTexture, color), ScaleMode.StretchToFill);
 		GUIUtility.RotateAroundPivot(-angle, pivot);
+	}
+
+	
+	public static Texture2D colorizeTexture(Texture2D originalTexture, Color color) {
+		
+		int width = originalTexture.width;
+		int height = originalTexture.height;
+		Texture2D colorizedTexture = new Texture2D(width, height);
+		
+		for (int x = 0; x < width; ++x) {
+			for (int y = 0; y < height; ++y) {
+				colorizedTexture.SetPixel(x, y, originalTexture.GetPixel(x,y) * color);
+			}
+		}
+		
+		colorizedTexture.Apply();
+		colorizedTexture.filterMode = originalTexture.filterMode;
+		
+		return colorizedTexture;
 	}
 }
