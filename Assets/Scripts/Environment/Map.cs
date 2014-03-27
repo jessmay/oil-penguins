@@ -7,42 +7,43 @@ Updated by Joshua Linge on 2014-03-17
  */
 
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Map {
+public class Map : IDisposable {
 
 	public string name;
 
 	private GameObject wall;
 
-	private int mapWidth = 20;
-	private int mapHeight = 20;
+	private int mapWidth;
+	private int mapHeight;
 	
 	private float xSize;
 	private float ySize;
 	
-	private Bounds bounds;
+	//private Bounds bounds;
 	private Vector3 center;
 
 	private GameObject[,] board;
 	public bool[,] canMove;
 
-	public Map(string n, GameObject w, int width, int height, Bounds b) {
+	public Map(string n, GameObject w, int width, int height) {
 
-		init(n, w, b, width, height);
+		init(n, w, width, height);
 
 		createBorder();
 	}
 
-	public Map(string n, GameObject w, Bounds b, Texture2D map) {
+	public Map(string n, GameObject w, Texture2D map) {
 
-		init (n, w, b, map.width, map.height);
+		init (n, w, map.width, map.height);
 
 		readMap(map);
 	}
 			
-	private void init (string n, GameObject w, Bounds b, int width, int height) {
+	private void init (string n, GameObject w, int width, int height) {
 
 		name = n;
 
@@ -50,20 +51,29 @@ public class Map {
 
 		createBoard(width, height);
 
-		bounds = b;
-		center = bounds.center;
+		center = Vector3.zero;
+		xSize = wall.renderer.bounds.size.x;
+		ySize = wall.renderer.bounds.size.y;
+
+
+		//bounds = b;
+		//center = bounds.center;
 		
 		//The size the wall needs to be to fit mapWidth x mapHeight within the bounds
-		xSize = bounds.size.x/mapWidth;
-		ySize = bounds.size.y/mapHeight;
+		//xSize = bounds.size.x/mapWidth;
+		//ySize = bounds.size.y/mapHeight;
 
 		//The scale value required to change the walls to the required width and height.
-		float wallX = xSize/(wall.renderer.bounds.size.x/wall.transform.localScale.x);
-		float wallY = ySize/(wall.renderer.bounds.size.y/wall.transform.localScale.y);
+		//float wallX = xSize/(wall.renderer.bounds.size.x/wall.transform.localScale.x);
+		//float wallY = ySize/(wall.renderer.bounds.size.y/wall.transform.localScale.y);
 		
 		//Scale wall to fit
-		wall.transform.localScale = new Vector3(wallX, wallY, 1);
+		//wall.transform.localScale = new Vector3(wallX, wallY, 1);
 
+	}
+
+	public Bounds getBounds() {
+		return new Bounds(center, new Vector3(mapWidth*xSize, mapHeight * ySize, 0));
 	}
 
 	private void createBoard(int width, int height) {
@@ -152,18 +162,19 @@ public class Map {
 	public Vector2 getCellIndex(Vector2 coord){
 		Vector2 cellIndex = new Vector2 ();
 
-		cellIndex.x = (int)((coord.x - center.x) / xSize + mapWidth/2);
-		cellIndex.y = (int)((coord.y - center.y) / ySize + mapHeight/2);
+		cellIndex.x = Mathf.FloorToInt((float)((coord.x - center.x + (mapWidth%2 == 1? xSize/2.0:0)) / xSize + mapWidth/2));
+		cellIndex.y = Mathf.FloorToInt((float)((coord.y - center.y + (mapHeight%2 == 1? ySize/2.0:0)) / ySize + mapHeight/2));
 
 		return cellIndex;
 	}
 
 	//Given a cell index, translate into a world coordinate centered at that cell.
 	public Vector3 cellIndexToWorld (Vector2 coord) {
+
 		Vector3 worldPoint = new Vector3(0,0, center.z);
 
-		worldPoint.x = center.x+xSize/2+(coord.x-mapWidth/2)*xSize;
-		worldPoint.y = center.y+ySize/2+(coord.y-mapHeight/2)*ySize;
+		worldPoint.x = center.x+xSize/2+(coord.x-mapWidth/2)*xSize - (mapWidth%2 == 1? xSize/2:0);
+		worldPoint.y = center.y+ySize/2+(coord.y-mapHeight/2)*ySize - (mapHeight%2 == 1? ySize/2:0);
 
 		return worldPoint;
 	}
@@ -270,5 +281,31 @@ public class Map {
 		}
 		
 		return nearNodes;
+	}
+
+
+
+
+	// Flag: Has Dispose already been called? 
+	bool disposed = false;
+	
+	// Public implementation of Dispose pattern callable by consumers. 
+	public void Dispose()
+	{ 
+		Dispose(true);
+		GC.SuppressFinalize(this);           
+	}
+	
+	// Protected implementation of Dispose pattern. 
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposed)
+			return; 
+		
+		if (disposing) {
+			removeAllWalls();
+		}
+
+		disposed = true;
 	}
 }

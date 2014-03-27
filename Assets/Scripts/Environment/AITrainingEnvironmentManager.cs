@@ -34,7 +34,7 @@ public class AITrainingEnvironmentManager : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
 
-		grid = new Grid (gridWidth, gridHeight, renderer.bounds);
+		//grid = new Grid (gridWidth, gridHeight, renderer.bounds);
 	}
 
 	void Start() {
@@ -61,14 +61,28 @@ public class AITrainingEnvironmentManager : MonoBehaviour {
 		agentScript.map = map;
 	}
 
+	private void createMap(Map newMap) {
+
+		if(map != null)
+			map.Dispose();
+
+		map = newMap;
+
+		Bounds mapBounds = map.getBounds();
+
+		if(grid != null)
+			grid.Dispose();
+
+		grid = new Grid (gridWidth, gridHeight, mapBounds);
+		
+		transform.localScale = new Vector3(mapBounds.size.x/renderer.bounds.size.x*transform.localScale.x, mapBounds.size.y/renderer.bounds.size.y*transform.localScale.y, transform.localScale.z);
+	}
+
 
 	//Create the default map
 	public void createDefaultMap() {
 
-		if(map != null)
-			map.removeAllWalls();
-
-		map = new Map("Default", Wall, mapWidth, mapHeight, renderer.bounds);
+		createMap (new Map("Default", Wall, mapWidth, mapHeight));
 
 		createPlayer();
 	}
@@ -81,16 +95,13 @@ public class AITrainingEnvironmentManager : MonoBehaviour {
 		//if(map != null && map.name.Equals(mapName))
 		//	return;
 
-		if(map != null)
-			map.removeAllWalls();
-
 		Debug.Log("Loading Map " +mapName);
 
 		byte[] bytes = File.ReadAllBytes(Application.dataPath + "/../Maps/"+ mapName +".png");
 		Texture2D mapImage = new Texture2D(1,1);
 		mapImage.LoadImage(bytes);
 		
-		map = new Map(mapName, Wall, renderer.bounds, mapImage);
+		createMap(new Map(mapName, Wall, mapImage));
 
 		createPlayer();
 	}

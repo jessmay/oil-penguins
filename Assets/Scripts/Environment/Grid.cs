@@ -7,14 +7,16 @@ Updated by Joshua Linge on 2014-03-17
  */
 
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Grid {
+public class Grid : IDisposable {
 
 	private int width = 10;
 	private int height = 10;
 	private Bounds bounds;
+	private Vector2 center;
 
 	private float xSize;
 	private float ySize;
@@ -28,6 +30,7 @@ public class Grid {
 		width = w;
 		height = h;
 		bounds = b;
+		center = b.center;
 
 		maxAgentRadius = 0;
 
@@ -57,11 +60,23 @@ public class Grid {
 	public Vector2 getCellIndex(Vector2 coord){
 		Vector2 cellIndex = new Vector2 ();
 
-		cellIndex.x = (int)((coord.x - bounds.center.x) / xSize + width/2);
-		cellIndex.y = (int)((coord.y - bounds.center.y) / ySize + height/2);
+		cellIndex.x = Mathf.FloorToInt((float)((coord.x - center.x + (width%2 == 1? xSize/2.0:0)) / xSize + width/2));
+		cellIndex.y = Mathf.FloorToInt((float)((coord.y - center.y + (height%2 == 1? xSize/2.0:0)) / ySize + height/2));
 
 		return cellIndex;
 	}
+	
+	//Given a cell index, translate into a world coordinate centered at that cell.
+	public Vector3 cellIndexToWorld (Vector2 coord) {
+
+		Vector3 worldPoint = new Vector3(0,0,0);
+		
+		worldPoint.x = center.x+xSize/2+(coord.x-width/2)*xSize - (width%2 == 1? xSize/2:0);
+		worldPoint.y = center.y+ySize/2+(coord.y-height/2)*ySize - (height%2 == 1? ySize/2:0);
+		
+		return worldPoint;
+	}
+
 
 	//Add an agent to the grid.
 	//Returns true if agent was added.
@@ -91,6 +106,17 @@ public class Grid {
 		grid [(int)from.y, (int)from.x].Remove (a);
 		return true;
 
+	}
+
+	private void removeAllAgents() {
+		for (int i = 0; i < height; i++) {
+			for(int j = 0; j < width; j++){
+
+				foreach (Agent agent in grid[i,j])
+					GameObject.Destroy(agent.gameObject);
+				grid[i,j].Clear();
+			}
+		}
 	}
 
 	public bool remove (Agent a) {
@@ -137,4 +163,29 @@ public class Grid {
 		return near;
 	}
 
+
+
+
+	// Flag: Has Dispose already been called? 
+		bool disposed = false;
+	
+	// Public implementation of Dispose pattern callable by consumers. 
+	public void Dispose()
+	{ 
+		Dispose(true);
+		GC.SuppressFinalize(this);           
+	}
+	
+	// Protected implementation of Dispose pattern. 
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposed)
+			return; 
+		
+		if (disposing) {
+			removeAllAgents();
+		}
+		
+		disposed = true;
+	}
 }

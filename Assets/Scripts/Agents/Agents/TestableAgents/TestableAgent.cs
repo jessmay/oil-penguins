@@ -88,6 +88,17 @@ public abstract class TestableAgent : Agent {
 			
 		}
 	}
+
+	void OnCollisionEnter2D(Collision2D collision) {
+		
+		brain.OnCollisionEnter(collision);
+	}
+	
+	
+	void OnCollisionExit2D(Collision2D collision) {
+		
+		brain.OnCollisionExit(collision);
+	}
 	
 	
 	//Returns when the agent is controllable.

@@ -121,8 +121,12 @@ public class Player : Agent {
 		{
 			//Get agent information
 			string debugText = "Agent Id: "+ gameObject.GetInstanceID() +"\n";
-			debugText += "Coordinates: " +"("+renderer.bounds.center.x +", "+ renderer.bounds.center.y+")" +"\n";
-			debugText += "Heading: " + heading + ".\n\n";
+			debugText += "Coordinates: " +"("+transform.position.x +", "+ transform.position.y+")" +"\n";
+			debugText += "Heading: " + heading + ".\n";
+			debugText += "Grid Coord: " + grid.getCellIndex(transform.position) +"\n";
+			debugText += "Map Coord: " + map.getCellIndex(transform.position) +"\n";
+
+			debugText += "\n";
 			
 			//Get sensor information
 			debugText += feelers.getDebugInformation()+ "\n";

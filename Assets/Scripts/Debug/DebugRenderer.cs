@@ -16,7 +16,7 @@ public class DebugRenderer {
 
 	public static Camera currentCamera {get; private set;}
 
-	public static float worldLineWidth = 0.5f;
+	private static float worldLineWidth = 0.5f;
 	public static float lineWidth;
 
 	//Initialize

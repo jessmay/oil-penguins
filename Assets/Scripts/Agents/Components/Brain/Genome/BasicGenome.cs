@@ -1,8 +1,13 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+
 
 public class BasicGenome : Genome {
+
+
+	private int currTick;
 
 	//Bonus statistics
 	public int numTimesFired {get; private set;}
@@ -15,6 +20,9 @@ public class BasicGenome : Genome {
 	public int colBonus {get; private set;}
 
 	public BasicGenome(double[][][] weights) : base(weights) {
+
+		currTick = 0;
+
 		numTimesFired = 0;
 		numTimesRotateLeft = 0;
 		numTimesRotateRight = 0;
@@ -82,12 +90,40 @@ public class BasicGenome : Genome {
 
 	public override void update(TestableAgent agent) {
 
+		++currTick;
+
+
 //		if(targetsEnabled && distanceFromTarget() < 1){
 //			
 //			++numTargetsHit;
 //			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME - geneticAlgorithm.tick)/(double)GeneticAlgorithm.TICKS_PER_GENOME;
 //			moveToNextTarget();
 //		}
+	}
+
+
+	private int collTick = -1;
+	private HashSet<int> collidingWalls = new HashSet<int>();
+	public override void OnCollisionEnter(Collision2D collision) {
+		
+		if (collidingWalls.Count == 0)
+			collTick = currTick;//geneticAlgorithm.tick;
+	
+		collidingWalls.Add(collision.gameObject.GetInstanceID());
+		
+	}
+	
+	
+	//The agent is no longer colliding with a wall, remove it from the list
+	// If last wall, update total number of ticks colliding.
+	public override void OnCollisionExit(Collision2D collision) {
+		
+		collidingWalls.Remove(collision.gameObject.GetInstanceID());
+		
+		if(collidingWalls.Count == 0) {
+			colBonus += currTick - collTick;	//geneticAlgorithm.tick - collTick;
+			collTick = -1;
+		}
 	}
 
 

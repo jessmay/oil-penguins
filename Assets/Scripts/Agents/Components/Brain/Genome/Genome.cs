@@ -21,6 +21,9 @@ public abstract class Genome : IComparable<Genome> {
 
 	public abstract void update(TestableAgent agent);
 
+	public abstract void OnCollisionEnter(Collision2D collision);
+	public abstract void OnCollisionExit(Collision2D collision);
+
 	public abstract double calculateFitness();
 
 	public abstract string getDebugInformation();

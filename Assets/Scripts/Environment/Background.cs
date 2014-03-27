@@ -12,8 +12,8 @@ public class Background : MonoBehaviour {
 	public GameObject Wall;
 	public GameObject Agent;
 
-	private int mapWidth = 20;
-	private int mapHeight = 20;
+	private int mapWidth = 25;
+	private int mapHeight = 15;
 
 	private int gridWidth = 10;
 	private int gridHeight = 10;
@@ -24,9 +24,26 @@ public class Background : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-		grid = new Grid (gridWidth, gridHeight, renderer.bounds);
-		map = new Map("Default", Wall, mapWidth, mapHeight, renderer.bounds);
+		createDefaultMap();
+	}
 
+	private void createDefaultMap() {
+
+		//Debug.Log("Creating Default Map");
+
+		if(map != null)
+			map.Dispose();
+		
+		map = new Map("Default", Wall, mapWidth, mapHeight);
+		
+		Bounds mapBounds = map.getBounds();
+
+		if (grid != null)
+			grid.Dispose();
+
+		grid = new Grid (gridWidth, gridHeight, mapBounds);
+		
+		transform.localScale = new Vector3(mapBounds.size.x/renderer.bounds.size.x*transform.localScale.x, mapBounds.size.y/renderer.bounds.size.y*transform.localScale.y, transform.localScale.z);
 	}
 
 	// Update is called once per frame
@@ -54,7 +71,34 @@ public class Background : MonoBehaviour {
 			grid.add(agent);
 		}
 
-
+//		if(Input.GetKeyDown(KeyCode.Alpha1)) {
+//			createDefaultMap();
+//		}
 	}
 
+	void OnGUI() {
+
+//		Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
+//		pos.z = 0;
+//
+//		string debugText = pos.ToString() +"\n" + map.getCellIndex(pos) + "\n";
+//
+//		
+//		GUI.color = Color.black;
+//		GUI.Label(new Rect(0, 0, 300, 800), debugText);
+//		
+//		for(int i = 0; i < map.getMapWidth(); i++){
+//			for(int j = 0; j < map.getMapHeight(); j++){
+//
+//				Vector2 node = map.cellIndexToWorld(new Vector2(i, j));
+//				node = DebugRenderer.currentCamera.WorldToScreenPoint(node);
+//				node.y = Screen.height - node.y;
+//
+//				if(!map.canMove[i, j]){
+//					DebugRenderer.drawCircle(node, DebugRenderer.worldToCameraLength(1));
+//				}
+//			}
+//		}
+	}
+	
 }
