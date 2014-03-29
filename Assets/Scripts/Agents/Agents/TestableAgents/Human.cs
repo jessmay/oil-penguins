@@ -2,25 +2,13 @@
 using System.Collections;
 
 public class Human : TestableAgent {
-
-	private Genome brain;
-
-	private double[] thoughts;
-	private double[] senses;
 	
-	private Vector2 target;
-
 	public override float getTurnStep() { return turnStep; }
-	public override float getMoveStep() { return moveStep*transform.localScale.x;}
+	public override float getMoveStep() { return 5.0f * transform.localScale.x;}
 
 	// Use this for initialization
 	protected override void initializeAgent () {
-
-		//Create brain
-		//brain = new SimpleGenome();
-
-		//Get ICE machine's location from map.
-		target = Vector2.zero;
+		base.initializeAgent();
 	}
 
 
@@ -30,7 +18,7 @@ public class Human : TestableAgent {
 
 	//Get ICE machine's location from map.
 	public override Vector2 getTarget() {
-		return target;
+		return map.cellIndexToWorld(map.ICEMachineLocation);
 	}
 	
 	//Nothing to deconstruct

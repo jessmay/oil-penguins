@@ -29,6 +29,21 @@ public class NeuralNet {
 		constructNetwork();
 	}
 
+	public NeuralNet(double[][][] weights) {
+
+		numInputs = weights[0][0].Length-1;
+		numOutputs= weights[weights.Length-1].Length;
+
+		numLayers = weights.Length;
+		numNeuronsPerLayer = numLayers == 1? numOutputs: weights[0].Length;
+
+		//Debug.Log(numInputs +" " +numOutputs + " "+ numLayers + " " + numNeuronsPerLayer);
+
+		constructNetwork();
+
+		replaceWeights(weights);
+	}
+
 
 	//Creates a network of neurons based on the initialized values of the neural network.
 	private void constructNetwork() {

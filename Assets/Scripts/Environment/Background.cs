@@ -77,7 +77,7 @@ public class Background : MonoBehaviour {
 	}
 
 	void OnGUI() {
-
+//
 //		Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 //		pos.z = 0;
 //

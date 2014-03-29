@@ -65,13 +65,13 @@ public abstract class Agent : MonoBehaviour {
 	// Use this for initialization
 	void Start() {
 
-		heading = transform.rotation.z;
+		heading = transform.rotation.eulerAngles.z;
 		velocity = Vector2.zero;
 		radius = GetComponent<CircleCollider2D> ().radius * transform.localScale.x;
 		gridCellIndex = Vector2.zero;
 
 		//Debug
-		//updateCenterInCameraSpace();
+		updateCenterInCameraSpace();
 
 		initializeAgent();
 
@@ -108,6 +108,17 @@ public abstract class Agent : MonoBehaviour {
 
 		//Remove agent from the grid
 		grid.remove(this);
+	}
+
+	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, Map map, Grid grid) {
+
+		GameObject newAgent = Instantiate(agent, location, rotation) as GameObject;
+		Agent agentScript = newAgent.GetComponent<Agent>();
+		
+		agentScript.map = map;
+		agentScript.grid = grid;
+
+		return newAgent;
 	}
 	
 	//Get the cell index into the agent grid.
@@ -172,6 +183,11 @@ public abstract class Agent : MonoBehaviour {
 	//Move the agent based on the current velocity.
 	private void Move() {
 
+		//Do not move outside the bounds of the grid.
+		if(!grid.inBounds(grid.getCellIndex(velocity*Time.deltaTime + (Vector2)transform.position))) {
+			velocity = Vector2.zero; 
+		}
+
 		//Save the previous grid cell index.
 		Vector2 prevCell = gridCellIndex;
 
@@ -188,7 +204,7 @@ public abstract class Agent : MonoBehaviour {
 		}
 
 		//Update debug information
-		//updateCenterInCameraSpace();
+		updateCenterInCameraSpace();
 	}
 
 	//Given a point, returns the distance from the agent to the point.
@@ -215,7 +231,6 @@ public abstract class Agent : MonoBehaviour {
 	void OnGUI(){
 
 		if(debug) {
-			updateCenterInCameraSpace();
 
 			DrawDebugInformation ();
 
@@ -286,9 +301,6 @@ public abstract class Agent : MonoBehaviour {
 	//Calculates the center of the agent in camera space.
 	private void updateCenterInCameraSpace() {
 
-		//Center of player object in local world space
-		//Vector3 center = new Vector3(renderer.bounds.center.x, -renderer.bounds.center.y);
-		
 		//Player's center in camera space
 		centerCameraSpace = (Vector2)DebugRenderer.currentCamera.WorldToScreenPoint(renderer.bounds.center);
 		centerCameraSpace.y = Screen.height - centerCameraSpace.y;

@@ -3,10 +3,10 @@ using System.Collections;
 
 public abstract class TestableAgent : Agent {
 	
-	private Genome brain;
+	protected Genome brain;
 	
-	private double[] thoughts;
-	private double[] senses;
+	protected double[] thoughts;
+	protected double[] senses;
 
 	//Sensors
 	public Feelers feelers {get; private set;}
@@ -19,7 +19,7 @@ public abstract class TestableAgent : Agent {
 
 	// Use this for initialization
 	protected override void initializeAgent () {
-		
+
 		//Create sensors
 		feelers = new Feelers(this, radius*3, getNumberOfFeelers());
 		adjAgents = new AdjacentAgents(this, radius*3, grid);
@@ -31,11 +31,7 @@ public abstract class TestableAgent : Agent {
 	public void replaceBrain(Genome genome) {
 		brain = genome;
 	}
-	
-	//Nothing to deconstruct
-	protected override void destroyAgent() {}
-	
-	
+
 	// Update is called once per frame
 	protected override void updateAgent () {
 		
@@ -116,7 +112,7 @@ public abstract class TestableAgent : Agent {
 			Vector3 cst = DebugRenderer.currentCamera.WorldToScreenPoint(t);
 			cst.y = Screen.height - cst.y;
 			
-			DebugRenderer.drawCircle(cst, DebugRenderer.worldToCameraLength(1));
+			DebugRenderer.drawCircle(cst, DebugRenderer.worldToCameraLength(1), Color.green);
 		//}
 		
 		//Draw sensors to the screen.

@@ -11,6 +11,8 @@ public abstract class Genome : IComparable<Genome> {
 
 	public Genome(double[][][] weights) {
 		this.weights = weights;
+
+		brain = new NeuralNet(weights);
 	}
 
 	public abstract double getFiredValue();
@@ -73,7 +75,7 @@ public abstract class Genome : IComparable<Genome> {
 
 
 	public static Genome createGenome(Type genome, double[][][] weights) {
-		return (Genome)Activator.CreateInstance(genome, weights);
+		return (Genome)Activator.CreateInstance(genome, new System.Object[]{weights});
 	}
 
 	//Given two parents, return a child that is a cross of these two genomes.

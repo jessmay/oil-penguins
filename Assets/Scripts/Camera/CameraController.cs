@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour {
 
 	private const float ViewPortEdge = 0.1f;
 	private const float CameraMovementSpeed = 5.0f;
+	private const float ViewEdgeDistance = 0.5f;
 
 	public bool invertedScroll = false;
 	public bool frozen = false;
@@ -40,8 +41,23 @@ public class CameraController : MonoBehaviour {
 	private void zoom () {
 		
 		if(Input.GetAxis("Mouse ScrollWheel") != 0) {
-			float size = camera.orthographicSize + (invertedScroll? 1:-1) * Input.GetAxis("Mouse ScrollWheel");
+
+			float amountScroll = Input.GetAxis("Mouse ScrollWheel");
+			float size = camera.orthographicSize + (invertedScroll? 1:-1) * amountScroll;
 			camera.orthographicSize = Mathf.Clamp(size, minCameraSize, maxCameraSize);
+			
+			DebugRenderer.updateLineWidth();
+
+//			if (size > minCameraSize && size < maxCameraSize) {
+//
+//				Vector3 mousePosition = camera.ScreenToWorldPoint(Input.mousePosition);
+//				Vector3 cameraPosition = camera.gameObject.transform.position;
+//				mousePosition.z = cameraPosition.z;
+//
+//				Vector3 dif = (mousePosition - cameraPosition);
+//
+//				camera.gameObject.transform.position = clampCameraPosition(cameraPosition + amountScroll * dif.normalized * (!invertedScroll? 1:-1));
+//			}
 		}
 
 	}
@@ -55,7 +71,7 @@ public class CameraController : MonoBehaviour {
 
 		Vector3 mousePosition = camera.ScreenToViewportPoint(Input.mousePosition);
 		Vector3 cameraPosition = camera.gameObject.transform.position;
-		
+
 		if (mousePosition.x < ViewPortEdge && mousePosition.x >= camera.rect.x) {
 			
 			cameraPosition.x += -getCameraSpeed(Math.Max(mousePosition.x, camera.rect.x)); //-((CameraMovementSpeed / camera.orthographicSize)* (0.1f - (mousePosition.x)));
@@ -74,7 +90,7 @@ public class CameraController : MonoBehaviour {
 			cameraPosition.y += getCameraSpeed(camera.rect.height - Math.Min(mousePosition.y, camera.rect.height)); 
 		}
 		
-		camera.gameObject.transform.position = cameraPosition;
+		camera.gameObject.transform.position = clampCameraPosition(cameraPosition);
 	}
 
 	private float getCameraSpeed(float amount) {
@@ -85,5 +101,19 @@ public class CameraController : MonoBehaviour {
 
 		Vector3 mousePosition = camera.ScreenToViewportPoint(Input.mousePosition);
 		return (mousePosition.x >= camera.rect.x && mousePosition.x < camera.rect.width && mousePosition.y >= camera.rect.y && mousePosition.y < camera.rect.height);
+	}
+
+	private Vector3 clampCameraPosition(Vector3 cameraPosition) {
+
+		Bounds mapBounds = Options.gameMap.map.getBounds();
+
+		float zoom = camera.orthographicSize;
+
+		cameraPosition.x = Mathf.Clamp(cameraPosition.x, -mapBounds.extents.x + zoom * ViewEdgeDistance, mapBounds.extents.x - zoom * ViewEdgeDistance);
+		cameraPosition.y = Mathf.Clamp(cameraPosition.y, -mapBounds.extents.y + zoom * ViewEdgeDistance, mapBounds.extents.y - zoom * ViewEdgeDistance);
+
+		//Debug.Log(cameraPosition);
+
+		return cameraPosition;
 	}
 }

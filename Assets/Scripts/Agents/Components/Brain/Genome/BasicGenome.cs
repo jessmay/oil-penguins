@@ -41,7 +41,7 @@ public class BasicGenome : Genome {
 		double[] senses = new double[4];
 
 		//Get proper target
-		double angle = agent.getAngleToPoint(Vector2.zero);
+		double angle = agent.getAngleToPoint(agent.getTarget());
 		
 		senses[0] = angle/180;
 		

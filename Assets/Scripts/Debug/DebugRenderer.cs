@@ -12,7 +12,7 @@ using System.Collections.Generic;
 public class DebugRenderer {
 
 	private static Texture2D lineTexture;
-	private static Dictionary<float, Texture2D> circleTextures;
+	private static Dictionary<Color, Dictionary<float, Texture2D>> circles;
 
 	public static Camera currentCamera {get; private set;}
 
@@ -25,29 +25,36 @@ public class DebugRenderer {
 		lineTexture.SetPixel(0,0, Color.white);
 		lineTexture.Apply();
 
-		circleTextures = new Dictionary<float, Texture2D>();
-
-
+		circles = new Dictionary<Color, Dictionary<float, Texture2D>>();
 	}
 
 	public static void updateCamera(Camera camera) {
 
 		currentCamera = camera;
+		updateLineWidth();
+	}
+
+	public static void updateLineWidth() {
 		lineWidth = DebugRenderer.worldToCameraLength(worldLineWidth);
 	}
 
-	//Retrives a circle of the given radius. 
+	//Retrives a circle of the given radius and color. 
 	//If the circle does not exist, create it.
-	private static Texture2D getCircle(float radius) {
+	private static Texture2D getCircle(float radius, Color color) {
 
-		if(!circleTextures.ContainsKey(radius))
-			circleTextures[radius] = createCircle(radius);
+		if(!circles.ContainsKey(color)) {
+			circles[color] = new Dictionary<float, Texture2D>(); 
+		}
 
-		return circleTextures[radius];
+		if(!circles[color].ContainsKey(radius))
+			circles[color][radius] = createCircle(radius, color);
+		
+		return circles[color][radius];
+
 	}
 
-	//Create a texture of a circle with a radius of the given size.
-	private static Texture2D createCircle(float radius) {
+	//Create a texture of a circle with the given radius and color.
+	private static Texture2D createCircle(float radius, Color color) {
 
 		int ceilInt = Mathf.CeilToInt(radius);
 
@@ -61,7 +68,7 @@ public class DebugRenderer {
 				float sqInnerRadius = (radius-lineWidth)*(radius-lineWidth);
 
 				if(sqMag < sqOuterRadius && sqMag > sqInnerRadius) {
-					circle.SetPixel(x+ceilInt,y+ceilInt, Color.black);
+					circle.SetPixel(x+ceilInt,y+ceilInt, color);
 				}
 				else {
 					circle.SetPixel(x+ceilInt,y+ceilInt, Color.clear);
@@ -86,9 +93,9 @@ public class DebugRenderer {
 	//Draw a circle at the given point. All in camera space.
 	public static void drawCircle(Vector2 center, float radius, Color? c = null) {
 
-		//Color color = c.HasValue ? c.Value : Color.black;
+		Color color = c.HasValue ? c.Value : Color.black;
 
-		GUI.DrawTexture(new Rect(center.x-radius, center.y-radius, radius*2, radius*2), getCircle(radius), ScaleMode.ScaleToFit);
+		GUI.DrawTexture(new Rect(center.x-radius, center.y-radius, radius*2, radius*2), getCircle(radius, color), ScaleMode.ScaleToFit);
 	}
 	
 	//Draw a box

@@ -8,6 +8,7 @@ Updated by Joshua Linge on 2014-03-17
 
 using UnityEngine;
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -17,8 +18,8 @@ public class Map : IDisposable {
 
 	private GameObject wall;
 
-	private int mapWidth;
-	private int mapHeight;
+	public int mapWidth {get; private set;}
+	public int mapHeight {get; private set;}
 	
 	private float xSize;
 	private float ySize;
@@ -29,20 +30,44 @@ public class Map : IDisposable {
 	private GameObject[,] board;
 	public bool[,] canMove;
 
+
+
+	public List<Vector2> HumanSpawnPoints;// {get; private set;}
+	public Vector2 ICEMachineLocation;// {get; private set;} //Change to GameObject later.
+	public Vector2 PenguinSpawn;// {get; private set;}
+
+
+	//Map colors
+	public static Color WallColor = Color.black;
+	public static Color HumanSpawnColor = Color.red;
+	public static Color PenguinSpawnColor = Color.blue;
+	public static Color ICEMachineColor = Color.cyan;
+	public static Color EmptyColor = Color.clear;
+
+	public static Vector2 INVALID_LOCATION = -Vector2.one;
+
+
+	//Construct default map with the given size
 	public Map(string n, GameObject w, int width, int height) {
 
 		init(n, w, width, height);
 
 		createBorder();
+
+		HumanSpawnPoints.Add(Vector2.zero);
+		ICEMachineLocation = new Vector2(mapWidth/2, mapHeight/2);
+		PenguinSpawn = new Vector2(mapWidth/2, mapHeight/2);
 	}
 
+	//Construct a map based on the given image
 	public Map(string n, GameObject w, Texture2D map) {
 
 		init (n, w, map.width, map.height);
 
 		readMap(map);
 	}
-			
+
+	//Initialize variables
 	private void init (string n, GameObject w, int width, int height) {
 
 		name = n;
@@ -91,6 +116,10 @@ public class Map : IDisposable {
 				canMove[i,j] = true;
 			}
 		}
+
+		HumanSpawnPoints = new List<Vector2>();
+		PenguinSpawn = INVALID_LOCATION;
+		ICEMachineLocation = INVALID_LOCATION;
 	}
 
 	//Put walls along the edges of the map
@@ -121,15 +150,41 @@ public class Map : IDisposable {
 		for (int x = 0; x < map.width; ++x) {
 			for (int y = 0; y < map.height; ++y) {
 
-				if (map.GetPixel(x,y) == Color.black) {
+				Color pixel = map.GetPixel(x,y);
+
+				if (pixel == WallColor) {
 					addWall(new Vector2(x, y));
 				}
-				else {
-					removeWall(new Vector2(x,y));
+
+				else if (pixel == HumanSpawnColor) {
+
+					//Not on the edge of the map
+					if(x != 0 && x != mapWidth-1 && y != 0 && y != mapHeight-1) {
+						throw new Exception("Invalid map. Human spawn location not on the edge. ("+x +", "+y +")");
+					}
+
+					HumanSpawnPoints.Add(new Vector2(x,y));
+				}
+
+				else if (pixel == PenguinSpawnColor) {
+
+					if(PenguinSpawn != INVALID_LOCATION) {
+						throw new Exception("Invalid map. Multiple penguin spawn points. ("+PenguinSpawn.x +", "+PenguinSpawn.y +") ("+x +", "+y +")");
+					}
+
+					PenguinSpawn = new Vector2(x,y);
+				}
+
+				else if (pixel == ICEMachineColor) {
+					
+					if(ICEMachineLocation != INVALID_LOCATION) {
+						throw new Exception("Invalid map. Multiple ICE Machine locations. ("+ICEMachineLocation.x +", "+ICEMachineLocation.y +") ("+x +", "+y +")");
+					}
+					
+					ICEMachineLocation = new Vector2(x,y);
 				}
 			}
 		}
-
 	}
 
 	public Texture2D saveMap () {
@@ -140,12 +195,19 @@ public class Map : IDisposable {
 			for (int y = 0; y < map.height; ++y) {
 				
 				if (board[y,x] != null) {
-					map.SetPixel(x,y, Color.black);
+					map.SetPixel(x,y, WallColor);
 				}
 				else {
-					map.SetPixel(x,y, Color.clear);
+					map.SetPixel(x,y, EmptyColor);
 				}
 			}
+		}
+
+		map.SetPixel((int)PenguinSpawn.x, (int)PenguinSpawn.y, PenguinSpawnColor);
+		map.SetPixel((int)ICEMachineLocation.x, (int)ICEMachineLocation.y, ICEMachineColor);
+
+		foreach (Vector2 loc in HumanSpawnPoints) {
+			map.SetPixel((int)loc.x, (int)loc.y, HumanSpawnColor);
 		}
 
 		map.Apply();
@@ -281,6 +343,45 @@ public class Map : IDisposable {
 		}
 		
 		return nearNodes;
+	}
+
+
+
+
+	public string MapDirectory = Application.dataPath + "/../Maps";
+
+	//Save the current map to the given file name.
+	public void saveMap (string mapName) {
+		
+		Debug.Log("Saving Map " +mapName);
+		
+		if(!Directory.Exists(MapDirectory)) 
+			Directory.CreateDirectory(MapDirectory);
+		
+		byte[] bytes = saveMap().EncodeToPNG();
+		File.WriteAllBytes(MapDirectory +"/" + mapName +".png", bytes);
+		
+	}
+
+	//Load a map from the given file name.
+	public static Map loadMap (string mapName, GameObject Wall) {
+
+		string MapDirectory = Application.dataPath + "/../Maps";
+
+		Debug.Log("Loading Map " +mapName);
+
+		string fileName = MapDirectory +"/"+ mapName +".png";
+
+		if(!File.Exists(fileName)) {
+			Debug.LogWarning("Map "+mapName +" could not be found.");
+			mapName = "Default";
+		}
+			
+		byte[] bytes = File.ReadAllBytes(MapDirectory +"/"+ mapName +".png");
+		Texture2D mapImage = new Texture2D(1,1);
+		mapImage.LoadImage(bytes);
+		
+		return new Map(mapName, Wall, mapImage);
 	}
 
 
