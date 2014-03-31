@@ -30,9 +30,9 @@ public class MapMakerMenuStateSave : GUIState {
 
 		fileName = GUI.TextField (new Rect(Screen.width/2 - sWidth/4 , Screen.height/2 , sWidth/2 - 20, buttonHeight), fileName, 50, finiteStateMachine.pauseMenu.skin.textField);
 
-		bool fileExists = File.Exists(Options.MapDirectory + "/" +fileName);
-		if(fileExists) {
-			GUI.Label(new Rect(Screen.width/2 + sWidth/4 -20, Screen.height/2, 40, height), "X", label);
+		bool fileExists = File.Exists(Options.MapDirectory + "/" +fileName +".png");
+		if(fileExists || fileName.Equals("")) {
+			GUI.Label(new Rect(Screen.width/2 + sWidth/4 -20, Screen.height/2 + 20, 40, height), "X", label);
 		}
 		
 		GUI.enabled = !fileExists && !fileName.Equals("");
@@ -52,7 +52,7 @@ public class MapMakerMenuStateSave : GUIState {
 	}
 
 	public override void enter () {
-		fileName = "";
+		fileName = Options.mapName == null? "": Options.mapName;
 	}
 
 	public override void exit () {}

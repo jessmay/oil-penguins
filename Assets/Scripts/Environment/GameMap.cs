@@ -38,7 +38,7 @@ public class GameMap : MonoBehaviour{
 
 	void OnGUI() {
 
-		if(GetComponent<MapEditor>() == null)
+		if(GetComponent<PauseMenu>().isPaused())
 			return;
 
 
