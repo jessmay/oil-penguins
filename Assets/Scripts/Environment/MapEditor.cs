@@ -26,7 +26,7 @@ public class MapEditor : MonoBehaviour {
 			pos.z = 0;
 
 			Vector2 mapPos = gameMap.map.getCellIndex(pos);
-
+			//Debug.Log("Click at map position: "+mapPos);
 
 
 			if(currColor == Map.WallColor) {
@@ -75,6 +75,7 @@ public class MapEditor : MonoBehaviour {
 			if(Input.GetKeyDown(((i+1)).ToString())) {
 				currColor = mapColors[i];
 				colorIndex = i;
+				//Debug.Log("Color changed to index: "+i);
 			}
 		}
 
@@ -101,6 +102,7 @@ public class MapEditor : MonoBehaviour {
 
 	void OnGUI() {
 		DebugRenderer.drawBox(0,0, 50,50, 0, Vector2.zero, currColor);
+
 	}
 
 }

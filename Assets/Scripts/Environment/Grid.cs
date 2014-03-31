@@ -142,7 +142,7 @@ public class Grid : IDisposable {
 		for (int i = (int)lower.y; i <= (int)upper.y; ++i) {
 			for (int j = (int)lower.x; j <= (int)upper.x; ++j) {
 
-				if (!inBounds(i,j))
+				if (!inBounds(j,i))
 					continue;
 
 				for (int k = 0; k < grid[i,j].Count; ++k) {

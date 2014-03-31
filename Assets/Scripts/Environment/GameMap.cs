@@ -20,8 +20,11 @@ public class GameMap : MonoBehaviour{
 
 		HumansOnMap = new List<GameObject>();
 		PenguinsOnMap = new List<GameObject>();
-		
-		createMap(Options.mapName);
+
+		if (Options.mapName != null)
+			loadMap(Options.mapName);
+		else
+			createMap(Options.mapName, Options.mapSize);
 		Options.gameMap = this;
 	}
 
@@ -70,10 +73,34 @@ public class GameMap : MonoBehaviour{
 		}
 
 	}
-	
-	private void createMap(string mapName) {
+
+
+	private void createMap(string mapName, Vector2 mapSize) {
 		
 		Debug.Log("Creating map "+mapName);
+		
+		if(map != null)
+			map.Dispose();
+		
+		map = new Map(mapName, Wall, (int)mapSize.x, (int)mapSize.y);
+		
+		Bounds mapBounds = map.getBounds();
+		
+		if (grid != null)
+			grid.Dispose();
+		
+		grid = new Grid (map.getMapWidth(), map.getMapHeight(), mapBounds);
+		
+		transform.localScale = new Vector3(mapBounds.size.x/renderer.bounds.size.x*transform.localScale.x, mapBounds.size.y/renderer.bounds.size.y*transform.localScale.y, transform.localScale.z);
+		
+		HumansOnMap.Clear();
+		PenguinsOnMap.Clear();
+	}
+
+	//Load the given map name and dispose of all previous used resouces.
+	private void loadMap(string mapName) {
+		
+		Debug.Log("Loading map "+mapName);
 		
 		if(map != null)
 			map.Dispose();
@@ -88,34 +115,41 @@ public class GameMap : MonoBehaviour{
 		grid = new Grid (map.getMapWidth(), map.getMapHeight(), mapBounds);
 		
 		transform.localScale = new Vector3(mapBounds.size.x/renderer.bounds.size.x*transform.localScale.x, mapBounds.size.y/renderer.bounds.size.y*transform.localScale.y, transform.localScale.z);
+	
+		HumansOnMap.Clear();
+		PenguinsOnMap.Clear();
 	}
 
-//	public void loadMap (string mapName) {
-//		
-//		//Reload the same map?
-//		//if(map != null && map.name.Equals(mapName))
-//		//	return;
-//		
-//		Debug.Log("Loading Map " +mapName);
-//		
-//		byte[] bytes = File.ReadAllBytes(Application.dataPath + "/../Maps/"+ mapName +".png");
-//		Texture2D mapImage = new Texture2D(1,1);
-//		mapImage.LoadImage(bytes);
-//		
-//		//createMap(mapName, mapImage);//new Map(mapName, Wall, mapImage)
-//		
-//		//createPlayer();
-//	}
-
 	
+	//Force to only spawn one penguin so that no penguin spawns on top of another?
+	//	Should be a check in the manager script.
+
 	//Add type if icicle penguins added.
 	public void spawnPenguin(int amount = 1) {
+		
+		for (int currPenguin = 0; currPenguin < amount; ++currPenguin) {
+			
+			StartCoroutine(spawnPenguin (currPenguin * 3.0f, map.PenguinSpawn));
+		}
+	}
 
+	//Spawns a penguin at the given location after a delay.
+	// Penguins face towards the center of the map.
+	IEnumerator spawnPenguin(float delay, Vector2 location) {
+		
+		yield return new WaitForSeconds(delay);
+		
+		Debug.Log("Spawning new penguin at "+ map.cellIndexToWorld(location));
+		GameObject penguin = Agent.CreateAgent(Penguin, map.cellIndexToWorld(location), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), map, grid);
+
+		//Initialize penguin specific values
+		//penguin.GetComponent<Penguin>();
+		
+		PenguinsOnMap.Add(penguin);
 	}
 
 
 	//Given a human spawn point on the map, spawn the amount of humans. 
-	// Humans face towards the center of the map.
 	public void spawnHuman(Vector2 location, int amount = 1) {
 
 		for (int currHuman = 0; currHuman < amount; ++currHuman) {
@@ -124,6 +158,8 @@ public class GameMap : MonoBehaviour{
 		}
 	}
 
+	//Spawns a human at the given location after a delay.
+	// Humans face towards the center of the map.
 	IEnumerator spawnHuman(float delay, Vector2 location) {
 
 		yield return new WaitForSeconds(delay);

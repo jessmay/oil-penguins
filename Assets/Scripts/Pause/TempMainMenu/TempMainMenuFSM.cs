@@ -13,5 +13,8 @@ public class TempMainMenuFSM : GUIFSM {
 	public override void initialize ()
 	{
 		addState(new TempMainMenuState(this));
+		addState(new TempMainMenuStateMapEditor(this));
+		addState(new TempMainMenuStateMapEditorLoad(this));
+		addState(new TempMainMenuStateMapEditorNew(this));
 	}
 }

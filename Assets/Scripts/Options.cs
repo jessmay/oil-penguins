@@ -6,10 +6,12 @@ public class Options {
 	public static string mapName;
 	public static GameMap gameMap;
 	
+	public static Vector2 mapSize;
 
+	public static string MapDirectory = Application.dataPath + "/../Maps";
 
 	static Options() {
-		mapName = "NewMap";//"FourCorners";//"Default";
+		mapName = "NotSure";//"FourCorners";//"Default";
 	}
 
 }

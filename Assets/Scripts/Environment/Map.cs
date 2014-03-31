@@ -54,9 +54,9 @@ public class Map : IDisposable {
 
 		createBorder();
 
-		HumanSpawnPoints.Add(Vector2.zero);
+		//HumanSpawnPoints.Add(Vector2.zero);
 		ICEMachineLocation = new Vector2(mapWidth/2, mapHeight/2);
-		PenguinSpawn = new Vector2(mapWidth/2, mapHeight/2);
+		PenguinSpawn = new Vector2(mapWidth/2, mapHeight/2+1);
 	}
 
 	//Construct a map based on the given image
@@ -348,36 +348,39 @@ public class Map : IDisposable {
 
 
 
-	public string MapDirectory = Application.dataPath + "/../Maps";
+
+
+
+	//public static string MapDirectory;
 
 	//Save the current map to the given file name.
 	public void saveMap (string mapName) {
 		
 		Debug.Log("Saving Map " +mapName);
 		
-		if(!Directory.Exists(MapDirectory)) 
-			Directory.CreateDirectory(MapDirectory);
+		if(!Directory.Exists(Options.MapDirectory)) 
+			Directory.CreateDirectory(Options.MapDirectory);
 		
 		byte[] bytes = saveMap().EncodeToPNG();
-		File.WriteAllBytes(MapDirectory +"/" + mapName +".png", bytes);
+		File.WriteAllBytes(Options.MapDirectory +"/" + mapName +".png", bytes);
 		
 	}
 
 	//Load a map from the given file name.
 	public static Map loadMap (string mapName, GameObject Wall) {
 
-		string MapDirectory = Application.dataPath + "/../Maps";
+		//string MapDirectory = Application.dataPath + "/../Maps";
 
 		Debug.Log("Loading Map " +mapName);
 
-		string fileName = MapDirectory +"/"+ mapName +".png";
+		string fileName = Options.MapDirectory +"/"+ mapName +".png";
 
 		if(!File.Exists(fileName)) {
 			Debug.LogWarning("Map "+mapName +" could not be found.");
 			mapName = "Default";
 		}
 			
-		byte[] bytes = File.ReadAllBytes(MapDirectory +"/"+ mapName +".png");
+		byte[] bytes = File.ReadAllBytes(Options.MapDirectory +"/"+ mapName +".png");
 		Texture2D mapImage = new Texture2D(1,1);
 		mapImage.LoadImage(bytes);
 		
