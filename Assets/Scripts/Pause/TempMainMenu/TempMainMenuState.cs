@@ -42,7 +42,8 @@ public class TempMainMenuState : GUIState {
 		}
 
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top) *2, sWidth/2, buttonHeight),"Human Testing", button)) {
-			
+
+			Options.mapName = "NotSure";
 			finiteStateMachine.pauseMenu.unPause();
 			Application.LoadLevel("TestScene");
 		}

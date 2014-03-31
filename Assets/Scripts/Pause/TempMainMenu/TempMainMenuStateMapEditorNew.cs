@@ -77,7 +77,7 @@ public class TempMainMenuStateMapEditorNew : GUIState {
 		
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Back", button)) {
 
-			finiteStateMachine.changeState(typeof(TempMainMenuState));
+			finiteStateMachine.changeState(typeof(TempMainMenuStateMapEditor));
 		}
 
 	}

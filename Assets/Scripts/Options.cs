@@ -11,7 +11,7 @@ public class Options {
 	public static string MapDirectory = Application.dataPath + "/../Maps";
 
 	static Options() {
-		mapName = "NotSure";//"FourCorners";//"Default";
+		//mapName = "NotSure";//"FourCorners";//"Default";
 	}
 
 }

@@ -38,6 +38,9 @@ public class GameMap : MonoBehaviour{
 
 	void OnGUI() {
 
+		if(GetComponent<MapEditor>() == null)
+			return;
+
 
 //		Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 //		pos.z = 0;
