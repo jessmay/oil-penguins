@@ -23,7 +23,7 @@ public class TempMainMenuStateMapEditor : GUIState {
 		
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Load Map", button)) {
 
-			finiteStateMachine.changeState(typeof(TempMainMenuStateMapEditorLoad));
+			finiteStateMachine.changeState(typeof(TempMainMenuStateLoad), TempMainMenuStateLoad.FROM_MAP_EDITOR);
 
 			//finiteStateMachine.pauseMenu.unPause();
 			//Application.LoadLevel("ANNTrainer");

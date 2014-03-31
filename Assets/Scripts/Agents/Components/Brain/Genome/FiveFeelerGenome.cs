@@ -4,9 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-public class BasicGenome : Genome {
-
-
+public class FiveFeelerGenome : Genome {
+	
 	private int currTick;
 
 	//Bonus statistics
@@ -19,7 +18,7 @@ public class BasicGenome : Genome {
 	public int rotBonus {get; private set;}
 	public int colBonus {get; private set;}
 
-	public BasicGenome(double[][][] weights) : base(weights) {
+	public FiveFeelerGenome(double[][][] weights) : base(weights) {
 
 		currTick = 0;
 
@@ -35,7 +34,7 @@ public class BasicGenome : Genome {
 
 	
 	public override double getFiredValue() { return 0.7; }
-	public override int getNumberOfFeelers(){ return 3; }
+	public override int getNumberOfFeelers(){ return 5; }
 
 	public override double[] sense(TestableAgent agent) {
 		//Initialize input based on senses.
@@ -79,9 +78,10 @@ public class BasicGenome : Genome {
 		}
 		
 		//Move backward
-//		else if (thoughts[1] < 1-getFiredValue()) {
-//			agent.moveTo(-(float)thoughts[1] * agent.getMoveStep());
-//		}
+		else if (thoughts[1] < 1-getFiredValue()) {
+			agent.moveTo(-(float)thoughts[1] * agent.getMoveStep());
+			++numTimesFired;
+		}
 		
 		
 		//TODO Give option to strafe left and right.

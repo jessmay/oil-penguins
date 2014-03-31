@@ -2,7 +2,19 @@
 using System.Collections;
 
 public abstract class TestableAgent : Agent {
-	
+
+
+	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, Map map, Grid grid, Genome genome) {
+		
+		GameObject newAgent = Agent.CreateAgent(agent, location, rotation, map, grid);
+
+		TestableAgent ta = newAgent.GetComponent<TestableAgent>();
+
+		ta.brain = genome;
+		
+		return newAgent;
+	}
+
 	protected Genome brain;
 	
 	protected double[] thoughts;
@@ -14,14 +26,13 @@ public abstract class TestableAgent : Agent {
 	public PieSlices pieSlices {get; private set;}
 
 
-	public abstract int getNumberOfFeelers();
 	public abstract Vector2 getTarget();
 
 	// Use this for initialization
 	protected override void initializeAgent () {
 
 		//Create sensors
-		feelers = new Feelers(this, radius*3, getNumberOfFeelers());
+		feelers = new Feelers(this, radius*3, brain.getNumberOfFeelers());
 		adjAgents = new AdjacentAgents(this, radius*3, grid);
 		pieSlices = new PieSlices(this, adjAgents);
 

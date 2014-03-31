@@ -16,6 +16,7 @@ public abstract class Genome : IComparable<Genome> {
 	}
 
 	public abstract double getFiredValue();
+	public abstract int getNumberOfFeelers();
 
 	public abstract double[] sense(TestableAgent agent);
 	public abstract double[] think(TestableAgent agent, double[] senses);

@@ -28,15 +28,16 @@ public class MapMakerMenuStateSave : GUIState {
 
 		// Get file name here
 
-		fileName = GUI.TextField (new Rect(Screen.width/2 - sWidth/4 , Screen.height/2 , sWidth/2 - 20, buttonHeight), fileName, 50, finiteStateMachine.pauseMenu.skin.textField);
-
 		bool fileExists = File.Exists(Options.MapDirectory + "/" +fileName +".png");
+
+		fileName = GUI.TextField (new Rect(Screen.width/2 - sWidth/4 , Screen.height/2 , sWidth/2 - (fileExists || fileName.Equals("")? 40:0), buttonHeight), fileName, 50, finiteStateMachine.pauseMenu.skin.textField);
+
 		if(fileExists || fileName.Equals("")) {
-			GUI.Label(new Rect(Screen.width/2 + sWidth/4 -20, Screen.height/2 + 20, 40, height), "X", label);
+			GUI.Label(new Rect(Screen.width/2 + sWidth/4 -40, Screen.height/2 + 20, 40, height), "X", label);
 		}
 		
-		GUI.enabled = !fileExists && !fileName.Equals("");
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Save", button)) {
+		GUI.enabled = !fileName.Equals("");
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight), (fileExists? "Save over":"Save"), button)) {
 
 			Options.gameMap.map.saveMap(fileName);
 			finiteStateMachine.pauseMenu.unPause();

@@ -38,8 +38,8 @@ public class GameMap : MonoBehaviour{
 
 	void OnGUI() {
 
-		if(GetComponent<PauseMenu>().isPaused())
-			return;
+		//if(GetComponent<PauseMenu>().isPaused())
+		//	return;
 
 
 //		Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -168,14 +168,16 @@ public class GameMap : MonoBehaviour{
 		yield return new WaitForSeconds(delay);
 
 		Debug.Log("Spawning new human at "+ map.cellIndexToWorld(location));
-		GameObject human = Agent.CreateAgent(Human, map.cellIndexToWorld(location), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), map, grid);
 
 		string[] files = Directory.GetFiles(Application.dataPath + "/../GA/Genomes/");
-
-		int index = Random.Range(2, files.Length);
-		Genome genome = BasicGenome.load(File.ReadAllText(files[index]));
 		
-		human.GetComponent<TestableAgent>().replaceBrain(genome);
+		int index = Random.Range(2, files.Length);
+		Genome genome = Genome.load(File.ReadAllText(files[index]));
+
+		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), map, grid, genome);
+
+
+		//human.GetComponent<TestableAgent>().replaceBrain(genome);
 
 		HumansOnMap.Add(human);
 	}

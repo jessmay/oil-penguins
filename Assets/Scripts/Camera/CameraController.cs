@@ -108,7 +108,7 @@ public class CameraController : MonoBehaviour {
 
 		Bounds mapBounds = Options.gameMap.map.getBounds();
 
-		float zoom = camera.orthographicSize;
+		//float zoom = camera.orthographicSize;
 
 		//Vector2 min = new Vector2(-mapBounds.extents.x + zoom * ViewEdgeDistance, -mapBounds.extents.y + zoom * ViewEdgeDistance);
 		//Vector2 max = new Vector2(mapBounds.extents.x - zoom * ViewEdgeDistance, mapBounds.extents.y - zoom * ViewEdgeDistance);

@@ -3,9 +3,12 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-public class TempMainMenuStateMapEditorLoad : GUIState {
+public class TempMainMenuStateLoad : GUIState {
 
-	public TempMainMenuStateMapEditorLoad (TempMainMenuFSM fsm) : base(fsm) { }
+	public static int FROM_MAP_EDITOR = 1;
+	public static int FROM_HUMAN_TESTS = 2;
+
+	public TempMainMenuStateLoad (TempMainMenuFSM fsm) : base(fsm) { }
 	
 	public override string getName () {
 		return "Temporary Main Menu Map Editor Load";
@@ -66,8 +69,13 @@ public class TempMainMenuStateMapEditorLoad : GUIState {
 			if(GUI.Button (new Rect(0, (0+currMap)*(buttonHeight - button.border.top), sWidth/2-(fileList.Length> maxFilesPerScroll?scrollBarWidth:0), buttonHeight), fileList[currMap], button)) {
 
 				Options.mapName = fileList[currMap];
+
+				if(statusCode == FROM_MAP_EDITOR)
+					Application.LoadLevel("MapEditor");
+				else if(statusCode == FROM_HUMAN_TESTS)
+					Application.LoadLevel("TestScene");
+
 				finiteStateMachine.pauseMenu.unPause();
-				Application.LoadLevel("MapEditor");
 				//return fileList[currMap];
 			}
 		}
@@ -78,7 +86,8 @@ public class TempMainMenuStateMapEditorLoad : GUIState {
 		//Exit or back button
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + 2*(buttonHeight- button.border.top), sWidth/2, buttonHeight), "Back", button)) {
 
-			finiteStateMachine.changeState(typeof(TempMainMenuStateMapEditor));
+			finiteStateMachine.changeToPreviousState();
+			//finiteStateMachine.changeState(typeof(TempMainMenuStateMapEditor));
 			//return null;
 		}
 
@@ -92,6 +101,6 @@ public class TempMainMenuStateMapEditorLoad : GUIState {
 	public override void exit () {}
 	
 	protected override bool isValidStatus (int statusCode) {
-		return (statusCode == DEFAULT_CODE);
+		return (statusCode == FROM_MAP_EDITOR || statusCode == FROM_HUMAN_TESTS);
 	}
 }

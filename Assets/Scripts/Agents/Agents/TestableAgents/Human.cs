@@ -12,10 +12,6 @@ public class Human : TestableAgent {
 	}
 
 
-	public override int getNumberOfFeelers(){
-		return 3;
-	}
-
 	//Get ICE machine's location from map.
 	public override Vector2 getTarget() {
 		return map.cellIndexToWorld(map.ICEMachineLocation);
@@ -28,22 +24,6 @@ public class Human : TestableAgent {
 	// Update is called once per frame
 	protected override void updateAgent () {
 		base.updateAgent();
-
-//		
-//		//Check debug buttons.
-//		checkButtons();
-//		
-//		//Calculate information for each sensor.
-//		sense();
-//		senses = brain.sense(this);
-//		
-//		//think about the information collected by the sensors.
-//		//think();
-//		thoughts = brain.think(this, senses);
-//		
-//		//act on ANN output.
-//		//act();
-//		brain.act(this, thoughts);
 	}
 	
 

@@ -14,7 +14,7 @@ public class TempMainMenuFSM : GUIFSM {
 	{
 		addState(new TempMainMenuState(this));
 		addState(new TempMainMenuStateMapEditor(this));
-		addState(new TempMainMenuStateMapEditorLoad(this));
+		addState(new TempMainMenuStateLoad(this));
 		addState(new TempMainMenuStateMapEditorNew(this));
 	}
 }
