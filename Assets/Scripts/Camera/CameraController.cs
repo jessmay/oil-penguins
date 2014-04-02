@@ -35,7 +35,7 @@ public class CameraController : MonoBehaviour {
 
 			camera.transform.position = startPos;
 			camera.orthographicSize = 30;
-
+			DebugRenderer.updateLineWidth();
 		}
 	}
 

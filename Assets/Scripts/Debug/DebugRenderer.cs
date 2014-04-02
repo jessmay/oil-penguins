@@ -11,8 +11,8 @@ using System.Collections.Generic;
 
 public class DebugRenderer {
 
-	private static Texture2D lineTexture;
 	private static Dictionary<Color, Dictionary<float, Texture2D>> circles;
+	private static Dictionary<Color, Texture2D> lineTextures;
 
 	public static Camera currentCamera {get; private set;}
 
@@ -21,11 +21,15 @@ public class DebugRenderer {
 
 	//Initialize
 	static DebugRenderer() {
-		lineTexture = new Texture2D(1, 1);
+		Texture2D lineTexture = new Texture2D(1, 1);
 		lineTexture.SetPixel(0,0, Color.white);
 		lineTexture.Apply();
 
+		lineTextures = new Dictionary<Color, Texture2D>();
+		lineTextures.Add(Color.white, lineTexture);
+
 		circles = new Dictionary<Color, Dictionary<float, Texture2D>>();
+		circles[Color.white] = new Dictionary<float, Texture2D>();
 	}
 
 	public static void updateCamera(Camera camera) {
@@ -38,16 +42,33 @@ public class DebugRenderer {
 		lineWidth = DebugRenderer.worldToCameraLength(worldLineWidth);
 	}
 
+
+	//Retrive a texture of the given color.
+	//If the texture does not exist, create it.
+	private static Texture2D getLineTexture(Color color) {
+
+		if(!lineTextures.ContainsKey(color)) {
+			lineTextures[color] = colorizeTexture(lineTextures[Color.white], color);
+		}
+
+		return lineTextures[color];
+	}
+
 	//Retrives a circle of the given radius and color. 
 	//If the circle does not exist, create it.
 	private static Texture2D getCircle(float radius, Color color) {
+
+		if(!circles[Color.white].ContainsKey(radius)) {
+			circles[Color.white][radius] = createCircle(radius, Color.white);
+		}
 
 		if(!circles.ContainsKey(color)) {
 			circles[color] = new Dictionary<float, Texture2D>(); 
 		}
 
-		if(!circles[color].ContainsKey(radius))
-			circles[color][radius] = createCircle(radius, color);
+		if(!circles[color].ContainsKey(radius)) {
+			circles[color][radius] = colorizeTexture(circles[Color.white][radius], color);
+		}
 		
 		return circles[color][radius];
 
@@ -104,7 +125,7 @@ public class DebugRenderer {
 		Color color = c.HasValue ? c.Value : Color.black;
 		
 		GUIUtility.RotateAroundPivot(angle, pivot);
-		GUI.DrawTexture(new Rect(x, y, width, height), colorizeTexture(lineTexture, color), ScaleMode.StretchToFill);
+		GUI.DrawTexture(new Rect(x, y, width, height), getLineTexture(color), ScaleMode.StretchToFill);
 		GUIUtility.RotateAroundPivot(-angle, pivot);
 	}
 
