@@ -22,19 +22,48 @@ public class CameraController : MonoBehaviour {
 
 		//Set camera location and zoom based on map
 
+		//Update max zoom based on map bounds.
+	}
+
+	void Start() {
+
+		if(Options.gameMap != null && !Options.Testing) {
+			Vector3 startPos = camera.transform.position;
+			Vector3 penguinPos = Options.gameMap.map.cellIndexToWorld(Options.gameMap.map.PenguinSpawn);
+			startPos.x = penguinPos.x;
+			startPos.y = penguinPos.y;
+
+			camera.transform.position = startPos;
+			camera.orthographicSize = 30;
+
+		}
+	}
+
+	void Update() {
+		if(frozen || !Options.Testing) 
+			return;
+
+		updateCamera();
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+
+		if(Input.GetKeyUp(KeyCode.F3)) {
+			frozen = !frozen;
+		}
 	
-		if(frozen)
+		if(frozen || Options.Testing)
 			return;
 
+		updateCamera();
+	}
+
+	private void updateCamera() {
+		
 		zoom();
-
+		
 		pan();
-
-
 	}
 
 	//Increase or decrease orthographic size (zoom) based on mouse scroll wheel.
@@ -108,7 +137,7 @@ public class CameraController : MonoBehaviour {
 
 		Bounds mapBounds = Options.gameMap.map.getBounds();
 
-		float zoom = camera.orthographicSize;
+		//float zoom = camera.orthographicSize;
 
 		//Vector2 min = new Vector2(-mapBounds.extents.x + zoom * ViewEdgeDistance, -mapBounds.extents.y + zoom * ViewEdgeDistance);
 		//Vector2 max = new Vector2(mapBounds.extents.x - zoom * ViewEdgeDistance, mapBounds.extents.y - zoom * ViewEdgeDistance);

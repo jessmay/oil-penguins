@@ -100,6 +100,11 @@ public class Map : IDisposable {
 	public Bounds getBounds() {
 		return new Bounds(center, new Vector3(mapWidth*xSize, mapHeight * ySize, 0));
 	}
+	
+	public Vector2 getRandomHumanSpawn() {
+		return HumanSpawnPoints[Mathf.FloorToInt(UnityEngine.Random.value*HumanSpawnPoints.Count)];
+	}
+
 
 	private void createBoard(int width, int height) {
 
@@ -159,7 +164,7 @@ public class Map : IDisposable {
 				else if (pixel == HumanSpawnColor) {
 
 					//Not on the edge of the map
-					if(x != 0 && x != mapWidth-1 && y != 0 && y != mapHeight-1) {
+					if((x != 0 && x != mapWidth-1 && y != 0 && y != mapHeight-1) && !Options.Testing) {
 						throw new Exception("Invalid map. Human spawn location not on the edge. ("+x +", "+y +")");
 					}
 
@@ -344,6 +349,7 @@ public class Map : IDisposable {
 		
 		return nearNodes;
 	}
+
 
 
 

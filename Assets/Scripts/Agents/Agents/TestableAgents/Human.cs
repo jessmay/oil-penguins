@@ -4,17 +4,13 @@ using System.Collections;
 public class Human : TestableAgent {
 	
 	public override float getTurnStep() { return turnStep; }
-	public override float getMoveStep() { return 5.0f * transform.localScale.x;}
+	public override float getMoveStep() { return 10.0f * transform.localScale.x;}
 
 	// Use this for initialization
 	protected override void initializeAgent () {
 		base.initializeAgent();
 	}
 
-
-	public override int getNumberOfFeelers(){
-		return 3;
-	}
 
 	//Get ICE machine's location from map.
 	public override Vector2 getTarget() {
@@ -29,21 +25,6 @@ public class Human : TestableAgent {
 	protected override void updateAgent () {
 		base.updateAgent();
 
-//		
-//		//Check debug buttons.
-//		checkButtons();
-//		
-//		//Calculate information for each sensor.
-//		sense();
-//		senses = brain.sense(this);
-//		
-//		//think about the information collected by the sensors.
-//		//think();
-//		thoughts = brain.think(this, senses);
-//		
-//		//act on ANN output.
-//		//act();
-//		brain.act(this, thoughts);
 	}
 	
 

@@ -184,9 +184,19 @@ public abstract class Agent : MonoBehaviour {
 	private void Move() {
 
 		//Do not move outside the bounds of the grid.
-		if(!grid.inBounds(grid.getCellIndex(velocity*Time.deltaTime + (Vector2)transform.position))) {
-			velocity = Vector2.zero; 
-		}
+//		if(!grid.inBounds(grid.getCellIndex(velocity*Time.deltaTime + (Vector2)transform.position))) {
+//			velocity = Vector2.zero; 
+//		}
+
+		//Force agents to be within the bounds of the map.
+		Vector3 clampedPos = transform.position;
+		Bounds mapBounds = map.getBounds();
+
+		clampedPos.x = Mathf.Clamp(clampedPos.x, mapBounds.min.x, mapBounds.max.x);
+		clampedPos.y = Mathf.Clamp(clampedPos.y, mapBounds.min.y, mapBounds.max.y);
+
+		transform.position = clampedPos;
+
 
 		//Save the previous grid cell index.
 		Vector2 prevCell = gridCellIndex;
@@ -209,7 +219,7 @@ public abstract class Agent : MonoBehaviour {
 
 	//Given a point, returns the distance from the agent to the point.
 	public double distanceBetweenPoint (Vector3 point) {
-		return Vector2.Distance(renderer.bounds.center, point);
+		return Vector2.Distance(transform.position, point);
 	}
 
 	//Given a point, returns the angle between the agent's heading vector 

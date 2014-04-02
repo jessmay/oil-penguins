@@ -9,7 +9,6 @@ public class MapMakerMenu : PauseMenu {
 	}
 
 	protected override System.Type initialPause () {
-		//return typeof(MapMakerMenuState);
 		return null;
 	}
 
