@@ -53,7 +53,7 @@ public abstract class Agent : MonoBehaviour {
 	public abstract float getTurnStep();
 	public abstract float getMoveStep();
 	
-	//Initilize the agent
+	//Initialize the agent
 	protected abstract void initializeAgent();
 
 	//Update agent
