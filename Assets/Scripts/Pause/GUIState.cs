@@ -1,6 +1,8 @@
 using UnityEngine;
 using System;
+using System.IO;
 using System.Collections;
+using System.Collections.Generic;
 
 public abstract class GUIState {
 
@@ -97,5 +99,73 @@ public abstract class GUIState {
 		}
 		
 		return 0;
+	}
+
+
+	//Displays an interface that allows the user to select a file from a directory.
+	//Returns 	"" if no file is selected,
+	//			null if the user clicks the exit button
+	//			a filename if the user clicks on a file displayed
+	protected Vector2 scrollPosition;
+	protected string getFileFromDirectory(string path, string message, string exit, int maxFilesPerScroll = 4) {
+		
+		//If the path does not exist, create it.
+		if(!Directory.Exists(path)) 
+			Directory.CreateDirectory(path);
+		
+		//Get all files in the current directory.
+		string[] fileList = Directory.GetFiles(path + "/");
+		List<string> fileNames = new List<string>();
+		
+		//Loop through each file in the directory
+		for (int currFile = 0; currFile < fileList.Length; ++currFile) {
+			
+			//Skip all hidden files (example: .DS_Store)
+			if(fileList[currFile].Remove(0,fileList[currFile].LastIndexOf('/')+1)[0] == '.')
+				continue;
+			
+			//Add file name to the list of file names
+			//Path and directory information is removed first.
+			fileNames.Add(fileList[currFile].Remove(fileList[currFile].LastIndexOf('.')).Remove(0,fileList[currFile].LastIndexOf('/')+1));
+		}
+		
+		fileList = fileNames.ToArray();
+		
+		
+		label.fontSize = 30;
+		
+		int scrollBarWidth = 16;
+
+		//Menu title
+		GUI.Box(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - (maxFilesPerScroll + 2)*(buttonHeight- button.border.top)/2, sWidth/2, buttonHeight),GUIContent.none, box);
+		GUI.Label(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - maxFilesPerScroll*(buttonHeight- button.border.top)/2 - (buttonHeight- button.border.top) + 20, sWidth/2, buttonHeight), message, label);
+		
+		//SrollView background
+		GUI.Box(new Rect (Screen.width/2 - sWidth/4 ,Screen.height/2 - maxFilesPerScroll*(buttonHeight - button.border.top)/2, sWidth/2, (buttonHeight* maxFilesPerScroll) - (button.border.top* (maxFilesPerScroll-1))),GUIContent.none, box);
+		
+		
+		//Scrollable view to display all file options to the user.
+		scrollPosition = GUI.BeginScrollView (new Rect (Screen.width/2 - sWidth/4 ,Screen.height/2 - maxFilesPerScroll*(buttonHeight- button.border.top)/2 + button.border.top, sWidth/2, (buttonHeight* maxFilesPerScroll) - (button.border.top* (maxFilesPerScroll-1)) - 2*button.border.top), scrollPosition, new Rect (0, 0, sWidth/2-scrollBarWidth, (buttonHeight* fileList.Length) - (button.border.top* (fileList.Length-1))- 2*button.border.top ));
+		
+		//Button for each file in the directory
+		for (int currFile = 0; currFile < fileList.Length; ++currFile) {
+			
+			//Return filename if button is clicked.
+			if(GUI.Button (new Rect(0, currFile*(buttonHeight-button.border.top) -button.border.top, sWidth/2-(fileList.Length> maxFilesPerScroll?scrollBarWidth:0), buttonHeight), fileList[currFile], button)) {
+				
+				return fileList[currFile];
+			}
+		}
+		
+		// End the scroll view that we began above.
+		GUI.EndScrollView ();
+		
+		//Exit or back button
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + maxFilesPerScroll*(buttonHeight- button.border.top)/2, sWidth/2, buttonHeight), exit, button)) {
+			
+			return null;
+		}
+		
+		return "";
 	}
 }

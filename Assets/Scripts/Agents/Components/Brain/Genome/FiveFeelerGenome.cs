@@ -9,7 +9,8 @@ public class FiveFeelerGenome : Genome {
 	private int currTick;
 
 	//Bonus statistics
-	public int numTimesFired {get; private set;}
+	public int numTimesForward {get; private set;}
+	public int numTimesBackward {get; private set;}
 	public int numTimesRotateLeft {get; private set;}
 	public int numTimesRotateRight {get; private set;}
 	
@@ -20,25 +21,56 @@ public class FiveFeelerGenome : Genome {
 
 	public FiveFeelerGenome(double[][][] weights) : base(weights) {
 
-		currTick = 0;
+		reset();
+	}
 
-		numTimesFired = 0;
+	public FiveFeelerGenome() {}
+
+	public override int getNumberOfInputs() { return 6; }
+	public override int getNumberOfOutputs() { return 2; }
+	public override int getNumberOfLayers() { return 1; }
+	public override int getNumberOfNeuronsPerLayer() { return 6; }
+
+	
+	public override double getFiredValue() { return 0.7; }
+	public override int getNumberOfFeelers(){ return 5; }
+	public override int getViewAngle() { return 270; }
+
+	public override void reset() {
+
+		currTick = 0;
+		
+		numTimesForward = 0;
+		numTimesBackward = 0;
 		numTimesRotateLeft = 0;
 		numTimesRotateRight = 0;
-
+		
 		numTargetsHit = 0;
 		targetBonus = 0;
 		rotBonus = 0;
 		colBonus = 0;
 	}
 
+	public override void endOfTarget(){
+
+		//If the agent was colliding when the test ended, 
+		//calculate the total number of ticks colliding.
+		if (collTick != -1){
+			
+			colBonus += currTick - collTick;
+			collTick = -1;
+			collidingWalls.Clear();
+		}
+	}
 	
-	public override double getFiredValue() { return 0.7; }
-	public override int getNumberOfFeelers(){ return 5; }
+	public override void endOfTests(){
+		
+	}
+
 
 	public override double[] sense(TestableAgent agent) {
 		//Initialize input based on senses.
-		double[] senses = new double[4];
+		double[] senses = new double[getNumberOfInputs()];
 
 		//Get proper target
 		double angle = agent.getAngleToPoint(agent.getTarget());
@@ -74,13 +106,13 @@ public class FiveFeelerGenome : Genome {
 		//Move forward
 		if(thoughts[1] > getFiredValue()) {
 			agent.moveTo((float)thoughts[1] * agent.getMoveStep());
-			++numTimesFired;
+			++numTimesForward;
 		}
 		
 		//Move backward
 		else if (thoughts[1] < 1-getFiredValue()) {
 			agent.moveTo(-(float)thoughts[1] * agent.getMoveStep());
-			++numTimesFired;
+			++numTimesBackward;
 		}
 		
 		
@@ -93,11 +125,19 @@ public class FiveFeelerGenome : Genome {
 
 		++currTick;
 
+		if(agent.distanceBetweenPoint(agent.getTarget()) < .5) {
+			++numTargetsHit;
+			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME() - currTick)/(double)GeneticAlgorithm.TICKS_PER_GENOME();
+
+			agent.transform.position = agent.map.cellIndexToWorld(agent.map.getRandomHumanSpawn());
+			//agent.reset();
+		}
+
 
 //		if(targetsEnabled && distanceFromTarget() < 1){
 //			
 //			++numTargetsHit;
-//			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME - geneticAlgorithm.tick)/(double)GeneticAlgorithm.TICKS_PER_GENOME;
+//			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME() - geneticAlgorithm.tick)/(double)GeneticAlgorithm.TICKS_PER_GENOME();
 //			moveToNextTarget();
 //		}
 	}
@@ -108,7 +148,7 @@ public class FiveFeelerGenome : Genome {
 	public override void OnCollisionEnter(Collision2D collision) {
 		
 		if (collidingWalls.Count == 0)
-			collTick = currTick;//geneticAlgorithm.tick;
+			collTick = currTick;
 	
 		collidingWalls.Add(collision.gameObject.GetInstanceID());
 		
@@ -122,7 +162,7 @@ public class FiveFeelerGenome : Genome {
 		collidingWalls.Remove(collision.gameObject.GetInstanceID());
 		
 		if(collidingWalls.Count == 0) {
-			colBonus += currTick - collTick;	//geneticAlgorithm.tick - collTick;
+			colBonus += currTick - collTick;
 			collTick = -1;
 		}
 	}
@@ -151,19 +191,25 @@ public class FiveFeelerGenome : Genome {
 		if(numTimesRotateLeft + numTimesRotateRight == 0)
 			return 0;
 		
-		return (1 - Math.Max((numTimesRotateLeft + numTimesRotateRight)-GeneticAlgorithm.TICKS_PER_GENOME/2.0, 0.0)/((double)GeneticAlgorithm.TICKS_PER_GENOME/2.0))/2.0;
+		return (1 - Math.Max((numTimesRotateLeft + numTimesRotateRight)-GeneticAlgorithm.TICKS_PER_GENOME()/2.0, 0.0)/((double)GeneticAlgorithm.TICKS_PER_GENOME()/2.0))/2.0;
 	}
 	
 	
 	//Calculate the bonus based on how many times the agent collided with a wall.
 	private double calcCollBonus() {
-		return Math.Max((GeneticAlgorithm.TICKS_PER_GENOME - colBonus*2.0)/(double)GeneticAlgorithm.TICKS_PER_GENOME/2.0, 0);
+		return Math.Max((GeneticAlgorithm.TICKS_PER_GENOME() - colBonus*2.0)/(double)GeneticAlgorithm.TICKS_PER_GENOME()/2.0, 0);
 	}
 	
 	
 	//Calculate the bonus based on how often the agent moved forward.
 	private double calcFiredBonus() {
-		return (numTimesFired/(double)GeneticAlgorithm.TICKS_PER_GENOME)/2.0;
+		return (numTimesForward/(double)GeneticAlgorithm.TICKS_PER_GENOME())/2.0;
+	}
+
+	private double calcBothMoveBonus() {
+		if(numTimesForward == 0 || numTimesBackward == 0)
+			return 0;
+		return .5;
 	}
 	
 	
@@ -179,11 +225,11 @@ public class FiveFeelerGenome : Genome {
 		string debugText = "";
 
 		debugText += "Targets: " +numTargetsHit +"\n";
-		debugText += "Fired: "+numTimesFired +"\n";
+		debugText += "Fired: "+numTimesForward +"\n";
 		debugText += "rotL:  " +numTimesRotateLeft +"\n";
 		debugText += "rotR:  " +numTimesRotateRight +"\n";
 		debugText += "rot:  " +calcRotBonus() +"\n";
-		//debugText += "col:  " +(colBonus + (collTick == -1? 0: geneticAlgorithm.tick - collTick)) +" ("+collidingWalls.Count +")\n";
+		debugText += "col:  " +(colBonus + (collTick == -1? 0: currTick - collTick)) +" ("+collidingWalls.Count +")\n";
 		
 		return debugText;
 	}

@@ -2,8 +2,7 @@
 using System.Collections;
 
 public abstract class TestableAgent : Agent {
-
-
+	
 	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, Map map, Grid grid, Genome genome) {
 		
 		GameObject newAgent = Agent.CreateAgent(agent, location, rotation, map, grid);
@@ -15,7 +14,7 @@ public abstract class TestableAgent : Agent {
 		return newAgent;
 	}
 
-	protected Genome brain;
+	public Genome brain {get; private set;}
 	
 	protected double[] thoughts;
 	protected double[] senses;
@@ -25,14 +24,19 @@ public abstract class TestableAgent : Agent {
 	public AdjacentAgents adjAgents {get; private set;}
 	public PieSlices pieSlices {get; private set;}
 
+	protected Vector3 startPosition;
+	protected Quaternion startRotation;
 
 	public abstract Vector2 getTarget();
 
 	// Use this for initialization
 	protected override void initializeAgent () {
 
+		startPosition = transform.position;
+		startRotation = transform.rotation;
+
 		//Create sensors
-		feelers = new Feelers(this, radius*3, brain.getNumberOfFeelers());
+		feelers = new Feelers(this, radius*3, brain.getNumberOfFeelers(), brain.getViewAngle());
 		adjAgents = new AdjacentAgents(this, radius*3, grid);
 		pieSlices = new PieSlices(this, adjAgents);
 
@@ -54,12 +58,12 @@ public abstract class TestableAgent : Agent {
 		senses = brain.sense(this);
 		
 		//think about the information collected by the sensors.
-		//think();
 		thoughts = brain.think(this, senses);
 		
 		//act on ANN output.
-		//act();
 		brain.act(this, thoughts);
+
+		brain.update(this);
 	}
 	
 	
@@ -106,6 +110,24 @@ public abstract class TestableAgent : Agent {
 		
 		brain.OnCollisionExit(collision);
 	}
+
+	public void reset() {
+
+		transform.position = startPosition;
+		transform.rotation = startRotation;
+		heading = transform.rotation.eulerAngles.z;
+
+		brain.reset();
+	}
+
+	public void reset(Vector3 position, Quaternion rotation) {
+
+		transform.position = position;
+		transform.rotation = rotation;
+		heading = transform.rotation.eulerAngles.z;
+
+		brain.reset();
+	}
 	
 	
 	//Returns when the agent is controllable.
@@ -113,7 +135,8 @@ public abstract class TestableAgent : Agent {
 		return false;
 	}
 	
-	
+	private double minDist = 30;
+
 	//Draw debug information to the screen.
 	protected override void DrawDebugInformation(){
 		
@@ -162,6 +185,12 @@ public abstract class TestableAgent : Agent {
 			debugText += "\n";
 			
 			debugText += brain.getDebugInformation() + "\n";
+
+			debugText += "Distance from target: " +distanceBetweenPoint(getTarget()) +"\n";
+
+			minDist = minDist >  distanceBetweenPoint(getTarget())? distanceBetweenPoint(getTarget()) : minDist;
+			debugText += "Minimum distance: " +minDist +"\n\n";
+
 			
 			//Get sensor information
 			debugText += feelers.getDebugInformation()+ "\n";

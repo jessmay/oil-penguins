@@ -16,25 +16,17 @@ public class TempMainMenuStateMapEditor : GUIState {
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2- buttonHeight + button.border.top, sWidth/2, buttonHeight),"Create New", button)) {
 
 			finiteStateMachine.changeState(typeof(TempMainMenuStateMapEditorNew));
-
-			//Application.LoadLevel("AStar");
-			//finiteStateMachine.pauseMenu.unPause();
 		}
 		
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Load Map", button)) {
 
-			finiteStateMachine.changeState(typeof(TempMainMenuStateLoad), TempMainMenuStateLoad.FROM_MAP_EDITOR);
-
-			//finiteStateMachine.pauseMenu.unPause();
-			//Application.LoadLevel("ANNTrainer");
+			finiteStateMachine.changeState(typeof(TempMainMenuStateLoadMap), TempMainMenuStateLoadMap.FROM_MAP_EDITOR);
 		}
 		
 		
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Back", button)) {
 
 			finiteStateMachine.changeState(typeof(TempMainMenuState));
-			//finiteStateMachine.pauseMenu.unPause();
-			//Application.LoadLevel("MapEditor");
 		}
 
 	}

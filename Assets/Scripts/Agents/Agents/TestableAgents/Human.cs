@@ -4,7 +4,7 @@ using System.Collections;
 public class Human : TestableAgent {
 	
 	public override float getTurnStep() { return turnStep; }
-	public override float getMoveStep() { return 5.0f * transform.localScale.x;}
+	public override float getMoveStep() { return 10.0f * transform.localScale.x;}
 
 	// Use this for initialization
 	protected override void initializeAgent () {
@@ -24,6 +24,7 @@ public class Human : TestableAgent {
 	// Update is called once per frame
 	protected override void updateAgent () {
 		base.updateAgent();
+
 	}
 	
 

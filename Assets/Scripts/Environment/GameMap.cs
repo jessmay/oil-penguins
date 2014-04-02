@@ -16,7 +16,7 @@ public class GameMap : MonoBehaviour{
 	public List<GameObject> HumansOnMap;
 	public List<GameObject> PenguinsOnMap;
 
-	void Start() {
+	void Awake() {
 
 		HumansOnMap = new List<GameObject>();
 		PenguinsOnMap = new List<GameObject>();
@@ -31,25 +31,15 @@ public class GameMap : MonoBehaviour{
 	void FixedUpdate() {
 
 		//Spawn a human at a random spawn point.
-		if(GetComponent<MapEditor>() == null && Input.GetMouseButtonDown(1)) {
-			spawnHuman(map.HumanSpawnPoints[Mathf.FloorToInt(Random.value*map.HumanSpawnPoints.Count)], 1);
-		}
+//		if(GetComponent<MapEditor>() == null && Input.GetMouseButtonDown(1)) {
+//			spawnHuman(map.getRandomHumanSpawn(), 1);
+//		}
 	}
 
 	void OnGUI() {
 
 		//if(GetComponent<PauseMenu>().isPaused())
 		//	return;
-
-
-//		Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
-//		pos.z = 0;
-//
-//		string debugText = pos.ToString() +"\n" + map.getCellIndex(pos) + "\n";
-//
-//		//GUI.color = Color.black;
-//		GUI.Label(new Rect(0, 0, 300, 800), debugText);
-
 
 		//Display each human spawn point
 		foreach (Vector2 loc in map.HumanSpawnPoints) {
@@ -152,6 +142,24 @@ public class GameMap : MonoBehaviour{
 	}
 
 
+	public GameObject spawnHumanImmediate(Vector2 location, Quaternion? rotationNullable){
+
+		Quaternion rotation = rotationNullable.HasValue? rotationNullable.Value: Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location));
+
+		Debug.Log("Spawning new human at "+ map.cellIndexToWorld(location));
+		
+		string[] files = Directory.GetFiles(Application.dataPath + "/../GA/Genomes/");
+		
+		int index = Random.Range(2, files.Length);
+		Genome genome = Genome.load(File.ReadAllText(files[index]));
+		
+		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, map, grid, genome);
+		
+		HumansOnMap.Add(human);
+
+		return human;
+	}
+
 	//Given a human spawn point on the map, spawn the amount of humans. 
 	public void spawnHuman(Vector2 location, int amount = 1) {
 
@@ -175,9 +183,6 @@ public class GameMap : MonoBehaviour{
 		Genome genome = Genome.load(File.ReadAllText(files[index]));
 
 		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), map, grid, genome);
-
-
-		//human.GetComponent<TestableAgent>().replaceBrain(genome);
 
 		HumansOnMap.Add(human);
 	}

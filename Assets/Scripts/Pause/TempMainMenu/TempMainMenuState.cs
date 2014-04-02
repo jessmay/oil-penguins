@@ -15,18 +15,14 @@ public class TempMainMenuState : GUIState {
 
 		label.fontSize = 30;
 		
-		//GUI.color = Color.white;
 		GUI.Label(new Rect(Screen.width/2 - width, Screen.height/2 - buttonHeight*3/2, width*2, buttonHeight),"Temp Pause Menu", label);
 		
-		// Unpause Button
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2- buttonHeight + button.border.top, sWidth/2, buttonHeight),"AStar Test", button)) {
 			
 			Application.LoadLevel("AStar");
 			finiteStateMachine.pauseMenu.unPause();
 		}
 		
-		// Quit Button
-		// Ignored if in editor
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"AI Trainer", button)) {
 
 			finiteStateMachine.pauseMenu.unPause();
@@ -37,23 +33,20 @@ public class TempMainMenuState : GUIState {
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Map Editor", button)) {
 
 			finiteStateMachine.changeState(typeof(TempMainMenuStateMapEditor));
-			//finiteStateMachine.pauseMenu.unPause();
-			//Application.LoadLevel("MapEditor");
 		}
 
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top) *2, sWidth/2, buttonHeight),"Human Testing", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top) *2, sWidth/2, buttonHeight),"Train ANN", button)) {
 
-			finiteStateMachine.changeState(typeof(TempMainMenuStateLoad), TempMainMenuStateLoad.FROM_HUMAN_TESTS);
-
-			//Options.mapName = "NotSure";
-			//finiteStateMachine.pauseMenu.unPause();
-			//Application.LoadLevel("TestScene");
+			finiteStateMachine.changeState(typeof(TempMainMenuStateTrainANN));
 		}
 
 	}
 
 	public override void enter () {
 		Options.mapName = null;
+		Options.Testing = false;
+
+		Options.populationName = null;
 	}
 
 	public override void exit () {}

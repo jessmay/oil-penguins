@@ -1,4 +1,4 @@
-﻿/*
+/*
 Joshua Linge
 TestAgent.cs
 
@@ -25,7 +25,7 @@ public class TestAgent : Agent {
 	public bool userControl;
 
 	public bool testing = true;
-	public GeneticAlgorithm geneticAlgorithm;
+	public GeneticAlgorithmOld geneticAlgorithm;
 
 	//Bonus statistics
 	public int numTimesFired {get; private set;}
@@ -75,7 +75,7 @@ public class TestAgent : Agent {
 
 		//Create brain and genetic algorithm
 		brain = new NeuralNet(numInputs, numOutputs, numLayers, numNeuronsPerLayer);
-		setGeneticAlgorithm( new GeneticAlgorithm(40, numInputs, numOutputs, numLayers, numNeuronsPerLayer));
+		setGeneticAlgorithm( new GeneticAlgorithmOld(40, numInputs, numOutputs, numLayers, numNeuronsPerLayer));
 
 		startLocation = transform.position;
 		startRotation = transform.rotation;
@@ -87,7 +87,7 @@ public class TestAgent : Agent {
 
 
 	//Set the agent's genetic algorithm, and set the neural network to the current genome.
-	public void setGeneticAlgorithm(GeneticAlgorithm geneticAlgorithm) {
+	public void setGeneticAlgorithm(GeneticAlgorithmOld geneticAlgorithm) {
 
 		this.geneticAlgorithm = geneticAlgorithm;	
 		this.geneticAlgorithm.resetCurrentGenome();
@@ -159,7 +159,7 @@ public class TestAgent : Agent {
 		if(targetsEnabled && distanceFromTarget() < 1){
 
 			++numTargetsHit;
-			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME - geneticAlgorithm.tick)/(double)GeneticAlgorithm.TICKS_PER_GENOME;
+			targetBonus += numTargetsHit * (GeneticAlgorithmOld.TICKS_PER_GENOME - geneticAlgorithm.tick)/(double)GeneticAlgorithmOld.TICKS_PER_GENOME;
 			moveToNextTarget();
 		}
 
@@ -374,19 +374,19 @@ public class TestAgent : Agent {
 		if(numTimesRotateLeft + numTimesRotateRight == 0)
 			return 0;
 		
-		return (1 - Math.Max((numTimesRotateLeft + numTimesRotateRight)-GeneticAlgorithm.TICKS_PER_GENOME/2.0, 0.0)/((double)GeneticAlgorithm.TICKS_PER_GENOME/2.0))/2.0;
+		return (1 - Math.Max((numTimesRotateLeft + numTimesRotateRight)-GeneticAlgorithmOld.TICKS_PER_GENOME/2.0, 0.0)/((double)GeneticAlgorithmOld.TICKS_PER_GENOME/2.0))/2.0;
 	}
 
 
 	//Calculate the bonus based on how many times the agent collided with a wall.
 	private double calcCollBonus() {
-		return Math.Max((GeneticAlgorithm.TICKS_PER_GENOME - colBonus*2.0)/(double)GeneticAlgorithm.TICKS_PER_GENOME/2.0, 0);
+		return Math.Max((GeneticAlgorithmOld.TICKS_PER_GENOME - colBonus*2.0)/(double)GeneticAlgorithmOld.TICKS_PER_GENOME/2.0, 0);
 	}
 
 
 	//Calculate the bonus based on how often the agent moved forward.
 	private double calcFiredBonus() {
-		return (numTimesFired/(double)GeneticAlgorithm.TICKS_PER_GENOME)/2.0;
+		return (numTimesFired/(double)GeneticAlgorithmOld.TICKS_PER_GENOME)/2.0;
 	}
 
 

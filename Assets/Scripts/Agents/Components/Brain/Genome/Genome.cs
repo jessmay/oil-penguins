@@ -4,8 +4,6 @@ using System.Collections;
 
 public abstract class Genome : IComparable<Genome> {
 
-	//public double fitness;
-
 	public double[][][] weights;
 	protected NeuralNet brain;
 
@@ -15,8 +13,20 @@ public abstract class Genome : IComparable<Genome> {
 		brain = new NeuralNet(weights);
 	}
 
+	public Genome() {
+
+		brain = new NeuralNet(getNumberOfInputs(), getNumberOfOutputs(), getNumberOfLayers(), getNumberOfNeuronsPerLayer());
+		weights = brain.getWeights();
+	}
+
+	public abstract int getNumberOfInputs();
+	public abstract int getNumberOfOutputs();
+	public abstract int getNumberOfLayers();
+	public abstract int getNumberOfNeuronsPerLayer();
+
 	public abstract double getFiredValue();
 	public abstract int getNumberOfFeelers();
+	public abstract int getViewAngle();
 
 	public abstract double[] sense(TestableAgent agent);
 	public abstract double[] think(TestableAgent agent, double[] senses);
@@ -27,14 +37,20 @@ public abstract class Genome : IComparable<Genome> {
 	public abstract void OnCollisionEnter(Collision2D collision);
 	public abstract void OnCollisionExit(Collision2D collision);
 
+	public double fitness;
+	public double totalFitness;
 	public abstract double calculateFitness();
+
+	public abstract void reset();
+	public abstract void endOfTarget();
+	public abstract void endOfTests();
 
 	public abstract string getDebugInformation();
 
 
 	//Sort genomes in decreasing fitness (highest first)
 	public int CompareTo(Genome other) {
-		return other.calculateFitness().CompareTo(calculateFitness());
+		return other.fitness.CompareTo(fitness);
 	}
 
 
@@ -77,6 +93,10 @@ public abstract class Genome : IComparable<Genome> {
 
 	public static Genome createGenome(Type genome, double[][][] weights) {
 		return (Genome)Activator.CreateInstance(genome, new System.Object[]{weights});
+	}
+
+	public static Genome createGenome(Type genome) {
+		return (Genome)Activator.CreateInstance(genome);
 	}
 
 	//Given two parents, return a child that is a cross of these two genomes.

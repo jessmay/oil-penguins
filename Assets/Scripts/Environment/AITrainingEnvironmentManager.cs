@@ -146,7 +146,7 @@ public class AITrainingEnvironmentManager : MonoBehaviour {
 
 		StreamWriter sr = File.CreateText(path +"/" +fileName + ".txt");
 
-		GeneticAlgorithm ga = ta.geneticAlgorithm;
+		GeneticAlgorithmOld ga = ta.geneticAlgorithm;
 
 		sr.WriteLine(ga.getPopulationAsAString());
 
@@ -167,7 +167,7 @@ public class AITrainingEnvironmentManager : MonoBehaviour {
 		reader.Close();
 		reader.Dispose();
 
-		GeneticAlgorithm ga = GeneticAlgorithm.loadPopulationFromString(fileContents);
+		GeneticAlgorithmOld ga = GeneticAlgorithmOld.loadPopulationFromString(fileContents);
 
 		TestAgent ta = currPlayer.GetComponent<TestAgent>();
 		ta.setGeneticAlgorithm(ga);
