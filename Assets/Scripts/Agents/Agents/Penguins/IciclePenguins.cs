@@ -3,6 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class IciclePenguins : Agent {
+	
+	protected Vector2 target;
+	protected Vector2 targetCell;
+	protected Vector2 source;
+	protected Vector2 sourceCell;
+	protected bool findTarget;
+	
+	protected List<Vector2> currPath;
+	protected int pathIndex;
+	
+	protected bool drawSource;
+	protected bool drawTarget;
+	protected bool drawPath;
+	protected bool drawNodes;
+	
+	protected Vector2 currGoal;
+
+	public int health;
+
+	public bool hasPath;
+
 
 	//Sensor
 	public AdjacentAgents adjAgents {get; private set;}
@@ -10,6 +31,22 @@ public class IciclePenguins : Agent {
 	//Initialize the agent
 	protected override void initializeAgent(){
 		adjAgents = new AdjacentAgents (this, radius * 2, grid);//TODO play around with radius value; smaller than humans
+		
+		target = new Vector2 (0, 0);
+		targetCell = new Vector2();
+		source = new Vector2 ();
+		sourceCell = new Vector2(0, 0);
+		findTarget = false;
+		
+		drawSource = false;
+		drawTarget = false;
+		drawPath = false;
+		drawNodes = false;
+		
+		currGoal = map.getCellIndex(renderer.bounds.center);
+
+		health = 100;
+		hasPath = false;
 	}
 	
 	//Update agent
@@ -76,18 +113,21 @@ public class IciclePenguins : Agent {
 		//Get list of close nodes, gets the closest, seeks, and calculates astar path
 		if((findChange || targetChange || sourceChange) && findTarget && source != target){
 			//Gets list of close nodes within one cell of the agent
-			closeNodes = new List<Vector2>();
-			closeNodes = map.getNearNodes(this);
+			//closeNodes = new List<Vector2>();
+			//closeNodes = map.getNearNodes(this);
 			
 			// Gets the closest node from the list of close nodes and sets it as the source node and the currGoal
 			currGoal = new Vector2();
-			currGoal = closestUnobstructed();
+			currGoal = map.getCellIndex(transform.position);
 			source = new Vector2();
 			source = map.cellIndexToWorld(currGoal);
 			
 			//gets aStar path if there is one, otherwise turns target seeking off
 			if(!aStar(source)){
 				findTarget = false;
+			}
+			else{
+				hasPath = true;
 			}
 			
 			pathIndex = 0;
@@ -100,6 +140,7 @@ public class IciclePenguins : Agent {
 			if(map.getCellIndex(renderer.bounds.center) == map.getCellIndex(target)){//distanceBetweenPoint(map.cellIndexToWorld(target)) <= (.5 * transform.localScale.x)
 				pathIndex = 0;
 				findTarget = false;
+				hasPath = false;
 			}
 			//Otherwise seek towards the current goal location in the aStar path
 			else {
@@ -150,10 +191,164 @@ public class IciclePenguins : Agent {
 		}
 
 	}
+	
+	// Not using a priority queue, using a hash table, so have to find the node with the min f value each round
+	private Vector2 findMin(Hashtable l, List<Vector2> curr){
+		float min = -1.0f;
+		Vector2 minVec = new Vector2 (0, 0);
+		
+		foreach (DictionaryEntry d in l) {
+			if((((float)d.Value) < min || min == -1) && curr.Contains((Vector2)d.Key)){
+				min = (float)d.Value;
+				minVec = (Vector2)d.Key;
+			}
+		}
+		
+		return minVec;
+	}
+	
+	// A* algorithm
+	// Uses map cells to detect where walls are
+	// If there is a path, it will be reconstructed at the end of this function
+	// and it will contain the locations of nodes in Map Cell space to follow
+	// Source node is in world coords
+	protected bool aStar(Vector2 sourceNode){
+		
+		Vector2 mapCellIndex = map.getCellIndex (sourceNode);
+		
+		List<Vector2> visited = new List<Vector2> ();
+		List<Vector2> curr = new List<Vector2> ();
+		curr.Add (mapCellIndex);
+		Hashtable from = new Hashtable ();
+		
+		Hashtable gVals = new Hashtable ();
+		gVals.Add (mapCellIndex, 0.0f);
+		Hashtable fVals = new Hashtable ();
+		fVals.Add (mapCellIndex, ((float)gVals [mapCellIndex]) + Vector2.Distance (mapCellIndex, map.getCellIndex(target)));
+		
+		while (curr.Count != 0) {
+			
+			Vector2 currNode = findMin(fVals, curr);
+			
+			// Arrived at the target? Great! Make the path list.
+			if(currNode == map.getCellIndex(target)){
+				//reconstruct path with the from list
+				currPath = new List<Vector2>();
+				currPath = createPath(from, currNode);
+				
+				return true; 
+			}
+			
+			curr.Remove(currNode);
+			visited.Add(currNode);
+			
+			//for each neighbor node, add to curr if unvisited and calculate f and g values
+			for(int i = -1; i < 2; i++){
+				for(int j = -1; j < 2; j++){
+					
+					int x = (int)currNode.x+i;
+					int y = (int)currNode.y+j;
+					
+					//currnode not inbounds, or not moveable to
+					if(!map.inBounds(new Vector2(x, y)) || !map.canMove[x,y])
+						continue;
+					
+					//corner case:if node to move to is diagonal, but perp nodes are nonmoveable, can't go there
+					if(Mathf.Abs(i) == Mathf.Abs(j) && (!map.canMove[x,(int)currNode.y] || !map.canMove[(int)currNode.x,y])){
+						continue;
+					}
+					
+					Vector2 neighbor = new Vector2(x, y);
+					if(visited.Contains(neighbor)){//also covers 0,0 case
+						continue;
+					}
+					
+					float tempG = (float)gVals[currNode] + Vector2.Distance(currNode, neighbor);
+					
+					if(!curr.Contains(neighbor) || tempG < (float)gVals[currNode]){
+						
+						from.Add(neighbor, currNode);
+						gVals.Add(neighbor, tempG);
+						fVals.Add(neighbor, tempG + Vector2.Distance(neighbor, map.getCellIndex(target)));
+						
+						if(!curr.Contains(neighbor))
+							curr.Add(neighbor);
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	// If aStar() finds a path, this function creates a List for that path
+	// that the agent can then access
+	private List<Vector2> createPath(Hashtable path,  Vector2 node){
+		
+		if (path.Contains (node)) {
+			List<Vector2> p = new List<Vector2>();
+			p = createPath(path, (Vector2)path[node]);
+			p.Add(node);
+			return p;
+		}
+		else{
+			List<Vector2> p = new List<Vector2>();
+			p.Add(node);
+			return p;
+		}
+		
+	}
 
 	protected override bool isControllable(){return false;}
 	
 	protected override void DrawDebugInformation(){
+		//Debug code, if drawSource is true, an 'S' will be drawn on the background where the source node is located
+		if (drawSource) {
+			GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
+			centeredStyle.alignment = TextAnchor.MiddleCenter;
+			GUI.color = Color.black;
+			source.y*=-1; // WorldToScreenPoint inverts the y values for some reason
+			int labelSize = 50;
+			GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(source).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(source).y-(labelSize/2),labelSize, labelSize), "S", centeredStyle);
+			source.y*=-1;
+		}
+
+		//Debug code, if drawTarget is true, a 'T' will be drawn on the background where the target node is located
+		if (drawTarget)
+		{
+			GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
+			centeredStyle.alignment = TextAnchor.MiddleCenter;
+			GUI.color = Color.black;
+			target.y*=-1;
+			int labelSize = 50;
+			//DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(target), 5.0f);
+			GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(target).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(target).y-(labelSize/2),labelSize, labelSize), "T", centeredStyle);
+			target.y*=-1;
+		}
+
+		// Debug code, draws the current moveable nodes in the nav graph onto the screen
+		if (drawNodes) {
+			for(int i = 0; i < map.getMapWidth(); i++){
+				for(int j = 0; j < map.getMapHeight(); j++){
+					Vector2 node = map.cellIndexToWorld(new Vector2(i, j));
+					node.y*=-1;
+					if(map.canMove[i, j]){
+						DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
+					}
+				}
+			}
+		}
+
+		// Debug code, if there exists an A* path currently and drawPath is true, will draw the nodes of the path on screen
+		if (drawPath && currPath != null) {
+			for(int i = 0; i < currPath.Count; i++){
+				Vector2 node = map.cellIndexToWorld(currPath[i]);
+				node.y*=-1;
+				DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
+				node.y*=-1;
+			}
+		}
+
 		//Draw circle for nearest agents
 		adjAgents.drawSensor();
 

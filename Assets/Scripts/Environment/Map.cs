@@ -318,7 +318,7 @@ public class Map : IDisposable {
 	}
 
 
-	// Assignment 2 adjacent node sensor
+	/*// Assignment 2 adjacent node sensor
 	// adjacent node sensor will detect nearby nodes (those nodes within one cell of the given agent)
 	public List<Vector2> getNearNodes(Agent a){
 		List<Vector2> nearNodes = new List<Vector2> ();
@@ -348,7 +348,7 @@ public class Map : IDisposable {
 		}
 		
 		return nearNodes;
-	}
+	}*/
 
 
 
