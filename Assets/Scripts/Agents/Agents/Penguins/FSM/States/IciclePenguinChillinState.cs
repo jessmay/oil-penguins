@@ -28,19 +28,19 @@ public class ChillinState : State {
 		//if fully tranquilized, fall asleep
 		if (IPfsm.penguin.health == 0) {
 			//move to sleep state
-			//finiteStateMachine.changeState(SleepState);
+			finiteStateMachine.changeState(typeof(SleepState));
 		}
 		
 		// if has path, transition to move state
 		if (IPfsm.penguin.hasPath) {
 			//move to move state
-			// finiteStateMachine.changeState(MoveState);
+			//finiteStateMachine.changeState(typeof(MoveState));
 		}
 		
 		// if hooman in adjAgentSensors, attack
 		if(IPfsm.penguin.adjAgents.near.Count > 0){
 			//move to attack state
-			//finiteStateMachine.changeState(AttackState);
+			//finiteStateMachine.changeState(typeof(AttackState));
 		}
 	}
 

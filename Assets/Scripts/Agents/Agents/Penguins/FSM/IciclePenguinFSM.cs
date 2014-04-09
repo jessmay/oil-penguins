@@ -12,6 +12,9 @@ public class IciclePenguinFSM : FiniteStateMachine{
 	protected override void initialize ()
 	{
 		addState(new ChillinState(this));
+		addState (new SleepState (this));
+		addState (new MoveState (this));
+		addState (new AttackState (this));
 	}
 
 	protected override System.Type getDefaultState ()

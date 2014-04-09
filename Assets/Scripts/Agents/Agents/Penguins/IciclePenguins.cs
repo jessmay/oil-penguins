@@ -24,6 +24,10 @@ public class IciclePenguins : Agent {
 
 	public bool hasPath;
 
+	public int sleepTimer;
+	public bool selectable;
+
+	private IciclePenguinFSM IPfsm;
 
 	//Sensor
 	public AdjacentAgents adjAgents {get; private set;}
@@ -47,6 +51,10 @@ public class IciclePenguins : Agent {
 
 		health = 100;
 		hasPath = false;
+		sleepTimer = 0;
+		selectable = true;
+
+		IPfsm = new IciclePenguinFSM (this);
 	}
 	
 	//Update agent
@@ -55,6 +63,7 @@ public class IciclePenguins : Agent {
 		sense ();
 		aStarUpdate ();
 		checkButtons ();
+		IPfsm.update ();
 	}
 	
 	//prepare agent for destruction
