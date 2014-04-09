@@ -4,12 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-public class BasicGenome : Genome {
+public class FiveLongFeelerGenome : Genome {
 	
 	private int currTick;
 
 	//Bonus statistics
-	public int numTimesFired {get; private set;}
+	public int numTimesForward {get; private set;}
+	public int numTimesBackward {get; private set;}
 	public int numTimesRotateLeft {get; private set;}
 	public int numTimesRotateRight {get; private set;}
 	
@@ -18,30 +19,31 @@ public class BasicGenome : Genome {
 	public int rotBonus {get; private set;}
 	public int colBonus {get; private set;}
 
-	public BasicGenome(double[][][] weights) : base(weights) {
+	public FiveLongFeelerGenome(double[][][] weights) : base(weights) {
 
 		reset();
 	}
 
-	public BasicGenome() {}
+	public FiveLongFeelerGenome() {}
 
-	public override int getNumberOfInputs() { return 4; }
+	public override int getNumberOfInputs() { return 6; }
 	public override int getNumberOfOutputs() { return 2; }
-	public override int getNumberOfLayers() { return 1; }
+	public override int getNumberOfLayers() { return 2; }
 	public override int getNumberOfNeuronsPerLayer() { return 6; }
 
 	
 	public override double getFiredValue() { return 0.7; }
 	public override float getLengthOfFeelers(TestableAgent agent) { return agent.getRadius() * feelerLength; }
-	public override float getDefaultLengthOfFeelers() { return 3; }
-	public override int getNumberOfFeelers() { return 3; }
-	public override int getViewAngle() { return 180; }
+	public override float getDefaultLengthOfFeelers() { return 30; }
+	public override int getNumberOfFeelers(){ return 5; }
+	public override int getViewAngle() { return 270; }
 
-	public override void reset(){
+	public override void reset() {
 
 		currTick = 0;
 		
-		numTimesFired = 0;
+		numTimesForward = 0;
+		numTimesBackward = 0;
 		numTimesRotateLeft = 0;
 		numTimesRotateRight = 0;
 		
@@ -62,15 +64,15 @@ public class BasicGenome : Genome {
 			collidingWalls.Clear();
 		}
 	}
-
+	
 	public override void endOfTests(){
-
+		
 	}
 
 
 	public override double[] sense(TestableAgent agent) {
 		//Initialize input based on senses.
-		double[] senses = new double[4];
+		double[] senses = new double[getNumberOfInputs()];
 
 		//Get proper target
 		double angle = agent.getAngleToPoint(agent.getTarget());
@@ -106,19 +108,37 @@ public class BasicGenome : Genome {
 		//Move forward
 		if(thoughts[1] > getFiredValue()) {
 			agent.moveTo((float)thoughts[1] * agent.getMoveStep());
-			++numTimesFired;
+			++numTimesForward;
 		}
+		
+		//Move backward
+		else if (thoughts[1] < 1-getFiredValue()) {
+			agent.moveTo(-(float)thoughts[1] * agent.getMoveStep());
+			++numTimesBackward;
+		}
+		
+		
+		//TODO Give option to strafe left and right.
+
+
 	}
 
 	public override void update(TestableAgent agent) {
 
 		++currTick;
 
-		if(agent.distanceBetweenPoint(agent.getTarget()) < 1) {
+		if(agent.distanceBetweenPoint(agent.getTarget()) < .5) {
 			++numTargetsHit;
 			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME() - currTick)/(double)GeneticAlgorithm.TICKS_PER_GENOME();
 
 			moveToTestStart(agent);
+
+//			agent.transform.position = agent.map.cellIndexToWorld(agent.map.HumanSpawnPoints[Options.geneticAlgorithm.currTarget]);//agent.startPosition;//agent.map.cellIndexToWorld(agent.map.getRandomHumanSpawn());
+//			Quaternion rotation = Quaternion.LookRotation(agent.transform.forward, Vector3.zero - (agent.transform.position));//agent.map.cellIndexToWorld(agent.transform.position)
+//
+//			if(!Options.mapName.Equals("TrainingMap"))
+//				agent.turn(rotation.eulerAngles.z - agent.transform.rotation.eulerAngles.z);
+//			//agent.transform.rotation = Options.mapName.Equals("TrainingMap")?Options.gameMap.Human.transform.rotation: rotation;
 
 		}
 	}
@@ -157,7 +177,7 @@ public class BasicGenome : Genome {
 //			return .01;
 //		}
 		
-		return    targetBonus 
+		return    targetBonus
 				+ numTargetsHit
 				+ calcRotBonus()
 				+ calcCollBonus()
@@ -185,7 +205,13 @@ public class BasicGenome : Genome {
 	
 	//Calculate the bonus based on how often the agent moved forward.
 	private double calcFiredBonus() {
-		return (numTimesFired/(double)GeneticAlgorithm.TICKS_PER_GENOME())/2.0;
+		return (numTimesForward/(double)GeneticAlgorithm.TICKS_PER_GENOME())/2.0;
+	}
+
+	private double calcBothMoveBonus() {
+		if(numTimesForward == 0 || numTimesBackward == 0)
+			return 0;
+		return .5;
 	}
 	
 	
@@ -201,7 +227,7 @@ public class BasicGenome : Genome {
 		string debugText = "";
 
 		debugText += "Targets: " +numTargetsHit +"\n";
-		debugText += "Fired: "+numTimesFired +"\n";
+		debugText += "Fired: "+numTimesForward +"\n";
 		debugText += "rotL:  " +numTimesRotateLeft +"\n";
 		debugText += "rotR:  " +numTimesRotateRight +"\n";
 		debugText += "rot:  " +calcRotBonus() +"\n";

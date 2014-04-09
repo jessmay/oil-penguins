@@ -33,6 +33,8 @@ public class FiveFeelerGenome : Genome {
 
 	
 	public override double getFiredValue() { return 0.7; }
+	public override float getLengthOfFeelers(TestableAgent agent) { return agent.getRadius() * feelerLength; }
+	public override float getDefaultLengthOfFeelers() { return 3; }
 	public override int getNumberOfFeelers(){ return 5; }
 	public override int getViewAngle() { return 270; }
 
@@ -129,17 +131,17 @@ public class FiveFeelerGenome : Genome {
 			++numTargetsHit;
 			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME() - currTick)/(double)GeneticAlgorithm.TICKS_PER_GENOME();
 
-			agent.transform.position = agent.map.cellIndexToWorld(agent.map.getRandomHumanSpawn());
-			//agent.reset();
+
+			moveToTestStart(agent);
+
+//			agent.transform.position = agent.map.cellIndexToWorld(agent.map.getRandomHumanSpawn());
+//			Quaternion rotation = Quaternion.LookRotation(agent.transform.forward, Vector3.zero - agent.map.cellIndexToWorld(agent.transform.position));
+//
+//			if(!Options.mapName.Equals("TrainingMap"))
+//				agent.turn(rotation.eulerAngles.z - agent.transform.rotation.eulerAngles.z);
+			//agent.transform.rotation = Options.mapName.Equals("TrainingMap")?Options.gameMap.Human.transform.rotation: rotation;
+
 		}
-
-
-//		if(targetsEnabled && distanceFromTarget() < 1){
-//			
-//			++numTargetsHit;
-//			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME() - geneticAlgorithm.tick)/(double)GeneticAlgorithm.TICKS_PER_GENOME();
-//			moveToNextTarget();
-//		}
 	}
 
 
@@ -177,6 +179,7 @@ public class FiveFeelerGenome : Genome {
 //		}
 		
 		return    targetBonus 
+				+ numTargetsHit
 				+ calcRotBonus()
 				+ calcCollBonus()
 				+ calcFiredBonus()

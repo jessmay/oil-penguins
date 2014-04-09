@@ -118,7 +118,15 @@ public class DebugRenderer {
 
 		GUI.DrawTexture(new Rect(center.x-radius, center.y-radius, radius*2, radius*2), getCircle(radius, color), ScaleMode.ScaleToFit);
 	}
-	
+
+
+	public static void drawBox(Rect rect, Color? c = null) {
+
+		Color color = c.HasValue ? c.Value : Color.black;
+
+		GUI.DrawTexture(rect, getLineTexture(color), ScaleMode.StretchToFill);
+	}
+
 	//Draw a box
 	public static void drawBox(float x, float y, float width, float height, float angle, Vector2 pivot, Color? c = null){
 
@@ -129,6 +137,23 @@ public class DebugRenderer {
 		GUIUtility.RotateAroundPivot(-angle, pivot);
 	}
 
+
+	public static void drawLineRect(Rect rect, float width, Color? c = null) {
+
+		width = Mathf.CeilToInt(width);
+
+		Color color = c.HasValue ? c.Value : Color.black;
+		
+		//Bottom line
+		drawBox(new Rect(rect.xMin, rect.yMax - width, rect.width, width), color);
+		//Left line
+		drawBox(new Rect(rect.xMin, rect.yMin, width, rect.height), color);
+		//Top line
+		drawBox(new Rect(rect.xMin, rect.yMin, rect.width, width), color);
+		//Right line
+		drawBox(new Rect(rect.xMax - width, rect.yMin, width, rect.height), color);
+	}
+	
 	
 	public static Texture2D colorizeTexture(Texture2D originalTexture, Color color) {
 		

@@ -304,7 +304,7 @@ public abstract class Agent : MonoBehaviour {
 
 	/* 		Debug 		*/
 	
-	protected bool debug = true;
+	protected bool debug = false;
 
 	private Vector2 centerCameraSpace;
 

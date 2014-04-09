@@ -23,10 +23,18 @@ public class TempMainMenuState : GUIState {
 			finiteStateMachine.pauseMenu.unPause();
 		}
 		
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"AI Trainer", button)) {
+//		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"AI Trainer", button)) {
+//
+//			finiteStateMachine.pauseMenu.unPause();
+//			Application.LoadLevel("ANNTrainerOld");
+//		}
 
-			finiteStateMachine.pauseMenu.unPause();
-			Application.LoadLevel("ANNTrainer");
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Play", button)) {
+			
+			//finiteStateMachine.pauseMenu.unPause();
+			//Application.LoadLevel("PlayGame");
+
+			finiteStateMachine.changeState(typeof(TempMainMenuStateLoadMap), TempMainMenuStateLoadMap.FROM_PLAY_GAME);
 		}
 
 

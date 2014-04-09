@@ -14,6 +14,8 @@ public class CameraController : MonoBehaviour {
 	public bool invertedScroll = false;
 	public bool frozen = false;
 
+	private float scrollAmount;
+
 	// Use this for initialization
 	void Awake () {
 
@@ -40,6 +42,14 @@ public class CameraController : MonoBehaviour {
 	}
 
 	void Update() {
+		
+		if(Input.GetKeyUp(KeyCode.F3)) {
+			frozen = !frozen;
+		}
+
+		//TODO: Make platform independent.
+		scrollAmount = Input.GetAxis("Mouse ScrollWheel") != 0?  Mathf.Sign(Input.GetAxis("Mouse ScrollWheel")) : 0;
+
 		if(frozen || !Options.Testing) 
 			return;
 
@@ -49,10 +59,6 @@ public class CameraController : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 
-		if(Input.GetKeyUp(KeyCode.F3)) {
-			frozen = !frozen;
-		}
-	
 		if(frozen || Options.Testing)
 			return;
 
@@ -69,10 +75,10 @@ public class CameraController : MonoBehaviour {
 	//Increase or decrease orthographic size (zoom) based on mouse scroll wheel.
 	private void zoom () {
 		
-		if(Input.GetAxis("Mouse ScrollWheel") != 0) {
+		if(scrollAmount != 0) {
 
-			float amountScroll = Input.GetAxis("Mouse ScrollWheel");
-			float size = camera.orthographicSize + (invertedScroll? 1:-1) * amountScroll;
+			//float scrollAmount = Input.GetAxis("Mouse ScrollWheel");
+			float size = camera.orthographicSize + (invertedScroll? 1:-1) * scrollAmount;
 			camera.orthographicSize = Mathf.Clamp(size, minCameraSize, maxCameraSize);
 			
 			DebugRenderer.updateLineWidth();
@@ -120,7 +126,7 @@ public class CameraController : MonoBehaviour {
 			moveAmount.y = getCameraSpeed(camera.rect.height - Math.Min(mousePosition.y, camera.rect.height)); 
 		}
 		
-		camera.gameObject.transform.position = clampCameraPosition(cameraPosition, moveAmount);
+		moveCameraClamped(cameraPosition, moveAmount);
 	}
 
 	private float getCameraSpeed(float amount) {
@@ -133,7 +139,7 @@ public class CameraController : MonoBehaviour {
 		return (mousePosition.x >= camera.rect.x && mousePosition.x < camera.rect.width && mousePosition.y >= camera.rect.y && mousePosition.y < camera.rect.height);
 	}
 
-	private Vector3 clampCameraPosition(Vector3 cameraPosition, Vector2 moveAmount) {
+	public void moveCameraClamped(Vector3 cameraPosition, Vector2 moveAmount) {
 
 		Bounds mapBounds = Options.gameMap.map.getBounds();
 
@@ -154,6 +160,6 @@ public class CameraController : MonoBehaviour {
 
 		//Debug.Log(min +" < " +cameraPosition +" < " +max);
 
-		return cameraPosition;
+		camera.gameObject.transform.position =  cameraPosition;
 	}
 }

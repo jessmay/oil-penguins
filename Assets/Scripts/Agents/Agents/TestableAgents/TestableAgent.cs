@@ -24,8 +24,8 @@ public abstract class TestableAgent : Agent {
 	public AdjacentAgents adjAgents {get; private set;}
 	public PieSlices pieSlices {get; private set;}
 
-	protected Vector3 startPosition;
-	protected Quaternion startRotation;
+	public Vector3 startPosition {get; private set;}
+	public Quaternion startRotation {get; private set;}
 
 	public abstract Vector2 getTarget();
 
@@ -36,9 +36,9 @@ public abstract class TestableAgent : Agent {
 		startRotation = transform.rotation;
 
 		//Create sensors
-		feelers = new Feelers(this, radius*3, brain.getNumberOfFeelers(), brain.getViewAngle());
-		adjAgents = new AdjacentAgents(this, radius*3, grid);
-		pieSlices = new PieSlices(this, adjAgents);
+		feelers = new Feelers(this, brain.getLengthOfFeelers(this), brain.getNumberOfFeelers(), brain.getViewAngle());
+		//adjAgents = new AdjacentAgents(this, radius*3, grid);
+		//pieSlices = new PieSlices(this, adjAgents);
 
 	}
 	
@@ -51,7 +51,8 @@ public abstract class TestableAgent : Agent {
 	protected override void updateAgent () {
 		
 		//Check debug buttons.
-		checkButtons();
+		if(debug) 
+			checkButtons();
 		
 		//Calculate information for each sensor.
 		sense();
@@ -63,7 +64,8 @@ public abstract class TestableAgent : Agent {
 		//act on ANN output.
 		brain.act(this, thoughts);
 
-		brain.update(this);
+		if(Options.Testing)
+			brain.update(this);
 	}
 	
 	
@@ -74,15 +76,15 @@ public abstract class TestableAgent : Agent {
 		feelers.calculate();
 		
 		//Get list of nearest agents
-		adjAgents.calculate();
+		//adjAgents.calculate();
 		
 		//Get agents in pie slice angles
-		pieSlices.calculate();
+		//pieSlices.calculate();
 	}
 	
 	//Check for debug button presses
 	private void checkButtons () {
-		
+
 		//display feelers
 		if (Input.GetKeyDown(KeyCode.Z)) {
 			feelers.toggleDisplay();
@@ -101,14 +103,16 @@ public abstract class TestableAgent : Agent {
 	}
 
 	void OnCollisionEnter2D(Collision2D collision) {
-		
-		brain.OnCollisionEnter(collision);
+
+		if(Options.Testing)
+			brain.OnCollisionEnter(collision);
 	}
 	
 	
 	void OnCollisionExit2D(Collision2D collision) {
-		
-		brain.OnCollisionExit(collision);
+
+		if(Options.Testing)
+			brain.OnCollisionExit(collision);
 	}
 
 	public void reset() {
@@ -134,19 +138,17 @@ public abstract class TestableAgent : Agent {
 	protected override bool isControllable(){
 		return false;
 	}
-	
-	private double minDist = 30;
 
 	//Draw debug information to the screen.
 	protected override void DrawDebugInformation(){
 		
 		//Draw current target if target is enabled.
 		//if (targetsEnabled){
-			Vector3 t = getTarget();
-			Vector3 cst = DebugRenderer.currentCamera.WorldToScreenPoint(t);
-			cst.y = Screen.height - cst.y;
-			
-			DebugRenderer.drawCircle(cst, DebugRenderer.worldToCameraLength(1), Color.green);
+//			Vector3 t = getTarget();
+//			Vector3 cst = DebugRenderer.currentCamera.WorldToScreenPoint(t);
+//			cst.y = Screen.height - cst.y;
+//			
+//			DebugRenderer.drawCircle(cst, DebugRenderer.worldToCameraLength(1), Color.green);
 		//}
 		
 		//Draw sensors to the screen.
@@ -155,10 +157,10 @@ public abstract class TestableAgent : Agent {
 			feelers.drawSensor();
 			
 			//Draw circle for nearest agents
-			adjAgents.drawSensor();
+			//adjAgents.drawSensor();
 			
 			//Draw pie slices
-			pieSlices.drawSensor();
+			//pieSlices.drawSensor();
 		}
 		
 		//Draw debug text to the screen
@@ -183,19 +185,16 @@ public abstract class TestableAgent : Agent {
 			}
 			
 			debugText += "\n";
-			
+			debugText += "Genome: " +brain.GetType().Name +"\n";
 			debugText += brain.getDebugInformation() + "\n";
 
-			debugText += "Distance from target: " +distanceBetweenPoint(getTarget()) +"\n";
-
-			minDist = minDist >  distanceBetweenPoint(getTarget())? distanceBetweenPoint(getTarget()) : minDist;
-			debugText += "Minimum distance: " +minDist +"\n\n";
+			debugText += "Distance from target: " +distanceBetweenPoint(getTarget()) +"\n\n";
 
 			
 			//Get sensor information
 			debugText += feelers.getDebugInformation()+ "\n";
-			debugText += adjAgents.getDebugInformation()+ "\n";
-			debugText += pieSlices.getDebugInformation()+ "\n";
+			//debugText += adjAgents.getDebugInformation()+ "\n";
+			//debugText += pieSlices.getDebugInformation()+ "\n";
 			
 			GUI.color = Color.black;
 			GUI.Label(new Rect(0, 0, 300, 800), debugText);

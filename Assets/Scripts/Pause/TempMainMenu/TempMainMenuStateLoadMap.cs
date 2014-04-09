@@ -5,8 +5,10 @@ using System.Collections.Generic;
 
 public class TempMainMenuStateLoadMap : GUIState {
 
-	public static int FROM_MAP_EDITOR = 1;
-	public static int FROM_HUMAN_TESTS = 2;
+
+	public static int FROM_PLAY_GAME = 1;
+	public static int FROM_MAP_EDITOR = 2;
+	public static int FROM_HUMAN_TESTS = 3;
 
 	public TempMainMenuStateLoadMap (TempMainMenuFSM fsm) : base(fsm) { }
 	
@@ -29,11 +31,14 @@ public class TempMainMenuStateLoadMap : GUIState {
 		else if (!fileName.Equals("")) {
 			Options.mapName = fileName;
 
-			if(statusCode == FROM_MAP_EDITOR)
+			if(statusCode == FROM_PLAY_GAME) {
+				Application.LoadLevel("PlayGame");
+			}
+			else if(statusCode == FROM_MAP_EDITOR) {
 				Application.LoadLevel("MapEditor");
-
+			}
 			else if(statusCode == FROM_HUMAN_TESTS) {
-				Application.LoadLevel("TestScene");
+				Application.LoadLevel("AITrainer");
 				Options.Testing = true;
 			}
 
@@ -48,6 +53,6 @@ public class TempMainMenuStateLoadMap : GUIState {
 	public override void exit () {}
 	
 	protected override bool isValidStatus (int statusCode) {
-		return (statusCode == FROM_MAP_EDITOR || statusCode == FROM_HUMAN_TESTS);
+		return (statusCode == FROM_PLAY_GAME || statusCode == FROM_MAP_EDITOR || statusCode == FROM_HUMAN_TESTS);
 	}
 }

@@ -19,10 +19,11 @@ public class TempMainMenuStateTrainANN : GUIState {
 		
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2- buttonHeight + button.border.top, sWidth/2, buttonHeight),"Create New Population", button)) {
 
-			Options.Testing = true;
-			Options.mapName = "TrainingMap";
-			Application.LoadLevel("TestScene");
-			finiteStateMachine.pauseMenu.unPause();
+			//Options.Testing = true;
+			//Options.mapName = "TrainingMap";
+			//Application.LoadLevel("TestScene");
+			//finiteStateMachine.pauseMenu.unPause();
+			finiteStateMachine.changeState(typeof(TempMainMenuStateLoadMap), TempMainMenuStateLoadMap.FROM_HUMAN_TESTS);
 		}
 		
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Load Population", button)) {

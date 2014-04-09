@@ -13,6 +13,7 @@ public class GameMap : MonoBehaviour{
 	public Grid grid {get; private set;}
 	public Map map {get; private set;}
 
+	public int totalHumansSpawned;
 	public List<GameObject> HumansOnMap;
 	public List<GameObject> PenguinsOnMap;
 
@@ -23,16 +24,20 @@ public class GameMap : MonoBehaviour{
 
 		if (Options.mapName != null)
 			loadMap(Options.mapName);
-		else
+		else {
+			Options.mapName = "New Map";
 			createMap(Options.mapName, Options.mapSize);
+		}
 		Options.gameMap = this;
 	}
 
 	void FixedUpdate() {
 
 		//Spawn a human at a random spawn point.
-//		if(GetComponent<MapEditor>() == null && Input.GetMouseButtonDown(1)) {
-//			spawnHuman(map.getRandomHumanSpawn(), 1);
+//		if(GetComponent<MapEditor>() != null && Input.GetMouseButtonDown(1)) {
+//			spawnHuman(map.getCellIndex(DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition)), 1);
+//			//Vector2 location = map.getRandomHumanSpawn();
+//			//spawnHumanImmediate(location, Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), new Explorer1Genome());
 //		}
 	}
 
@@ -70,7 +75,7 @@ public class GameMap : MonoBehaviour{
 
 	private void createMap(string mapName, Vector2 mapSize) {
 		
-		Debug.Log("Creating map "+mapName);
+		Debug.Log("Creating map "+mapName +" with a size of "+mapSize+".");
 		
 		if(map != null)
 			map.Dispose();
@@ -88,6 +93,8 @@ public class GameMap : MonoBehaviour{
 		
 		HumansOnMap.Clear();
 		PenguinsOnMap.Clear();
+
+		totalHumansSpawned = 0;
 	}
 
 	//Load the given map name and dispose of all previous used resouces.
@@ -111,6 +118,8 @@ public class GameMap : MonoBehaviour{
 	
 		HumansOnMap.Clear();
 		PenguinsOnMap.Clear();
+
+		totalHumansSpawned = 0;
 	}
 
 	
@@ -142,48 +151,76 @@ public class GameMap : MonoBehaviour{
 	}
 
 
-	public GameObject spawnHumanImmediate(Vector2 location, Quaternion? rotationNullable){
+	public GameObject spawnHumanImmediate(Vector2 location, Quaternion? rotationNullable, Genome genome){
 
 		Quaternion rotation = rotationNullable.HasValue? rotationNullable.Value: Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location));
 
 		Debug.Log("Spawning new human at "+ map.cellIndexToWorld(location));
 		
-		string[] files = Directory.GetFiles(Application.dataPath + "/../GA/Genomes/");
-		
-		int index = Random.Range(2, files.Length);
-		Genome genome = Genome.load(File.ReadAllText(files[index]));
-		
 		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, map, grid, genome);
 		
 		HumansOnMap.Add(human);
+
+		++totalHumansSpawned;
 
 		return human;
 	}
 
 	//Given a human spawn point on the map, spawn the amount of humans. 
-	public void spawnHuman(Vector2 location, int amount = 1) {
+	public List<GameObject> spawnHuman(Vector2 location, int amount = 1) {
+
+		List<GameObject> humans = new List<GameObject>(amount);
 
 		for (int currHuman = 0; currHuman < amount; ++currHuman) {
 
-			StartCoroutine(spawnHuman (currHuman * 3.0f, location));
+			StartCoroutine(spawnHuman (currHuman * 3.0f, location, humans));
 		}
+
+		return humans;
 	}
 
 	//Spawns a human at the given location after a delay.
 	// Humans face towards the center of the map.
-	IEnumerator spawnHuman(float delay, Vector2 location) {
+	IEnumerator spawnHuman(float delay, Vector2 location, List<GameObject> humansList) {
 
 		yield return new WaitForSeconds(delay);
 
-		Debug.Log("Spawning new human at "+ map.cellIndexToWorld(location));
-
+		
 		string[] files = Directory.GetFiles(Application.dataPath + "/../GA/Genomes/");
 		
-		int index = Random.Range(2, files.Length);
-		Genome genome = Genome.load(File.ReadAllText(files[index]));
+		//string[] fileList = Directory.GetFiles(path + "/");
+		List<string> fileNames = new List<string>();
+		
+		//Loop through each file in the directory
+		for (int currFile = 0; currFile < files.Length; ++currFile) {
+			
+			if(!files[currFile].Substring(files[currFile].Length-4).Equals(".txt"))
+				continue;
+//			//Skip all hidden files (example: .DS_Store)
+//			if(files[currFile].Remove(0,files[currFile].LastIndexOf('/')+1)[0] == '.')
+//				continue;
+//			
+//			//Add file name to the list of file names
+//			//Path and directory information is removed first.
+//			fileNames.Add(fileList[currFile].Remove(fileList[currFile].LastIndexOf('.')).Remove(0,fileList[currFile].LastIndexOf('/')+1));
+			
+			fileNames.Add(files[currFile]);
+		}
+		
+		files = fileNames.ToArray();
+		
+		Genome genome;
+		if(files.Length != 0){
+			
+			int index = Random.Range(0, files.Length);
+			genome = Genome.load(File.ReadAllText(files[index]));
+			Debug.Log("Genome from file: "+ files[index]);
+		}
+		else {
+			genome = new FiveFeelerGenome();
+		}
+		//Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location))
+		humansList.Add (spawnHumanImmediate(location, map.getSpawnAngle(location), genome));
 
-		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), map, grid, genome);
-
-		HumansOnMap.Add(human);
 	}
 }

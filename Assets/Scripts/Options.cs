@@ -6,6 +6,7 @@ public class Options {
 	public static string mapName;
 	public static GameMap gameMap;
 
+	public static GeneticAlgorithmMultiTesting geneticAlgorithm;
 	public static string populationName;
 	public static bool Testing;
 	
@@ -16,7 +17,7 @@ public class Options {
 	public static string GenomeDirectory = GADirectory +"/Genomes";
 
 	static Options() {
-		mapName = "TrainingMap";
+		mapName = "NewMap";
 		Testing = false;
 	}
 

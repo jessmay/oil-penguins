@@ -4,9 +4,10 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
-public class GeneticAlgorithm : MonoBehaviour {
+public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 	
 	public Genome[] population {get; private set;}
+	public Genome[] prevPopulation {get; private set;}
 	public int populationSize {get; private set;}
 	
 	public const double mutationRate = 0.2;
@@ -23,10 +24,7 @@ public class GeneticAlgorithm : MonoBehaviour {
 	public double bestFitness {get; private set;}
 	public Genome mostFit {get; private set;}
 
-	
-	List<Vector2> SpawnPoints;
 
-	
 	public static int TICKS_PER_GENOME() {
 		int value = 700 * (Options.mapName.Equals("TrainingMap")?1:5);
 		return value;
@@ -34,14 +32,14 @@ public class GeneticAlgorithm : MonoBehaviour {
 	//public const int TARGETS_PER_GENOME() { ;
 
 	[HideInInspector]
-	public TestableAgent testSubject;
+	public TestableAgent[] testSubjects;
 
 	[HideInInspector]
 	public GameMap gameMap;
 
 	void Awake() {
 		Options.Testing = true;
-		//Options.geneticAlgorithm = this;
+		Options.geneticAlgorithm = this;
 	}
 
 	// Use this for initialization
@@ -50,17 +48,10 @@ public class GeneticAlgorithm : MonoBehaviour {
 		
 		gameMap = GetComponent<GameMap>();
 
-		SpawnPoints = new List<Vector2>(gameMap.map.HumanSpawnPoints);
-//		
-//		//gameMap.spawnHumanImmediate(gameMap.map.getRandomHumanSpawn(), gameMap.Human.transform.rotation);
-//		gameMap.spawnHumanImmediate(gameMap.map.HumanSpawnPoints[currTarget], gameMap.Human.transform.rotation);
-//
-//		testSubject = gameMap.HumansOnMap[0].GetComponent<TestableAgent>();
-
 		if(Options.populationName == null){
 
-			Type genome = typeof(FiveLongFeelerGenome);
-			populationSize = 50;
+			Type genome = typeof(Explorer1Genome);//FiveLongFeelerGenome//Explorer1Genome
+			populationSize = 100;
 
 			population = new Genome[populationSize];
 			
@@ -80,11 +71,19 @@ public class GeneticAlgorithm : MonoBehaviour {
 			loadPopulationFromString(File.ReadAllText(fileName));
 		}
 
-		
-		//gameMap.spawnHumanImmediate(gameMap.map.getRandomHumanSpawn(), gameMap.Human.transform.rotation);
-		gameMap.spawnHumanImmediate(gameMap.map.HumanSpawnPoints[currTarget], gameMap.Human.transform.rotation, population[0]);
-		
-		testSubject = gameMap.HumansOnMap[0].GetComponent<TestableAgent>();
+		prevPopulation = null;
+
+		testSubjects = new TestableAgent[populationSize];
+
+		for(int currIndividual = 0; currIndividual < populationSize; ++currIndividual) {
+
+			//Vector3 location = gameMap.map.cellIndexToWorld(gameMap.map.HumanSpawnPoints[currTarget]);
+			//Quaternion rotation = Quaternion.LookRotation(transform.forward, Vector3.zero - location);
+			Quaternion rotation = gameMap.map.getSpawnAngle(currTarget);
+			gameMap.spawnHumanImmediate(gameMap.map.HumanSpawnPoints[currTarget], Options.mapName.Equals("TrainingMap")?gameMap.Human.transform.rotation: rotation, population[currIndividual]);
+			
+			testSubjects[currIndividual] = gameMap.HumansOnMap[currIndividual].GetComponent<TestableAgent>();
+		}
 
 
 		initialize();
@@ -98,61 +97,62 @@ public class GeneticAlgorithm : MonoBehaviour {
 			
 			//Move to next target.
 			currTarget = (currTarget+1) % gameMap.map.HumanSpawnPoints.Count;
-			
-			//Notify agent of end of target test
-			testSubject.brain.endOfTarget();
-			
-			//calculate fitness and add to genomes current total.
-			population[populationIndex].totalFitness += population[populationIndex].calculateFitness();
 
-			//Get new test location
-			//Vector3 location = gameMap.map.cellIndexToWorld(gameMap.map.getRandomHumanSpawn());
-			//Vector3 location = gameMap.map.cellIndexToWorld(getRandomSpawn());
-			Vector3 location = gameMap.map.cellIndexToWorld(gameMap.map.HumanSpawnPoints[currTarget]);
-			Quaternion rotation = Quaternion.LookRotation(transform.forward, Vector3.zero - gameMap.map.cellIndexToWorld(location));
+			for(int currIndividual = 0; currIndividual < populationSize; ++currIndividual) {
+				//Notify agent of end of target test
+				testSubjects[currIndividual].brain.endOfTarget();
+				
+				//calculate fitness and add to genomes current total.
+				population[currIndividual].totalFitness += population[currIndividual].calculateFitness();
+				
+				//Get new test location
+				Vector3 location = gameMap.map.cellIndexToWorld(gameMap.map.HumanSpawnPoints[currTarget]);
+				Quaternion rotation = gameMap.map.getSpawnAngle(currTarget);//Quaternion.LookRotation(transform.forward, Vector3.zero - location);
+				
+				//Reset the agent to new starting values.
+				testSubjects[currIndividual].reset(location, Options.mapName.Equals("TrainingMap")?gameMap.Human.transform.rotation: rotation);
 
-			//Reset the agent to new starting values.
-			testSubject.reset(location, Options.mapName.Equals("TrainingMap")?gameMap.Human.transform.rotation: rotation);
-			
+			}
+
 			//Finished testing current genome
 			if(currTarget == 0) {
-			//if(SpawnPoints.Count == 0) {
-				
-				//Notify agent
-				testSubject.brain.endOfTests();
 
-				//Reset spawnpoints list.
-				//SpawnPoints.AddRange(gameMap.map.HumanSpawnPoints);
+				bestFitness = 0;
 
-				//Calculate fitness for current genome
-				population[populationIndex].fitness = population[populationIndex].totalFitness/gameMap.map.HumanSpawnPoints.Count;
-				
-				//Add fitness to total.
-				totalFitness += population[populationIndex].fitness;
-				
-				Debug.Log("Population["+populationIndex+"] " +population[populationIndex].fitness);
-				
-				//Save the best fitness for the generation.
-				bestFitness = Math.Max(bestFitness, population[populationIndex].fitness);
-				
-				//Move to next genome
-				++populationIndex;
-				
-				//Replace weights in agent with new genome's weights.
-				testSubject.replaceBrain(population[populationIndex%populationSize]);
-				
+				for(int currIndividual = 0; currIndividual < populationSize; ++currIndividual) {
+					//Notify agent
+					testSubjects[currIndividual].brain.endOfTests();
+					
+					//Calculate fitness for current genome
+					population[currIndividual].fitness = population[currIndividual].totalFitness/gameMap.map.HumanSpawnPoints.Count;
+					
+					//Add fitness to total.
+					totalFitness += population[currIndividual].fitness;
+					
+					Debug.Log("Population["+currIndividual+"] " +population[currIndividual].fitness);
+					
+					//Save the best fitness for the generation.
+					bestFitness = Math.Max(bestFitness, population[currIndividual].fitness);
+					
+					//Move to next genome
+					++populationIndex;
+					
+					//Replace weights in agent with new genome's weights.
+					testSubjects[currIndividual].replaceBrain(population[currIndividual%populationSize]);
+
+				}
+
 				//End of one generation
-				if(populationIndex == populationSize) {
-					Debug.Log("Generation "+generation +" completed");
+				Debug.Log("Generation "+generation +" completed");
 					
-					createNewPopulation();
-					
-					populationIndex = 0;
-					totalFitness = 0;
-					bestFitness = 0;
-					++generation;
+				createNewPopulation();
+				
+				populationIndex = 0;
+				totalFitness = 0;
+				++generation;
 
-					testSubject.replaceBrain(population[populationIndex%populationSize]);
+				for(int currIndividual = 0; currIndividual < populationSize; ++currIndividual) {
+					testSubjects[currIndividual].replaceBrain(population[currIndividual%populationSize]);
 				}
 			}
 			
@@ -167,24 +167,43 @@ public class GeneticAlgorithm : MonoBehaviour {
 		int width = 300;
 		int height = 50;
 
-		Time.timeScale = GUI.HorizontalSlider (new Rect (Screen.width/2 - width/2, 25, width, height), Time.timeScale, 0.0f, 50.0f);
+		Time.timeScale = GUI.HorizontalSlider (new Rect (Screen.width/2 - width/2, 25, width, height), Time.timeScale, 0.0f, 5.0f);
+		
+		GUI.color = Color.black;
+		GUI.Label(new Rect(Screen.width/2 - width/2, 25 + height, width, height*2), "Generation["+generation+"]\nPrevious best: " +bestFitness +"\nTarget "+(currTarget+1) +"/" +gameMap.map.HumanSpawnPoints.Count);
 
-		GUI.Label(new Rect(Screen.width/2 - width/2, 25 + height, width, height*2), "Generation["+generation+"]: "+bestFitness+"\nPopulation["+populationIndex+"]["+currTarget+"]: "+population[populationIndex].calculateFitness());
-
+		GUI.color = Color.white;
 		//load/save buttons here
 
 		if(GUI.Button(new Rect(Screen.width/2 - width/2, Screen.height - (25 + 2*height), width, height), "Save Population")) {
 
 			string fileName = Options.GADirectory +"/"+DateTime.Now.ToString().Replace('/','-').Replace(':','.') + ".txt";
 			Debug.Log("Saving population to file "+fileName +".");
-			File.WriteAllText(fileName, getPopulationAsAString());
+			File.WriteAllText(fileName, getPopulationAsAString(prevPopulation));
 
 		}
-		if(GUI.Button(new Rect(Screen.width/2 - width/2, Screen.height - (25 + height), width, height), "Load Population")) {
 
-			showLoadMenu = !showLoadMenu;
-			scrollPosition = Vector2.zero;
+		if(GUI.Button(new Rect(Screen.width/2 - width/2, Screen.height - (25 + height), width, height), "Save Best Individual") && mostFit != null) {
+
+			//string fileName = Options.GenomeDirectory +"/"+DateTime.Now.ToString().Replace('/','-').Replace(':','.') + ".txt";
+			string fileName = mostFit.GetType().Name;
+			int count = 1;
+
+			while (File.Exists(Options.GenomeDirectory +"/" + fileName + count.ToString("D2") + ".txt")) {
+				++count;
+			}
+
+			fileName = Options.GenomeDirectory +"/" + fileName + count.ToString("D2") + ".txt";
+
+			Debug.Log("Saving most fit to file "+fileName +".");
+			File.WriteAllText(fileName, mostFit.save());
 		}
+
+//		if(GUI.Button(new Rect(Screen.width/2 - width/2, Screen.height - (25 + height), width, height), "Load Population")) {
+//
+//			showLoadMenu = !showLoadMenu;
+//			scrollPosition = Vector2.zero;
+//		}
 
 		if(showLoadMenu) {
 
@@ -237,7 +256,11 @@ public class GeneticAlgorithm : MonoBehaviour {
 					string fileName = path +"/" +fileList[currMap]+".txt";
 					Debug.Log ("Loading Population from file "+fileName +".");
 					loadPopulationFromString(File.ReadAllText(fileName));
-					testSubject.reset();
+
+
+					//testSubjects.reset();
+
+
 					showLoadMenu = false;
 				}
 			}
@@ -258,7 +281,7 @@ public class GeneticAlgorithm : MonoBehaviour {
 		bestFitness = 0;
 		mostFit = population[0];
 
-		testSubject.replaceBrain(population[populationIndex]);
+		//testSubjects.replaceBrain(population[populationIndex]);
 	}
 
 	
@@ -276,14 +299,6 @@ public class GeneticAlgorithm : MonoBehaviour {
 	}
 
 
-	private Vector2 getRandomSpawn() {
-		int index = Mathf.FloorToInt(UnityEngine.Random.value*SpawnPoints.Count);
-		Vector2 spawn = SpawnPoints[index];
-		SpawnPoints.RemoveAt(index);
-		return spawn;
-	}
-
-	
 	//Create a new population selecting and crossing genomes of the previous population.
 	private void createNewPopulation() {
 		
@@ -318,7 +333,10 @@ public class GeneticAlgorithm : MonoBehaviour {
 				newPopulation[currGenome].mutate(mutationRate);
 			}
 		}
-		
+
+		//Save previous population
+		prevPopulation = population;
+
 		//Save over old population.
 		population = newPopulation;
 	}
@@ -360,12 +378,19 @@ public class GeneticAlgorithm : MonoBehaviour {
 	
 	//Return the entire population as a string.
 	//Used in saving the current population.
-	public string getPopulationAsAString() {
+	public string getPopulationAsAString(Genome[] population = null) {
+
+		int generation = this.generation-1;
+
+		if(population == null) {
+			population = this.population;
+			++generation;
+		}
+
+		string pop = population.Length + "\n" +generation +"\n" +separator;
 		
-		string pop = populationSize + "\n" +generation +"\n" +separator;
-		
-		for (int currGenome = 0; currGenome < populationSize; ++currGenome) {
-			pop += population[currGenome].save() + (currGenome +1 == populationSize? "":""+separator);
+		for (int currGenome = 0; currGenome < population.Length; ++currGenome) {
+			pop += population[currGenome].save() + (currGenome +1 == population.Length? "":""+separator);
 		}
 		
 		return pop;

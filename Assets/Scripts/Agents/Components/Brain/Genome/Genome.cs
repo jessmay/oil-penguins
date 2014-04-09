@@ -6,17 +6,23 @@ public abstract class Genome : IComparable<Genome> {
 
 	public double[][][] weights;
 	protected NeuralNet brain;
+	protected float feelerLength;
 
 	public Genome(double[][][] weights) {
 		this.weights = weights;
 
 		brain = new NeuralNet(weights);
+
+		feelerLength = getDefaultLengthOfFeelers();
 	}
 
 	public Genome() {
 
 		brain = new NeuralNet(getNumberOfInputs(), getNumberOfOutputs(), getNumberOfLayers(), getNumberOfNeuronsPerLayer());
+
 		weights = brain.getWeights();
+
+		feelerLength = getDefaultLengthOfFeelers();
 	}
 
 	public abstract int getNumberOfInputs();
@@ -25,6 +31,8 @@ public abstract class Genome : IComparable<Genome> {
 	public abstract int getNumberOfNeuronsPerLayer();
 
 	public abstract double getFiredValue();
+	public abstract float getLengthOfFeelers(TestableAgent agent);
+	public abstract float getDefaultLengthOfFeelers();
 	public abstract int getNumberOfFeelers();
 	public abstract int getViewAngle();
 
@@ -45,6 +53,16 @@ public abstract class Genome : IComparable<Genome> {
 	public abstract void endOfTarget();
 	public abstract void endOfTests();
 
+	protected void moveToTestStart(TestableAgent agent) {
+
+		agent.transform.position = agent.map.cellIndexToWorld(agent.map.HumanSpawnPoints[Options.geneticAlgorithm.currTarget]);//agent.startPosition;//agent.map.cellIndexToWorld(agent.map.getRandomHumanSpawn());
+		Quaternion rotation = Quaternion.LookRotation(agent.transform.forward, Vector3.zero - (agent.transform.position));//agent.map.cellIndexToWorld(agent.transform.position)
+		
+		if(!Options.mapName.Equals("TrainingMap"))
+			agent.turn(rotation.eulerAngles.z - agent.transform.rotation.eulerAngles.z);
+
+	}
+	
 	public abstract string getDebugInformation();
 
 
@@ -191,7 +209,7 @@ public abstract class Genome : IComparable<Genome> {
 
 	public string save() {
 
-		string contents = GetType().Name + "\n";
+		string contents = GetType().Name + " " + feelerLength + "\n";
 
 		contents += getWeightsAsString();
 
@@ -201,13 +219,20 @@ public abstract class Genome : IComparable<Genome> {
 
 	public static Genome load(string contents) {
 
-		string typeName = contents.Substring(0, contents.IndexOf("\n"));
+		string[] header = contents.Substring(0, contents.IndexOf("\n")).Split(new char[]{' '});
+
+		string typeName = header[0];
 
 		contents = contents.Substring(contents.IndexOf("\n")+1);
 
 		double[][][] weights = createWeightsFromString(contents.Split(new char[]{'\n'}));
 
-		return createGenome(Type.GetType(typeName), weights);
+		Genome genome = createGenome(Type.GetType(typeName), weights);
+
+		if(header.Length > 1)
+			genome.feelerLength = Convert.ToSingle(header[1]);
+
+		return genome;
 	}
 
 

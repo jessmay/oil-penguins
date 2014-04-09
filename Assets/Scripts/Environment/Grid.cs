@@ -130,8 +130,10 @@ public class Grid : IDisposable {
 
 	// This gets the adjacent agents within a given radius of Agent A
 	// If looking for adjacent node sensor, it will be in Map.cs
-	public List<Agent> getNear (Agent a, float radius) {
+	public List<Agent> getNear (Agent a, float radius, Type agentType = null) {
 		List<Agent> near = new List<Agent> ();
+
+		agentType = agentType == null? typeof(Agent): agentType;
 
 		float myRadius = a.getRadius();
 		radius += myRadius;
@@ -148,7 +150,7 @@ public class Grid : IDisposable {
 				for (int k = 0; k < grid[i,j].Count; ++k) {
 
 					Agent b = grid[i,j][k];
-					if (b.Equals(a)) continue;
+					if (b.Equals(a) || !agentType.IsAssignableFrom(b.GetType())) continue;
 
 					float theirRadius = b.getRadius();
 					float dist = Vector3.Distance(a.renderer.bounds.center, b.renderer.bounds.center);

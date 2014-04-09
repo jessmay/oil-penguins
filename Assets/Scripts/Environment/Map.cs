@@ -105,6 +105,27 @@ public class Map : IDisposable {
 		return HumanSpawnPoints[Mathf.FloorToInt(UnityEngine.Random.value*HumanSpawnPoints.Count)];
 	}
 
+	public Quaternion getSpawnAngle(int spawnIndex) {
+		return getSpawnAngle(HumanSpawnPoints[spawnIndex]);
+	}
+
+	public Quaternion getSpawnAngle(Vector2 spawnPoint) {
+
+		Vector2 direction = Vector2.zero;
+
+		if(spawnPoint.x == 0)
+			direction.x += 1;
+		else if (spawnPoint.x == mapWidth-1)
+			direction.x -= 1;
+
+		if(spawnPoint.y == 0)
+			direction.y += 1;
+		else if (spawnPoint.y == mapHeight-1)
+			direction.y -= 1;
+		
+		return Quaternion.LookRotation(Vector3.forward, direction);
+	}
+
 
 	private void createBoard(int width, int height) {
 
@@ -165,7 +186,7 @@ public class Map : IDisposable {
 
 					//Not on the edge of the map
 					if((x != 0 && x != mapWidth-1 && y != 0 && y != mapHeight-1) && !Options.Testing) {
-						throw new Exception("Invalid map. Human spawn location not on the edge. ("+x +", "+y +")");
+						//throw new Exception("Invalid map. Human spawn location not on the edge. ("+x +", "+y +")");
 					}
 
 					HumanSpawnPoints.Add(new Vector2(x,y));

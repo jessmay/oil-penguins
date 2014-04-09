@@ -21,12 +21,16 @@ public class Feelers : Sensor {
 		
 		// Save current object layer
 		int oldLayer = me.gameObject.layer;
-		
-		//Change object layer to a layer it will be alone
-		me.gameObject.layer = LayerMask.NameToLayer("RayCast");
-		
-		int layerToIgnore = 1 << me.gameObject.layer;
-		layerToIgnore = ~layerToIgnore;
+
+		int layerToIgnore = ~(1 << me.gameObject.layer);
+
+		if(!Options.Testing) {
+			//Change object layer to a layer it will be alone
+			me.gameObject.layer = LayerMask.NameToLayer("RayCast");
+			
+			layerToIgnore = 1 << me.gameObject.layer;
+			layerToIgnore = ~layerToIgnore;
+		}
 
 
 		float heading = me.getHeading();

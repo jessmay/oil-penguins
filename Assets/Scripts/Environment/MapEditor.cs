@@ -18,7 +18,11 @@ public class MapEditor : MonoBehaviour {
 
 
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
+
+		if(GetComponent<PauseMenu>().isPaused())
+			return;
+
 
 		//Place/remove wall at the given mouse location
 		if (Input.GetMouseButtonDown (0)) {
