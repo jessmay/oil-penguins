@@ -13,6 +13,8 @@ using System.Collections.Generic;
 
 public abstract class Agent : MonoBehaviour {
 
+	[HideInInspector]
+	public GameMap gameMap;
 	public Grid grid;
 	public Map map;
 
@@ -51,9 +53,12 @@ public abstract class Agent : MonoBehaviour {
 		initializeAgent();
 	}
 
-	void FixedUpdate() {
+	void Update() {
 
 		checkControls();
+	}
+
+	void FixedUpdate() {
 
 		updateAgent();
 
@@ -68,13 +73,14 @@ public abstract class Agent : MonoBehaviour {
 		grid.remove(this);
 	}
 
-	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, Map map, Grid grid) {
+	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, GameMap gameMap) {
 
 		GameObject newAgent = Instantiate(agent, location, rotation) as GameObject;
 		Agent agentScript = newAgent.GetComponent<Agent>();
-		
-		agentScript.map = map;
-		agentScript.grid = grid;
+
+		agentScript.gameMap = gameMap;
+		agentScript.map = gameMap.map;
+		agentScript.grid = gameMap.grid;
 
 		return newAgent;
 	}

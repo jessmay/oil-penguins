@@ -3,9 +3,9 @@ using System.Collections;
 
 public abstract class TestableAgent : Agent {
 	
-	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, Map map, Grid grid, Genome genome) {
+	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, GameMap gameMap, Genome genome) {
 		
-		GameObject newAgent = Agent.CreateAgent(agent, location, rotation, map, grid);
+		GameObject newAgent = Agent.CreateAgent(agent, location, rotation, gameMap);
 
 		TestableAgent ta = newAgent.GetComponent<TestableAgent>();
 
@@ -21,8 +21,8 @@ public abstract class TestableAgent : Agent {
 
 	//Sensors
 	public Feelers feelers {get; private set;}
-	public AdjacentAgents adjAgents {get; private set;}
-	public PieSlices pieSlices {get; private set;}
+//	public AdjacentAgents adjAgents {get; private set;}
+//	public PieSlices pieSlices {get; private set;}
 
 	public Vector3 startPosition {get; private set;}
 	public Quaternion startRotation {get; private set;}
@@ -90,16 +90,16 @@ public abstract class TestableAgent : Agent {
 			feelers.toggleDisplay();
 		}
 		
-		//display adjacent agents
-		if(Input.GetKeyDown(KeyCode.C)){
-			adjAgents.toggleDisplay();
-		}
-		
-		//display pie slices
-		if(Input.GetKeyDown(KeyCode.X)){
-			pieSlices.toggleDisplay();
-			
-		}
+//		//display adjacent agents
+//		if(Input.GetKeyDown(KeyCode.C)){
+//			adjAgents.toggleDisplay();
+//		}
+//		
+//		//display pie slices
+//		if(Input.GetKeyDown(KeyCode.X)){
+//			pieSlices.toggleDisplay();
+//			
+//		}
 	}
 
 	void OnCollisionEnter2D(Collision2D collision) {

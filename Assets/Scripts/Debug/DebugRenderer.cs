@@ -120,6 +120,18 @@ public class DebugRenderer {
 	}
 
 
+	//Draw a circle given world coordinates
+	public static void drawCircleWorld(Vector2 center, float radius, Color? c = null) {
+
+		Color color = c.HasValue ? c.Value : Color.black;
+		
+		Texture2D circle = getCircle(worldToCameraLength(radius), color);
+
+		Graphics.DrawTexture(new Rect(center.x-radius, center.y-radius, 2*radius, 2*radius), circle);
+
+	}
+
+
 	public static void drawBox(Rect rect, Color? c = null) {
 
 		Color color = c.HasValue ? c.Value : Color.black;

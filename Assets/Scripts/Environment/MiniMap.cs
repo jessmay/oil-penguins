@@ -101,16 +101,19 @@ public class MiniMap : MonoBehaviour {
 		}
 
 		//Draw ICE machine
-//		{
-//			Vector3 ICECoord = gameMap.ICEMachine.transform.position;
-//			ICECoord = (ICECoord + mapBounds.size/2.0f);
-//			
-//			ICECoord.x = ICECoord.x/mapBounds.size.x * onScreenSize.x;
-//			ICECoord.y = ICECoord.y/mapBounds.size.y * onScreenSize.y;
-//			
-//			DebugRenderer.drawBox(coord.x + ICECoord.x, ICECoord.y, wallSize, wallSize, 0, Vector3.zero, Map.ICEMachineColor);
-//
-//		}
+		{
+			Vector3 ICECoord = gameMap.ICEMachineOnMap.transform.position;
+			ICECoord = (ICECoord + mapBounds.size/2.0f);
+			
+			ICECoord.x = ICECoord.x/mapBounds.size.x * onScreenSize.x;
+			ICECoord.y = onScreenSize.y - ICECoord.y/mapBounds.size.y * onScreenSize.y;
+
+			Vector2 newCoord = coord + (Vector2)ICECoord;
+			
+			DebugRenderer.drawBox(new Rect(newCoord.x - wallSize/2, newCoord.y - wallSize/2, wallSize, wallSize), Map.ICEMachineColor);
+			//DebugRenderer.drawBox(coord.x + ICECoord.x, ICECoord.y, wallSize, wallSize, 0, Vector3.zero, Map.ICEMachineColor);
+
+		}
 
 		//Draw humans
 		foreach(GameObject human in gameMap.HumansOnMap) {

@@ -21,8 +21,8 @@ public class Map : IDisposable {
 	public int mapWidth {get; private set;}
 	public int mapHeight {get; private set;}
 	
-	private float xSize;
-	private float ySize;
+	public float xSize {get; private set;}
+	public float ySize {get; private set;}
 	
 	//private Bounds bounds;
 	private Vector3 center;

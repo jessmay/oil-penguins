@@ -16,6 +16,7 @@ public class GameMap : MonoBehaviour{
 	public int totalHumansSpawned;
 	public List<GameObject> HumansOnMap;
 	public List<GameObject> PenguinsOnMap;
+	public GameObject ICEMachineOnMap {get; private set;}
 
 	void Awake() {
 
@@ -41,7 +42,15 @@ public class GameMap : MonoBehaviour{
 //		}
 	}
 
+	//void OnRenderObject() {
 	void OnGUI() {
+
+		if(GUI.Button(new Rect(Screen.width/2 - 100/2, Screen.height - (25 + 50), 100, 50), "Spawn Penguin")) {
+			spawnPenguin();
+		}
+
+
+		return;
 
 		//if(GetComponent<PauseMenu>().isPaused())
 		//	return;
@@ -70,6 +79,24 @@ public class GameMap : MonoBehaviour{
 			DebugRenderer.drawCircle(ICELoc, DebugRenderer.worldToCameraLength(1), Map.ICEMachineColor);
 		}
 
+
+//		foreach (Vector2 loc in map.HumanSpawnPoints) {
+//			
+//			DebugRenderer.drawCircleWorld(map.cellIndexToWorld(loc), 1, Map.HumanSpawnColor);
+//		}
+//		
+//		//Display penguin spawn point
+//		if(map.PenguinSpawn != Map.INVALID_LOCATION) {
+//			
+//			DebugRenderer.drawCircleWorld(map.cellIndexToWorld(map.PenguinSpawn), 1, Map.PenguinSpawnColor);
+//		}
+//		
+//		//Display ICE Machine location
+//		if(map.ICEMachineLocation != Map.INVALID_LOCATION) {
+//			
+//			DebugRenderer.drawCircleWorld(map.cellIndexToWorld(map.ICEMachineLocation), 1, Map.ICEMachineColor);
+//		}
+
 	}
 
 
@@ -82,19 +109,7 @@ public class GameMap : MonoBehaviour{
 		
 		map = new Map(mapName, Wall, (int)mapSize.x, (int)mapSize.y);
 		
-		Bounds mapBounds = map.getBounds();
-		
-		if (grid != null)
-			grid.Dispose();
-		
-		grid = new Grid (map.getMapWidth(), map.getMapHeight(), mapBounds);
-		
-		transform.localScale = new Vector3(mapBounds.size.x/renderer.bounds.size.x*transform.localScale.x, mapBounds.size.y/renderer.bounds.size.y*transform.localScale.y, transform.localScale.z);
-		
-		HumansOnMap.Clear();
-		PenguinsOnMap.Clear();
-
-		totalHumansSpawned = 0;
+		initialize();
 	}
 
 	//Load the given map name and dispose of all previous used resouces.
@@ -107,6 +122,11 @@ public class GameMap : MonoBehaviour{
 
 		map = Map.loadMap(mapName, Wall);
 
+		initialize();
+	}
+
+	private void initialize() {
+		
 		Bounds mapBounds = map.getBounds();
 		
 		if (grid != null)
@@ -115,11 +135,13 @@ public class GameMap : MonoBehaviour{
 		grid = new Grid (map.getMapWidth(), map.getMapHeight(), mapBounds);
 		
 		transform.localScale = new Vector3(mapBounds.size.x/renderer.bounds.size.x*transform.localScale.x, mapBounds.size.y/renderer.bounds.size.y*transform.localScale.y, transform.localScale.z);
-	
+
 		HumansOnMap.Clear();
 		PenguinsOnMap.Clear();
-
+		
 		totalHumansSpawned = 0;
+
+		ICEMachineOnMap = Instantiate(ICEMachine, map.cellIndexToWorld(map.ICEMachineLocation), ICEMachine.transform.rotation) as GameObject;
 	}
 
 	
@@ -142,7 +164,7 @@ public class GameMap : MonoBehaviour{
 		yield return new WaitForSeconds(delay);
 		
 		Debug.Log("Spawning new penguin at "+ map.cellIndexToWorld(location));
-		GameObject penguin = Agent.CreateAgent(Penguin, map.cellIndexToWorld(location), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), map, grid);
+		GameObject penguin = Agent.CreateAgent(Penguin, map.cellIndexToWorld(location), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), this);
 
 		//Initialize penguin specific values
 		//penguin.GetComponent<Penguin>();
@@ -155,9 +177,9 @@ public class GameMap : MonoBehaviour{
 
 		Quaternion rotation = rotationNullable.HasValue? rotationNullable.Value: Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location));
 
-		Debug.Log("Spawning new human at "+ map.cellIndexToWorld(location));
+		//Debug.Log("Spawning new human at "+ map.cellIndexToWorld(location));
 		
-		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, map, grid, genome);
+		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, this, genome);
 		
 		HumansOnMap.Add(human);
 
@@ -214,7 +236,7 @@ public class GameMap : MonoBehaviour{
 			
 			int index = Random.Range(0, files.Length);
 			genome = Genome.load(File.ReadAllText(files[index]));
-			Debug.Log("Genome from file: "+ files[index]);
+			//Debug.Log("Genome from file: "+ files[index]);
 		}
 		else {
 			genome = new FiveFeelerGenome();

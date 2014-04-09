@@ -26,7 +26,7 @@ public class WaveManager : MonoBehaviour {
 	void Update() {
 		
 		if(Input.GetKeyUp(KeyCode.K)) {
-			Debug.Log("Kill");
+
 			foreach(GameObject human in gameMap.HumansOnMap) {
 				Destroy(human);
 			}
@@ -49,11 +49,11 @@ public class WaveManager : MonoBehaviour {
 
 		if(betweenWaves) {
 
-			GUI.Label(new Rect(0, 0, 300, 600), (waveStartTime - Time.time).ToString());
+			GUI.Label(new Rect(0, 0, 300, 600), "Wave " +waveNumber +" starts in " +Mathf.RoundToInt(waveStartTime - Time.time) +" seconds.");
 		}
 
 		else {
-			GUI.Label(new Rect(0, 0, 300, 600), (gameMap.HumansOnMap.Count).ToString());
+			GUI.Label(new Rect(0, 0, 300, 600), gameMap.HumansOnMap.Count.ToString() +" human" +(gameMap.HumansOnMap.Count==1?"":"s") +" left.");
 		}
 
 		//Add button to start wave before time.
