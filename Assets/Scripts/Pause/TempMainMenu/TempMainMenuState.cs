@@ -53,6 +53,7 @@ public class TempMainMenuState : GUIState {
 	public override void enter () {
 		Options.mapName = null;
 		Options.Testing = false;
+		Options.play = false;
 
 		Options.populationName = null;
 	}

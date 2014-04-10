@@ -3,8 +3,8 @@ using System.Collections;
 
 public class ICEMachine : MonoBehaviour {
 
-	private bool held;
-	private GameObject holder;
+	public bool held {get; private set;}
+	public GameObject holder {get; private set;}
 
 	// Use this for initialization
 	void Start () {
@@ -12,7 +12,7 @@ public class ICEMachine : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 
 		if(held) {
 			transform.position = holder.transform.position + holder.transform.up*((transform.localScale.x*((BoxCollider2D)collider2D).size.x)/2 + holder.gameObject.GetComponent<Agent>().getRadius());
@@ -30,8 +30,6 @@ public class ICEMachine : MonoBehaviour {
 		held = true;
 		humanAgent.pickUp();
 		holder = collider.gameObject;
-
-		Debug.Log("Hit");
 	}
 
 	public void drop() {
@@ -40,6 +38,13 @@ public class ICEMachine : MonoBehaviour {
 
 		held = false;
 		holder = null;
+	}
+
+	void OnDestroy() {
+
+		if(held) {
+			holder.GetComponent<HumanAgent>().drop();
+		}
 	}
 }
 

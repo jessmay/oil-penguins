@@ -32,6 +32,7 @@ public class TempMainMenuStateLoadMap : GUIState {
 			Options.mapName = fileName;
 
 			if(statusCode == FROM_PLAY_GAME) {
+				Options.play = true;
 				Application.LoadLevel("PlayGame");
 			}
 			else if(statusCode == FROM_MAP_EDITOR) {

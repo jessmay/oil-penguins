@@ -43,10 +43,9 @@ public class GameMap : MonoBehaviour{
 //		}
 	}
 
-	//void OnRenderObject() {
 	void OnGUI() {
 
-		if(GUI.Button(new Rect(Screen.width/2 - 100/2, Screen.height - (25 + 50), 100, 50), "Spawn Penguin")) {
+		if(Options.play && GUI.Button(new Rect(Screen.width/2 - 100/2, Screen.height - (25 + 50), 100, 50), "Spawn Penguin")) {
 			spawnPenguin();
 		}
 
@@ -139,7 +138,8 @@ public class GameMap : MonoBehaviour{
 		
 		totalHumansSpawned = 0;
 
-		ICEMachineOnMap = Instantiate(ICEMachine, map.cellIndexToWorld(map.ICEMachineLocation), ICEMachine.transform.rotation) as GameObject;
+		if(ICEMachine != null)
+			ICEMachineOnMap = Instantiate(ICEMachine, map.cellIndexToWorld(map.ICEMachineLocation), ICEMachine.transform.rotation) as GameObject;
 	}
 
 	

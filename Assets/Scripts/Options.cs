@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Options {
 
+	public static bool play;
 	public static string mapName;
 	public static GameMap gameMap;
 
@@ -19,6 +20,7 @@ public class Options {
 	static Options() {
 		mapName = "NewMap";
 		Testing = false;
+		play = false;
 	}
 
 }
