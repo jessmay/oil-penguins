@@ -13,9 +13,10 @@ public class GameMap : MonoBehaviour{
 	public Grid grid {get; private set;}
 	public Map map {get; private set;}
 
-	public int totalHumansSpawned;
-	public List<GameObject> HumansOnMap;
-	public List<GameObject> PenguinsOnMap;
+
+	public int totalHumansSpawned {get; private set;}
+	public List<GameObject> HumansOnMap {get; private set;}
+	public List<GameObject> PenguinsOnMap {get; private set;}
 	public GameObject ICEMachineOnMap {get; private set;}
 
 	void Awake() {
@@ -49,35 +50,32 @@ public class GameMap : MonoBehaviour{
 			spawnPenguin();
 		}
 
-
-		return;
-
 		//if(GetComponent<PauseMenu>().isPaused())
 		//	return;
 
 		//Display each human spawn point
-		foreach (Vector2 loc in map.HumanSpawnPoints) {
-
-			Vector3 loc2 = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(loc));
-			loc2.y = Screen.height - loc2.y;
-			DebugRenderer.drawCircle(loc2, DebugRenderer.worldToCameraLength(1), Map.HumanSpawnColor);
-		}
-
-		//Display penguin spawn point
-		if(map.PenguinSpawn != Map.INVALID_LOCATION) {
-
-			Vector2 penLoc = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(map.PenguinSpawn));
-			penLoc.y = Screen.height - penLoc.y;
-			DebugRenderer.drawCircle(penLoc, DebugRenderer.worldToCameraLength(1), Map.PenguinSpawnColor);
-		}
-
-		//Display ICE Machine location
-		if(map.ICEMachineLocation != Map.INVALID_LOCATION) {
-
-			Vector2 ICELoc = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(map.ICEMachineLocation));
-			ICELoc.y = Screen.height - ICELoc.y;
-			DebugRenderer.drawCircle(ICELoc, DebugRenderer.worldToCameraLength(1), Map.ICEMachineColor);
-		}
+//		foreach (Vector2 loc in map.HumanSpawnPoints) {
+//
+//			Vector3 loc2 = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(loc));
+//			loc2.y = Screen.height - loc2.y;
+//			DebugRenderer.drawCircle(loc2, DebugRenderer.worldToCameraLength(1), Map.HumanSpawnColor);
+//		}
+//
+//		//Display penguin spawn point
+//		if(map.PenguinSpawn != Map.INVALID_LOCATION) {
+//
+//			Vector2 penLoc = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(map.PenguinSpawn));
+//			penLoc.y = Screen.height - penLoc.y;
+//			DebugRenderer.drawCircle(penLoc, DebugRenderer.worldToCameraLength(1), Map.PenguinSpawnColor);
+//		}
+//
+//		//Display ICE Machine location
+//		if(map.ICEMachineLocation != Map.INVALID_LOCATION) {
+//
+//			Vector2 ICELoc = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(map.ICEMachineLocation));
+//			ICELoc.y = Screen.height - ICELoc.y;
+//			DebugRenderer.drawCircle(ICELoc, DebugRenderer.worldToCameraLength(1), Map.ICEMachineColor);
+//		}
 
 
 //		foreach (Vector2 loc in map.HumanSpawnPoints) {
@@ -218,10 +216,7 @@ public class GameMap : MonoBehaviour{
 			
 			if(!files[currFile].Substring(files[currFile].Length-4).Equals(".txt"))
 				continue;
-//			//Skip all hidden files (example: .DS_Store)
-//			if(files[currFile].Remove(0,files[currFile].LastIndexOf('/')+1)[0] == '.')
-//				continue;
-//			
+	
 //			//Add file name to the list of file names
 //			//Path and directory information is removed first.
 //			fileNames.Add(fileList[currFile].Remove(fileList[currFile].LastIndexOf('.')).Remove(0,fileList[currFile].LastIndexOf('/')+1));

@@ -33,7 +33,7 @@ public class Map : IDisposable {
 
 
 	public List<Vector2> HumanSpawnPoints;// {get; private set;}
-	public Vector2 ICEMachineLocation;// {get; private set;} //Change to GameObject later.
+	public Vector2 ICEMachineLocation;// {get; private set;}
 	public Vector2 PenguinSpawn;// {get; private set;}
 
 
@@ -54,7 +54,6 @@ public class Map : IDisposable {
 
 		createBorder();
 
-		//HumanSpawnPoints.Add(Vector2.zero);
 		ICEMachineLocation = new Vector2(mapWidth/2, mapHeight/2);
 		PenguinSpawn = new Vector2(mapWidth/2, mapHeight/2+1);
 	}

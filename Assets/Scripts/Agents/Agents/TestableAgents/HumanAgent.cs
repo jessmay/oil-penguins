@@ -28,6 +28,7 @@ public class HumanAgent : TestableAgent {
 	
 	//Nothing to deconstruct
 	protected override void destroyAgent() {
+
 		//Notify ICEMachine of death if holding the ICEMachine
 		if(holdingICEMachine) {
 			gameMap.ICEMachineOnMap.GetComponent<ICEMachine>().drop();

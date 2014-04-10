@@ -15,7 +15,7 @@ public class CameraController : MonoBehaviour {
 	public bool frozen = false;
 
 	private float scrollAmount;
-
+	private int prevScrollFrame;
 	// Use this for initialization
 	void Awake () {
 
@@ -29,6 +29,8 @@ public class CameraController : MonoBehaviour {
 
 	void Start() {
 
+		prevScrollFrame = Time.frameCount;
+
 		if(Options.gameMap != null && !Options.Testing) {
 			Vector3 startPos = camera.transform.position;
 			Vector3 penguinPos = Options.gameMap.map.cellIndexToWorld(Options.gameMap.map.PenguinSpawn);
@@ -41,6 +43,7 @@ public class CameraController : MonoBehaviour {
 		}
 	}
 
+	float tempScrollAmount = 0;
 	void Update() {
 		
 		if(Input.GetKeyUp(KeyCode.F3)) {
@@ -48,7 +51,15 @@ public class CameraController : MonoBehaviour {
 		}
 
 		//TODO: Make platform independent.
-		scrollAmount = Input.GetAxis("Mouse ScrollWheel") != 0?  Mathf.Sign(Input.GetAxis("Mouse ScrollWheel")) : 0;
+
+		tempScrollAmount += Input.GetAxis("Mouse ScrollWheel");
+		if(prevScrollFrame + 10 < Time.frameCount) {
+
+			scrollAmount = tempScrollAmount != 0? 10 * Mathf.Sign(tempScrollAmount) : 0;
+
+			prevScrollFrame = Time.frameCount;
+			tempScrollAmount = 0;
+		}
 
 		if(frozen || !Options.Testing) 
 			return;
@@ -77,11 +88,11 @@ public class CameraController : MonoBehaviour {
 		
 		if(scrollAmount != 0) {
 
-			//float scrollAmount = Input.GetAxis("Mouse ScrollWheel");
-			float size = camera.orthographicSize + (invertedScroll? 1:-1) * scrollAmount;
+			float size = camera.orthographicSize + (invertedScroll? 1:-1) * Mathf.Sign(scrollAmount)/2;
 			camera.orthographicSize = Mathf.Clamp(size, minCameraSize, maxCameraSize);
 			
 			DebugRenderer.updateLineWidth();
+			scrollAmount = scrollAmount - Mathf.Sign(scrollAmount);
 
 //			if (size > minCameraSize && size < maxCameraSize) {
 //

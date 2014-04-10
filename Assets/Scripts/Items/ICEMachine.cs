@@ -16,7 +16,7 @@ public class ICEMachine : MonoBehaviour {
 
 		if(held) {
 			transform.position = holder.transform.position + holder.transform.up*((transform.localScale.x*((BoxCollider2D)collider2D).size.x)/2 + holder.gameObject.GetComponent<Agent>().getRadius());
-			transform.rotation = Quaternion.LookRotation(Vector3.forward, transform.position - holder.transform.position);
+			transform.rotation = holder.transform.rotation;
 		}
 	}
 
