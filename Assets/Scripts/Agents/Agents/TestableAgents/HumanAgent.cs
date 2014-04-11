@@ -5,6 +5,9 @@ public class HumanAgent : TestableAgent {
 
 	public GameObject Tranquilizer;
 
+	public Health health {get; private set;}
+	private float maxHealth = 100;
+
 	private bool holdingICEMachine;
 
 	private static float minDistanceToHolder = 5;
@@ -17,6 +20,8 @@ public class HumanAgent : TestableAgent {
 		base.initializeAgent();
 
 		holdingICEMachine = false;
+
+		health = new Health(this, maxHealth);
 	}
 
 	void Update() {
@@ -84,6 +89,8 @@ public class HumanAgent : TestableAgent {
 		
 			Debug.Log("Humans Win");
 		}
+
+		health.Update();
 	}
 
 	public void pickUp() {
@@ -94,9 +101,11 @@ public class HumanAgent : TestableAgent {
 		holdingICEMachine = false;
 	}
 
-//	void OnGUI() {
-//		DebugRenderer.drawCircleWorld(getTarget(),1,Color.green);
-//	}
+	void OnGUI() {
+		DebugRenderer.drawCircleWorld(getTarget(),1,Color.green);
+
+		health.drawHealthBar();
+	}
 
 
 }
