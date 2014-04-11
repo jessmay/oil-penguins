@@ -50,10 +50,6 @@ public abstract class TestableAgent : Agent {
 	// Update is called once per frame
 	protected override void updateAgent () {
 		
-		//Check debug buttons.
-		if(debug) 
-			checkButtons();
-		
 		//Calculate information for each sensor.
 		sense();
 		senses = brain.sense(this);
@@ -81,25 +77,16 @@ public abstract class TestableAgent : Agent {
 		//Get agents in pie slice angles
 		//pieSlices.calculate();
 	}
-	
+
+	protected override void drawStatus () {}
+
 	//Check for debug button presses
-	private void checkButtons () {
+	protected override void checkButtons () {
 
 		//display feelers
 		if (Input.GetKeyDown(KeyCode.Z)) {
 			feelers.toggleDisplay();
 		}
-		
-//		//display adjacent agents
-//		if(Input.GetKeyDown(KeyCode.C)){
-//			adjAgents.toggleDisplay();
-//		}
-//		
-//		//display pie slices
-//		if(Input.GetKeyDown(KeyCode.X)){
-//			pieSlices.toggleDisplay();
-//			
-//		}
 	}
 
 	void OnCollisionEnter2D(Collision2D collision) {

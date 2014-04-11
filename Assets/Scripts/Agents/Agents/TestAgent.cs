@@ -142,7 +142,7 @@ public class TestAgent : Agent {
 	protected override void updateAgent () {
 
 		//Check debug buttons.
-		checkButtons();
+		//checkButtons();
 
 		//Calculate information for each sensor.
 		sense();
@@ -236,7 +236,7 @@ public class TestAgent : Agent {
 
 
 	//Check for debug button presses
-	private void checkButtons () {
+	protected override void checkButtons () {
 		
 		//display feelers
 		if (Input.GetKeyDown(KeyCode.Z)) {
@@ -482,6 +482,8 @@ public class TestAgent : Agent {
 	protected override bool isControllable(){
 		return userControl;
 	}
+
+	protected override void drawStatus () {	}
 
 
 	//Draw debug information to the screen.

@@ -53,8 +53,12 @@ public abstract class Agent : MonoBehaviour {
 		initializeAgent();
 	}
 
+	//Check for any button presses here instead of in updateAgent.
+	protected abstract void checkButtons();
+
 	void Update() {
 
+		checkButtons();
 		checkControls();
 	}
 
@@ -195,8 +199,13 @@ public abstract class Agent : MonoBehaviour {
 		return angle;
 	}
 
+	//Draw any status effects for the agent.
+	protected abstract void drawStatus();
+	
 	//Draw debug information.
 	void OnGUI(){
+
+		drawStatus();
 
 		if(debug) {
 			DrawDebugInformation ();

@@ -28,11 +28,11 @@ public class MoveState : State {
 	//Sees if there needs to be a state change
 	public void updateState(){
 
-		//if health equals 0, then sleep
-		if (IPfsm.penguin.health == 0) {
-			//change state to sleep
-			finiteStateMachine.changeState(typeof(SleepState));
-		}
+//		//if health equals 0, then sleep
+//		if (IPfsm.penguin.health == 0) {
+//			//change state to sleep
+//			finiteStateMachine.changeState(typeof(SleepState));
+//		}
 
 		//if at destination change to wait state
 		if (!IPfsm.penguin.hasPath) {

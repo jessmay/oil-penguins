@@ -49,7 +49,7 @@ public class Player : Agent {
 		//Thinking handled by the user.
 
 		//act
-		checkButtons();
+		//checkButtons();
 
 		if(seekMouse)
 			seek(DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition));
@@ -71,7 +71,7 @@ public class Player : Agent {
 
 
 	//Check for debug button presses
-	private void checkButtons () {
+	protected override void checkButtons () {
 		
 		//display feelers
 		if (Input.GetKeyDown(KeyCode.Z)) {
@@ -92,6 +92,8 @@ public class Player : Agent {
 			seekMouse = !seekMouse;
 		}
 	}
+
+	protected override void drawStatus () {}
 
 
 	/*		Debug		*/

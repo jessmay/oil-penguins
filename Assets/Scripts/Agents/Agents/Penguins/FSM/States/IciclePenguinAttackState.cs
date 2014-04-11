@@ -30,9 +30,9 @@ public class AttackState : State {
 	//Sees if there needs to be a state change
 	public void updateState(){
 		//if fully tranquilized, sleep
-		if (IPfsm.penguin.health == 0) {
-			finiteStateMachine.changeState(typeof(SleepState));
-		}
+//		if (IPfsm.penguin.health == 0) {
+//			finiteStateMachine.changeState(typeof(SleepState));
+//		}
 
 		//if player wants the penguin to move
 		if (IPfsm.penguin.hasPath) {

@@ -4,42 +4,25 @@ using System.Collections.Generic;
 
 public class Health {
 
-	//public abstract float getMaxHealth();
-	//protected abstract void onDeath(); //Move to GameAgent
-
 	private List<Infliction> inflictions;
 	public float currentHealth {get; private set;}
 	public float maxHealth {get; private set;}
 
-	private Agent agent; //Create basic GameAgent that contains health component for easier access without casting.
-	//private GameAgent agent;
+	private GameAgent agent;
 	
-//	public Health(GameAgent agent, float maxHealth, float? startHealth = null) {
-//		
-//		this.agent = agent;
-//		this.maxHealth = maxHealth;
-//		
-//		if(startHealth.HasValue)
-//			currentHealth = startHealth.Value;
-//		else
-//			currentHealth = maxHealth;
-//		
-//		inflictions = new List<Infliction>();
-//	}
-
-
-	public Health(Agent agent, float maxHealth, float? startHealth = null) {
-
+	public Health(GameAgent agent, float maxHealth, float? startHealth = null) {
+		
 		this.agent = agent;
 		this.maxHealth = maxHealth;
-
+		
 		if(startHealth.HasValue)
 			currentHealth = startHealth.Value;
 		else
 			currentHealth = maxHealth;
-
+		
 		inflictions = new List<Infliction>();
 	}
+	
 
 	public void Update() {
 
@@ -52,7 +35,7 @@ public class Health {
 
 		if(currentHealth <= 0) {
 			inflictions.Clear();
-			//agent.onDeath();
+			agent.onDeath();
 		}
 	}
 
@@ -64,8 +47,6 @@ public class Health {
 		float size = agent.getRadiusCameraSpace()*2;
 
 		Vector3 center = agent.getCenterCameraSpace();
-
-		//center.y = Screen.height - center.y;
 
 		float height = DebugRenderer.worldToCameraLength(0.2f);
 

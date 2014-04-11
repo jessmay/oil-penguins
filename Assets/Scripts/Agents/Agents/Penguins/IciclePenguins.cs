@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class IciclePenguins : Agent {
+public class IciclePenguins : GameAgent {
 	
 	/*protected Vector2 target;
 	protected Vector2 targetCell;
@@ -20,7 +20,10 @@ public class IciclePenguins : Agent {
 	
 	protected Vector2 currGoal;
 
-	public int health;
+	//public int health;
+	protected override float getMaxHealth () {
+		return 100;
+	}
 
 	public bool hasPath;
 
@@ -36,6 +39,8 @@ public class IciclePenguins : Agent {
 	
 	//Initialize the agent
 	protected override void initializeAgent(){
+		base.initializeAgent();
+
 		adjAgents = new AdjacentAgents (this, radius * 2, grid);//TODO play around with radius value; smaller than humans
 
 		aStar = new AStar (map);
@@ -52,7 +57,7 @@ public class IciclePenguins : Agent {
 		
 		currGoal = map.getCellIndex(transform.position);
 
-		health = 100;
+		//health = 100;
 		hasPath = false;
 		sleepTimer = 0;
 		selectable = true;
@@ -62,10 +67,12 @@ public class IciclePenguins : Agent {
 	
 	//Update agent
 	protected override void updateAgent(){
+		base.updateAgent();
+
 		//Check sensors for adj agents
 		sense ();
 		aStarUpdate ();
-		checkButtons ();
+		//checkButtons ();
 		IPfsm.update ();
 	}
 	
@@ -73,8 +80,21 @@ public class IciclePenguins : Agent {
 	//don't do anything, handled in Agent.cs
 	protected override void destroyAgent(){}
 
+
+	public override void onDeath () {
+		//change state to sleep
+		IPfsm.changeState(typeof(SleepState));
+	}
+
+
 	public override float getTurnStep() { return turnStep; }
 	public override float getMoveStep() { return 10.0f * transform.localScale.x;}//TODO play around with, faster than humans
+
+
+	//Render non debug information here
+	protected override void drawStatus () {
+		base.drawStatus();
+	}
 
 	//Get information about the environment.
 	private void sense() {
@@ -172,8 +192,10 @@ public class IciclePenguins : Agent {
 		}
 	}
 
+	//Check for button presses (or mouse clicks) here
+
 	//Check for debug button presses
-	private void checkButtons () {
+	protected override void checkButtons () {
 		
 		//display adjacent agents
 		if(Input.GetKeyDown(KeyCode.C)){

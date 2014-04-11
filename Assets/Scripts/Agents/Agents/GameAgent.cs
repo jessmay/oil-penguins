@@ -9,16 +9,14 @@ public abstract class GameAgent : Agent {
 	public abstract void onDeath();
 
 	protected override void initializeAgent () {
-
 		health = new Health(this, getMaxHealth());
 	}
 
 	protected override void updateAgent () {
-
 		health.Update();
 	}
 
-	protected void drawStatus() {
+	protected override void drawStatus() {
 		health.drawHealthBar();
 	}
 

@@ -26,10 +26,10 @@ public class ChillinState : State {
 	//Sees if there needs to be a state change
 	public void updateState(){
 		//if fully tranquilized, fall asleep
-		if (IPfsm.penguin.health == 0) {
-			//move to sleep state
-			finiteStateMachine.changeState(typeof(SleepState));
-		}
+//		if (IPfsm.penguin.health == 0) {
+//			//move to sleep state
+//			finiteStateMachine.changeState(typeof(SleepState));
+//		}
 		
 		// if has path, transition to move state
 		if (IPfsm.penguin.hasPath) {

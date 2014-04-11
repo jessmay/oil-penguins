@@ -70,14 +70,14 @@ public class Tranquilizer : MonoBehaviour {
 		//Deal damage
 		//Affect humans too?
 
-//		GameAgent gameAgent = target.GetComponent<GameAgent>();
-//		if(gameAgent != null) {
-//			gameAgent.addInfliction(new Infliction(100, 0.30f));
-//		}
-
-		if(collider.gameObject.GetComponent<HumanAgent>() != null) {
-			collider.gameObject.GetComponent<HumanAgent>().health.addInfliction(new Infliction(100, 0.30f));
+		GameAgent gameAgent = target.GetComponent<GameAgent>();
+		if(gameAgent != null) {
+			gameAgent.addInfliction(new Infliction(100, 0.30f));
 		}
+
+//		if(collider.gameObject.GetComponent<HumanAgent>() != null) {
+//			collider.gameObject.GetComponent<HumanAgent>().health.addInfliction(new Infliction(100, 0.30f));
+//		}
 
 	}
 
