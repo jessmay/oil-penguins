@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class TestableAgent : Agent {
+public abstract class TestableAgent : Agent, ITarget {
 	
 	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, GameMap gameMap, Genome genome) {
 		
@@ -19,11 +19,6 @@ public abstract class TestableAgent : Agent {
 	protected double[] thoughts;
 	protected double[] senses;
 
-	//Sensors
-	public Feelers feelers {get; private set;}
-//	public AdjacentAgents adjAgents {get; private set;}
-//	public PieSlices pieSlices {get; private set;}
-
 	public Vector3 startPosition {get; private set;}
 	public Quaternion startRotation {get; private set;}
 
@@ -35,11 +30,7 @@ public abstract class TestableAgent : Agent {
 		startPosition = transform.position;
 		startRotation = transform.rotation;
 
-		//Create sensors
-		feelers = new Feelers(this, brain.getLengthOfFeelers(this), brain.getNumberOfFeelers(), brain.getViewAngle());
-		//adjAgents = new AdjacentAgents(this, radius*3, grid);
-		//pieSlices = new PieSlices(this, adjAgents);
-
+		brain.initialize(this);
 	}
 	
 	//Replace weights in agent's neural network with the given weights.
@@ -51,7 +42,6 @@ public abstract class TestableAgent : Agent {
 	protected override void updateAgent () {
 		
 		//Calculate information for each sensor.
-		sense();
 		senses = brain.sense(this);
 		
 		//think about the information collected by the sensors.
@@ -63,31 +53,10 @@ public abstract class TestableAgent : Agent {
 		if(Options.Testing)
 			brain.update(this);
 	}
-	
-	
-	//Get information about the environment.
-	private void sense() {
-		
-		//Get length of feelers
-		feelers.calculate();
-		
-		//Get list of nearest agents
-		//adjAgents.calculate();
-		
-		//Get agents in pie slice angles
-		//pieSlices.calculate();
-	}
 
 	protected override void drawStatus () {}
 
-	//Check for debug button presses
-	protected override void checkButtons () {
-
-		//display feelers
-		if (Input.GetKeyDown(KeyCode.Z)) {
-			feelers.toggleDisplay();
-		}
-	}
+	protected override void checkButtons () {}
 
 	void OnCollisionEnter2D(Collision2D collision) {
 
@@ -138,18 +107,6 @@ public abstract class TestableAgent : Agent {
 //			DebugRenderer.drawCircle(cst, DebugRenderer.worldToCameraLength(1), Color.green);
 		//}
 		
-		//Draw sensors to the screen.
-		{
-			// Draw feelers
-			feelers.drawSensor();
-			
-			//Draw circle for nearest agents
-			//adjAgents.drawSensor();
-			
-			//Draw pie slices
-			//pieSlices.drawSensor();
-		}
-		
 		//Draw debug text to the screen
 		{
 			
@@ -177,12 +134,6 @@ public abstract class TestableAgent : Agent {
 
 			debugText += "Distance from target: " +distanceBetweenPoint(getTarget()) +"\n\n";
 
-			
-			//Get sensor information
-			debugText += feelers.getDebugInformation()+ "\n";
-			//debugText += adjAgents.getDebugInformation()+ "\n";
-			//debugText += pieSlices.getDebugInformation()+ "\n";
-			
 			GUI.color = Color.black;
 			GUI.Label(new Rect(0, 0, 300, 800), debugText);
 		}

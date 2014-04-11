@@ -78,7 +78,9 @@ public class IciclePenguins : GameAgent {
 	
 	//prepare agent for destruction
 	//don't do anything, handled in Agent.cs
-	protected override void destroyAgent(){}
+	protected override void destroyAgent(){
+		gameMap.PenguinsOnMap.Remove (gameObject);
+	}
 
 
 	public override void onDeath () {

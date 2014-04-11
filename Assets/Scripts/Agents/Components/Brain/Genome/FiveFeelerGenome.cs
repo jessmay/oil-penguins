@@ -33,11 +33,20 @@ public class FiveFeelerGenome : Genome {
 
 	
 	public override double getFiredValue() { return 0.7; }
-	public override float getLengthOfFeelers(TestableAgent agent) { return agent.getRadius() * feelerLength; }
+	public override float getLengthOfFeelers(Agent agent) { return agent.getRadius() * feelerLength; }
 	public override float getDefaultLengthOfFeelers() { return 3; }
 	public override int getNumberOfFeelers(){ return 5; }
 	public override int getViewAngle() { return 270; }
 
+	
+	public Feelers feelers {get; private set;}
+	
+	public override void initialize (Agent agent) {
+		
+		feelers = new Feelers(agent, getLengthOfFeelers(agent), getNumberOfFeelers(), getViewAngle());
+		feelers.toggleDisplay();
+	}
+	
 	public override void reset() {
 
 		currTick = 0;
@@ -70,7 +79,10 @@ public class FiveFeelerGenome : Genome {
 	}
 
 
-	public override double[] sense(TestableAgent agent) {
+	public override double[] sense<A>(A agent) {
+		
+		feelers.calculate();
+		
 		//Initialize input based on senses.
 		double[] senses = new double[getNumberOfInputs()];
 
@@ -79,19 +91,19 @@ public class FiveFeelerGenome : Genome {
 		
 		senses[0] = angle/180;
 		
-		for (int currFeeler = 0; currFeeler < agent.feelers.numFeelers; ++currFeeler) {
-			senses[1+currFeeler] = agent.feelers.feelers[currFeeler].magnitude/ agent.feelers.feelerLength;
+		for (int currFeeler = 0; currFeeler < feelers.numFeelers; ++currFeeler) {
+			senses[1+currFeeler] = feelers.feelers[currFeeler].magnitude/ feelers.feelerLength;
 		}
 
 		return senses;
 	}
 
 
-	public override double[] think(TestableAgent agent, double[] senses) {
+	public override double[] think(Agent agent, double[] senses) {
 		return brain.fire(senses);
 	}
 
-	public override void act(TestableAgent agent, double[] thoughts) {
+	public override void act(Agent agent, double[] thoughts) {
 		
 		//Turn right or clockwise
 		if(thoughts[0] > getFiredValue()) {
@@ -225,6 +237,9 @@ public class FiveFeelerGenome : Genome {
 
 
 	public override string getDebugInformation() {
+		
+		feelers.drawDebugInformation();
+		
 		string debugText = "";
 
 		debugText += "Targets: " +numTargetsHit +"\n";

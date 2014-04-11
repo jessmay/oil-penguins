@@ -8,13 +8,11 @@ public class LineOfSight : Sensor {
 
 	private Vector2 direction;
 
-	public LineOfSight(TestableAgent me) : base(me) {
+	public LineOfSight(Agent me) : base(me) {
 		displaySensor = true;
 	}
 
 	public override void calculate() {
-
-		TestableAgent me = (TestableAgent)this.me;
 
 		// Save current object layer
 		int oldLayer = me.gameObject.layer;
@@ -29,7 +27,7 @@ public class LineOfSight : Sensor {
 			layerToIgnore = ~layerToIgnore;
 		}
 		
-		direction = me.getTarget() - (Vector2)me.transform.position;
+		direction = ((ITarget)me).getTarget() - (Vector2)me.transform.position;
 		
 		raycast = Physics2D.Raycast((Vector2)(me.renderer.bounds.center) + direction.normalized * me.getRadius(), direction.normalized, direction.magnitude,layerToIgnore);
 		

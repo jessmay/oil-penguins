@@ -9,7 +9,6 @@ public class GameMap : MonoBehaviour{
 	public GameObject Human;
 	public GameObject Penguin;
 	public GameObject ICEMachine;
-	public GameObject Tranquilizer;
 
 	public Grid grid {get; private set;}
 	public Map map {get; private set;}
@@ -36,12 +35,6 @@ public class GameMap : MonoBehaviour{
 
 	void FixedUpdate() {
 
-		//Spawn a human at a random spawn point.
-//		if(GetComponent<MapEditor>() != null && Input.GetMouseButtonDown(1)) {
-//			spawnHuman(map.getCellIndex(DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition)), 1);
-//			//Vector2 location = map.getRandomHumanSpawn();
-//			//spawnHumanImmediate(location, Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), new Explorer1Genome());
-//		}
 	}
 
 	void OnGUI() {
@@ -49,52 +42,6 @@ public class GameMap : MonoBehaviour{
 		if(Options.play && GUI.Button(new Rect(Screen.width/2 - 100/2, Screen.height - (25 + 50), 100, 50), "Spawn Penguin")) {
 			spawnPenguin();
 		}
-
-		//if(GetComponent<PauseMenu>().isPaused())
-		//	return;
-
-		//Display each human spawn point
-//		foreach (Vector2 loc in map.HumanSpawnPoints) {
-//
-//			Vector3 loc2 = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(loc));
-//			loc2.y = Screen.height - loc2.y;
-//			DebugRenderer.drawCircle(loc2, DebugRenderer.worldToCameraLength(1), Map.HumanSpawnColor);
-//		}
-//
-//		//Display penguin spawn point
-//		if(map.PenguinSpawn != Map.INVALID_LOCATION) {
-//
-//			Vector2 penLoc = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(map.PenguinSpawn));
-//			penLoc.y = Screen.height - penLoc.y;
-//			DebugRenderer.drawCircle(penLoc, DebugRenderer.worldToCameraLength(1), Map.PenguinSpawnColor);
-//		}
-//
-//		//Display ICE Machine location
-//		if(map.ICEMachineLocation != Map.INVALID_LOCATION) {
-//
-//			Vector2 ICELoc = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(map.ICEMachineLocation));
-//			ICELoc.y = Screen.height - ICELoc.y;
-//			DebugRenderer.drawCircle(ICELoc, DebugRenderer.worldToCameraLength(1), Map.ICEMachineColor);
-//		}
-
-
-//		foreach (Vector2 loc in map.HumanSpawnPoints) {
-//			
-//			DebugRenderer.drawCircleWorld(map.cellIndexToWorld(loc), 1, Map.HumanSpawnColor);
-//		}
-//		
-//		//Display penguin spawn point
-//		if(map.PenguinSpawn != Map.INVALID_LOCATION) {
-//			
-//			DebugRenderer.drawCircleWorld(map.cellIndexToWorld(map.PenguinSpawn), 1, Map.PenguinSpawnColor);
-//		}
-//		
-//		//Display ICE Machine location
-//		if(map.ICEMachineLocation != Map.INVALID_LOCATION) {
-//			
-//			DebugRenderer.drawCircleWorld(map.cellIndexToWorld(map.ICEMachineLocation), 1, Map.ICEMachineColor);
-//		}
-
 	}
 
 
@@ -122,6 +69,7 @@ public class GameMap : MonoBehaviour{
 
 		initialize();
 	}
+
 
 	private void initialize() {
 		
@@ -176,15 +124,16 @@ public class GameMap : MonoBehaviour{
 
 		Quaternion rotation = rotationNullable.HasValue? rotationNullable.Value: Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location));
 
-		//Debug.Log("Spawning new human at "+ map.cellIndexToWorld(location));
-		
-		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, this, genome);
+		GameObject human;
+
+		if(Options.Testing) {
+			human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, this, genome);
+		}
+		else {
+			human = HumanAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, this, genome);
+		}
 		
 		HumansOnMap.Add(human);
-
-		if(human.GetComponent<HumanAgent>() != null) {
-			human.GetComponent<HumanAgent>().Tranquilizer = Tranquilizer;
-		}
 
 		++totalHumansSpawned;
 
@@ -213,7 +162,6 @@ public class GameMap : MonoBehaviour{
 		
 		string[] files = Directory.GetFiles(Application.dataPath + "/../GA/Genomes/");
 		
-		//string[] fileList = Directory.GetFiles(path + "/");
 		List<string> fileNames = new List<string>();
 		
 		//Loop through each file in the directory
@@ -222,10 +170,6 @@ public class GameMap : MonoBehaviour{
 			if(!files[currFile].Substring(files[currFile].Length-4).Equals(".txt"))
 				continue;
 	
-//			//Add file name to the list of file names
-//			//Path and directory information is removed first.
-//			fileNames.Add(fileList[currFile].Remove(fileList[currFile].LastIndexOf('.')).Remove(0,fileList[currFile].LastIndexOf('/')+1));
-			
 			fileNames.Add(files[currFile]);
 		}
 		
@@ -241,6 +185,7 @@ public class GameMap : MonoBehaviour{
 		else {
 			genome = new FiveFeelerGenome();
 		}
+
 		//Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location))
 		humansList.Add (spawnHumanImmediate(location, map.getSpawnAngle(location), genome));
 

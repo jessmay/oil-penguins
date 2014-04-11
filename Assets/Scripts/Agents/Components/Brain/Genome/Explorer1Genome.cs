@@ -37,10 +37,18 @@ public class Explorer1Genome : Genome {
 
 	
 	public override double getFiredValue() { return 0.7; }
-	public override float getLengthOfFeelers(TestableAgent agent) { return agent.getRadius() * feelerLength; }
+	public override float getLengthOfFeelers(Agent agent) { return agent.getRadius() * feelerLength; }
 	public override float getDefaultLengthOfFeelers() { return 30; }
 	public override int getNumberOfFeelers(){ return 5; }
 	public override int getViewAngle() { return 270; }
+
+	public Feelers feelers {get; private set;}
+	
+	public override void initialize (Agent agent) {
+		
+		lineOfSight = new LineOfSight(agent);
+		feelers = new Feelers(agent, getLengthOfFeelers(agent), getNumberOfFeelers(), getViewAngle());
+	}
 
 	public override void reset() {
 
@@ -76,7 +84,10 @@ public class Explorer1Genome : Genome {
 	}
 
 
-	public override double[] sense(TestableAgent agent) {
+	public override double[] sense<A>(A agent) {
+		
+		feelers.calculate();
+		
 		//Initialize input based on senses.
 		double[] senses = new double[getNumberOfInputs()];
 
@@ -85,26 +96,23 @@ public class Explorer1Genome : Genome {
 		
 		senses[0] = angle/180;
 
-		if(lineOfSight == null)
-			lineOfSight = new LineOfSight(agent);
-
 		lineOfSight.calculate();
 
 		senses[1] = lineOfSight.inSight? 1:0;
 		
-		for (int currFeeler = 0; currFeeler < agent.feelers.numFeelers; ++currFeeler) {
-			senses[2+currFeeler] = agent.feelers.feelers[currFeeler].magnitude/ agent.feelers.feelerLength;
+		for (int currFeeler = 0; currFeeler < feelers.numFeelers; ++currFeeler) {
+			senses[2+currFeeler] = feelers.feelers[currFeeler].magnitude/ feelers.feelerLength;
 		}
 
 		return senses;
 	}
 
 
-	public override double[] think(TestableAgent agent, double[] senses) {
+	public override double[] think(Agent agent, double[] senses) {
 		return brain.fire(senses);
 	}
 
-	public override void act(TestableAgent agent, double[] thoughts) {
+	public override void act(Agent agent, double[] thoughts) {
 
 		bool act = false;
 
@@ -256,6 +264,8 @@ public class Explorer1Genome : Genome {
 
 	public override string getDebugInformation() {
 
+		feelers.drawDebugInformation();
+		
 		lineOfSight.drawSensor();
 
 		string debugText = "";

@@ -25,20 +25,22 @@ public abstract class Genome : IComparable<Genome> {
 		feelerLength = getDefaultLengthOfFeelers();
 	}
 
+	public abstract void initialize(Agent agent);
+
 	public abstract int getNumberOfInputs();
 	public abstract int getNumberOfOutputs();
 	public abstract int getNumberOfLayers();
 	public abstract int getNumberOfNeuronsPerLayer();
 
 	public abstract double getFiredValue();
-	public abstract float getLengthOfFeelers(TestableAgent agent);
+	public abstract float getLengthOfFeelers(Agent agent);
 	public abstract float getDefaultLengthOfFeelers();
 	public abstract int getNumberOfFeelers();
 	public abstract int getViewAngle();
 
-	public abstract double[] sense(TestableAgent agent);
-	public abstract double[] think(TestableAgent agent, double[] senses);
-	public abstract void act(TestableAgent agent, double[] thoughts);
+	public abstract double[] sense<A>(A agent) where A : Agent, ITarget;
+	public abstract double[] think(Agent agent, double[] senses);
+	public abstract void act(Agent agent, double[] thoughts);
 
 	public abstract void update(TestableAgent agent);
 

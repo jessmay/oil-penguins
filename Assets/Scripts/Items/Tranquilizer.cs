@@ -67,17 +67,12 @@ public class Tranquilizer : MonoBehaviour {
 		else 
 			hitRotation = Quaternion.Inverse(target.transform.rotation) * transform.rotation;
 
-		//Deal damage
-		//Affect humans too?
 
+		//Deal damage
 		GameAgent gameAgent = target.GetComponent<GameAgent>();
 		if(gameAgent != null) {
 			gameAgent.addInfliction(new Infliction(100, 0.30f));
 		}
-
-//		if(collider.gameObject.GetComponent<HumanAgent>() != null) {
-//			collider.gameObject.GetComponent<HumanAgent>().health.addInfliction(new Infliction(100, 0.30f));
-//		}
 
 	}
 
