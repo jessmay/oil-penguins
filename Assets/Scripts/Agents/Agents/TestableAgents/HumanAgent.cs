@@ -3,6 +3,8 @@ using System.Collections;
 
 public class HumanAgent : TestableAgent {
 
+	public GameObject Tranquilizer;
+
 	private bool holdingICEMachine;
 
 	private static float minDistanceToHolder = 5;
@@ -15,6 +17,13 @@ public class HumanAgent : TestableAgent {
 		base.initializeAgent();
 
 		holdingICEMachine = false;
+	}
+
+	void Update() {
+
+		if(Input.GetKeyDown(KeyCode.Space)) {
+			Instantiate(Tranquilizer, transform.position + transform.up*(radius + Tranquilizer.renderer.bounds.extents.y), transform.rotation);
+		}
 	}
 	
 	

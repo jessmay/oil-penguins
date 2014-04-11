@@ -9,6 +9,7 @@ public class GameMap : MonoBehaviour{
 	public GameObject Human;
 	public GameObject Penguin;
 	public GameObject ICEMachine;
+	public GameObject Tranquilizer;
 
 	public Grid grid {get; private set;}
 	public Map map {get; private set;}
@@ -180,6 +181,10 @@ public class GameMap : MonoBehaviour{
 		GameObject human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, this, genome);
 		
 		HumansOnMap.Add(human);
+
+		if(human.GetComponent<HumanAgent>() != null) {
+			human.GetComponent<HumanAgent>().Tranquilizer = Tranquilizer;
+		}
 
 		++totalHumansSpawned;
 

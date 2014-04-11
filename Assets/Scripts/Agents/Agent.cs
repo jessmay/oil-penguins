@@ -147,11 +147,6 @@ public abstract class Agent : MonoBehaviour {
 	//Move the agent based on the current velocity.
 	private void Move() {
 
-		//Do not move outside the bounds of the grid.
-//		if(!grid.inBounds(grid.getCellIndex(velocity*Time.deltaTime + (Vector2)transform.position))) {
-//			velocity = Vector2.zero; 
-//		}
-
 		//Force agents to be within the bounds of the map.
 		Vector3 clampedPos = transform.position;
 		Bounds mapBounds = map.getBounds();

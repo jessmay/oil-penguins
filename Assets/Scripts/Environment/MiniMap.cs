@@ -152,10 +152,10 @@ public class MiniMap : MonoBehaviour {
 			Vector2 maxB = new Vector2(Mathf.Min(mapBounds.max.x, viewPortMax.x), Mathf.Min(mapBounds.max.y, viewPortMax.y));
 			Vector2 minB = new Vector2(Mathf.Max(mapBounds.min.x, viewPortMin.x), Mathf.Max(mapBounds.min.y, viewPortMin.y));
 
-			maxB.x = maxB.x/mapBounds.size.x * onScreenSize.x + (onScreenSize.y)/2.0f;
+			maxB.x = maxB.x/mapBounds.size.x * onScreenSize.x + (onScreenSize.x)/2.0f;
 			maxB.y = maxB.y/mapBounds.size.y * onScreenSize.y - (onScreenSize.y)/2.0f;
 
-			minB.x = minB.x/mapBounds.size.x * onScreenSize.x + (onScreenSize.y)/2.0f;
+			minB.x = minB.x/mapBounds.size.x * onScreenSize.x + (onScreenSize.x)/2.0f;
 			minB.y = minB.y/mapBounds.size.y * onScreenSize.y - (onScreenSize.y)/2.0f;
 
 			DebugRenderer.drawLineRect(new Rect(coord.x + minB.x, coord.y - maxB.y, maxB.x - minB.x, maxB.y - minB.y), wallSize/2, ViewRectColor);
