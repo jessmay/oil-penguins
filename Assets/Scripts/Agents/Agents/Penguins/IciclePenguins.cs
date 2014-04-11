@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 public class IciclePenguins : Agent {
 	
-	protected Vector2 target;
+	/*protected Vector2 target;
 	protected Vector2 targetCell;
 	protected Vector2 source;
-	protected Vector2 sourceCell;
+	protected Vector2 sourceCell;*/
 	protected bool findTarget;
 	
-	protected List<Vector2> currPath;
+	//protected List<Vector2> currPath;
 	protected int pathIndex;
 	
 	protected bool drawSource;
@@ -27,6 +27,8 @@ public class IciclePenguins : Agent {
 	public int sleepTimer;
 	public bool selectable;
 
+	private AStar aStar;
+
 	private IciclePenguinFSM IPfsm;
 
 	//Sensor
@@ -35,11 +37,12 @@ public class IciclePenguins : Agent {
 	//Initialize the agent
 	protected override void initializeAgent(){
 		adjAgents = new AdjacentAgents (this, radius * 2, grid);//TODO play around with radius value; smaller than humans
-		
-		target = new Vector2 (0, 0);
+
+		aStar = new AStar (map);
+		/*target = new Vector2 (0, 0);
 		targetCell = new Vector2();
 		source = new Vector2 ();
-		sourceCell = new Vector2(0, 0);
+		sourceCell = new Vector2(0, 0);*/
 		findTarget = false;
 		
 		drawSource = false;
@@ -47,7 +50,7 @@ public class IciclePenguins : Agent {
 		drawPath = false;
 		drawNodes = false;
 		
-		currGoal = map.getCellIndex(renderer.bounds.center);
+		currGoal = map.getCellIndex(transform.position);
 
 		health = 100;
 		hasPath = false;
@@ -91,9 +94,8 @@ public class IciclePenguins : Agent {
 			Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			
 			//if new source location, sets values of source to mouse position
-			if((int)pos.x != source.x || (int)pos.y != source.y){
-				source = pos;
-				sourceCell = grid.getCellIndex(source);
+			if((int)pos.x != aStar.source.x || (int)pos.y != aStar.source.y){
+				aStar.setSource(pos);
 				sourceChange = true;
 			}
 		}
@@ -103,9 +105,8 @@ public class IciclePenguins : Agent {
 			Vector2 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			
 			//if new target location, sets values of target to mouse position
-			if((int)pos.x != target.x || (int)pos.y != target.y){
-				target = pos;
-				targetCell = grid.getCellIndex(target);
+			if((int)pos.x != aStar.target.x || (int)pos.y != aStar.target.y){
+				aStar.setTarget(pos);
 				targetChange = true;
 			}
 			
@@ -120,7 +121,7 @@ public class IciclePenguins : Agent {
 		}
 
 		//Get list of close nodes, gets the closest, seeks, and calculates astar path
-		if((findChange || targetChange || sourceChange) && findTarget && source != target){
+		if((findChange || targetChange || sourceChange) && findTarget && aStar.source != aStar.target){
 			//Gets list of close nodes within one cell of the agent
 			//closeNodes = new List<Vector2>();
 			//closeNodes = map.getNearNodes(this);
@@ -128,11 +129,11 @@ public class IciclePenguins : Agent {
 			// Gets the closest node from the list of close nodes and sets it as the source node and the currGoal
 			currGoal = new Vector2();
 			currGoal = map.getCellIndex(transform.position);
-			source = new Vector2();
-			source = map.cellIndexToWorld(currGoal);
+			aStar.setSource(map.cellIndexToWorld(currGoal));//source = new Vector2();
+			//source = map.cellIndexToWorld(currGoal);
 			
 			//gets aStar path if there is one, otherwise turns target seeking off
-			if(!aStar(source)){
+			if(!aStar.aStar()){
 				findTarget = false;
 			}
 			else{
@@ -146,7 +147,7 @@ public class IciclePenguins : Agent {
 		if(findTarget){
 			
 			//If the player is at the target, no more need to find the target
-			if(map.getCellIndex(renderer.bounds.center) == map.getCellIndex(target)){//distanceBetweenPoint(map.cellIndexToWorld(target)) <= (.5 * transform.localScale.x)
+			if(map.getCellIndex(transform.position) == aStar.targetCell){//distanceBetweenPoint(map.cellIndexToWorld(target)) <= (.5 * transform.localScale.x)
 				pathIndex = 0;
 				findTarget = false;
 				hasPath = false;
@@ -155,11 +156,11 @@ public class IciclePenguins : Agent {
 			else {
 				
 				//If in the cell index of current goal and not on target, close enough, check next location to seek
-				if (distanceBetweenPoint(map.cellIndexToWorld(currGoal)) <= (.5 * transform.localScale.x) && pathIndex < currPath.Count-1)
+				if (distanceBetweenPoint(map.cellIndexToWorld(currGoal)) <= (.5 * transform.localScale.x) && pathIndex < aStar.currPath.Count-1)
 				{
 					pathIndex++;
 					currGoal = new Vector2();
-					currGoal = (Vector2)currPath[pathIndex];
+					currGoal = (Vector2)aStar.currPath[pathIndex];
 					seek (map.cellIndexToWorld(currGoal));
 				}
 				//If not in the cell index of current goal, keep seeking to that current goal
@@ -201,7 +202,7 @@ public class IciclePenguins : Agent {
 
 	}
 	
-	// Not using a priority queue, using a hash table, so have to find the node with the min f value each round
+	/*// Not using a priority queue, using a hash table, so have to find the node with the min f value each round
 	private Vector2 findMin(Hashtable l, List<Vector2> curr){
 		float min = -1.0f;
 		Vector2 minVec = new Vector2 (0, 0);
@@ -306,7 +307,7 @@ public class IciclePenguins : Agent {
 			return p;
 		}
 		
-	}
+	}*/
 
 	protected override bool isControllable(){return false;}
 	
@@ -316,10 +317,10 @@ public class IciclePenguins : Agent {
 			GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
 			centeredStyle.alignment = TextAnchor.MiddleCenter;
 			GUI.color = Color.black;
-			source.y*=-1; // WorldToScreenPoint inverts the y values for some reason
+			aStar.source.y*=-1; // WorldToScreenPoint inverts the y values for some reason
 			int labelSize = 50;
-			GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(source).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(source).y-(labelSize/2),labelSize, labelSize), "S", centeredStyle);
-			source.y*=-1;
+			GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(aStar.source).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(aStar.source).y-(labelSize/2),labelSize, labelSize), "S", centeredStyle);
+			aStar.source.y*=-1;
 		}
 
 		//Debug code, if drawTarget is true, a 'T' will be drawn on the background where the target node is located
@@ -328,11 +329,11 @@ public class IciclePenguins : Agent {
 			GUIStyle centeredStyle = new GUIStyle(GUI.skin.label);
 			centeredStyle.alignment = TextAnchor.MiddleCenter;
 			GUI.color = Color.black;
-			target.y*=-1;
+			aStar.target.y*=-1;
 			int labelSize = 50;
 			//DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(target), 5.0f);
-			GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(target).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(target).y-(labelSize/2),labelSize, labelSize), "T", centeredStyle);
-			target.y*=-1;
+			GUI.Label(new Rect(DebugRenderer.currentCamera.WorldToScreenPoint(aStar.target).x-(labelSize/2), DebugRenderer.currentCamera.WorldToScreenPoint(aStar.target).y-(labelSize/2),labelSize, labelSize), "T", centeredStyle);
+			aStar.target.y*=-1;
 		}
 
 		// Debug code, draws the current moveable nodes in the nav graph onto the screen
@@ -349,9 +350,9 @@ public class IciclePenguins : Agent {
 		}
 
 		// Debug code, if there exists an A* path currently and drawPath is true, will draw the nodes of the path on screen
-		if (drawPath && currPath != null) {
-			for(int i = 0; i < currPath.Count; i++){
-				Vector2 node = map.cellIndexToWorld(currPath[i]);
+		if (drawPath && aStar.currPath != null) {
+			for(int i = 0; i < aStar.currPath.Count; i++){
+				Vector2 node = map.cellIndexToWorld(aStar.currPath[i]);
 				node.y*=-1;
 				DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
 				node.y*=-1;
@@ -364,7 +365,7 @@ public class IciclePenguins : Agent {
 		//Draw debug text to the screen
 		//Get agent information
 		string debugText = "Agent Id: "+ gameObject.GetInstanceID() +"\n";
-		debugText += "Coordinates: " +"("+renderer.bounds.center.x +", "+ renderer.bounds.center.y+")" +"\n";
+		debugText += "Coordinates: " +"("+transform.position.x +", "+ transform.position.y+")" +"\n";
 		debugText += "Heading: " + heading + ".\n\n";
 		
 		//Get sensor information
