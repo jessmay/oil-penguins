@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
-public class MoveState : State {
+public class IciclePenguinMoveState : State {
 
 	private IciclePenguinFSM IPfsm;
 	
-	public MoveState (IciclePenguinFSM fsm) : base(fsm) {
+	public IciclePenguinMoveState (IciclePenguinFSM fsm) : base(fsm) {
 		IPfsm = fsm;
 	}
 	
@@ -26,20 +26,7 @@ public class MoveState : State {
 	}
 	
 	//Sees if there needs to be a state change
-	public void updateState(){
-
-//		//if health equals 0, then sleep
-//		if (IPfsm.penguin.health == 0) {
-//			//change state to sleep
-//			finiteStateMachine.changeState(typeof(SleepState));
-//		}
-
-		//if at destination change to wait state
-		if (!IPfsm.penguin.hasPath) {
-			//change state to wait
-			finiteStateMachine.changeState(typeof(ChillinState));
-		}
-	}
+	public void updateState(){}
 	
 	protected override bool isValidStatus(int statusCode){
 		return (statusCode == DEFAULT_CODE);

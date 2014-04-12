@@ -13,6 +13,7 @@ public class AStar {
 	public Vector2 targetCell;
 
 	public List<Vector2> currPath;
+	public bool hasPath;
 
 	public AStar(Map m){
 		map = m;
@@ -69,7 +70,7 @@ public class AStar {
 				//reconstruct path with the from list
 				currPath = new List<Vector2>();
 				currPath = createPath(from, currNode);
-				
+				hasPath = true;
 				return true; 
 			}
 			

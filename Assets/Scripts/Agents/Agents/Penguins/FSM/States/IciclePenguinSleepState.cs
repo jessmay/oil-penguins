@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
-public class SleepState : State {
+public class IciclePenguinSleepState : State {
 
 	private IciclePenguinFSM IPfsm;
 	
-	public SleepState (IciclePenguinFSM fsm) : base(fsm) {
+	public IciclePenguinSleepState (IciclePenguinFSM fsm) : base(fsm) {
 		IPfsm = fsm;
 	}
 	
@@ -34,7 +34,7 @@ public class SleepState : State {
 		//if sleep timer runs out, wake up and go to Chillin State
 		if (IPfsm.penguin.sleepTimer == 0){
 			//Change state to chillin
-			finiteStateMachine.changeState(typeof(ChillinState));
+			finiteStateMachine.changeState(typeof(IciclePenguinChillinState));
 		}
 	}
 	

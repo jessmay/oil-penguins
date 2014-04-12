@@ -68,10 +68,23 @@ public class IciclePenguins : GameAgent {
 	//Update agent
 	protected override void updateAgent(){
 		base.updateAgent();
+		//updates A*
+		aStarUpdate ();
+
+		//if health equals 0, then sleep
+		if (IPfsm.penguin.health == 0) {
+			//change state to sleep
+			IPfsm.changeState(typeof(IciclePenguinSleepState));
+		}
+		else if (aStar.hasPath) {
+			IPfsm.changeState(typeof(IciclePenguinMoveState));
+		}
 
 		//Check sensors for adj agents
 		sense ();
-		aStarUpdate ();
+
+
+
 		//checkButtons ();
 		IPfsm.update ();
 	}
@@ -85,7 +98,7 @@ public class IciclePenguins : GameAgent {
 
 	public override void onDeath () {
 		//change state to sleep
-		IPfsm.changeState(typeof(SleepState));
+		IPfsm.changeState(typeof(IciclePenguinSleepState));
 	}
 
 
@@ -144,9 +157,6 @@ public class IciclePenguins : GameAgent {
 
 		//Get list of close nodes, gets the closest, seeks, and calculates astar path
 		if((findChange || targetChange || sourceChange) && findTarget && aStar.source != aStar.target){
-			//Gets list of close nodes within one cell of the agent
-			//closeNodes = new List<Vector2>();
-			//closeNodes = map.getNearNodes(this);
 			
 			// Gets the closest node from the list of close nodes and sets it as the source node and the currGoal
 			currGoal = new Vector2();
@@ -225,113 +235,6 @@ public class IciclePenguins : GameAgent {
 		}
 
 	}
-	
-	/*// Not using a priority queue, using a hash table, so have to find the node with the min f value each round
-	private Vector2 findMin(Hashtable l, List<Vector2> curr){
-		float min = -1.0f;
-		Vector2 minVec = new Vector2 (0, 0);
-		
-		foreach (DictionaryEntry d in l) {
-			if((((float)d.Value) < min || min == -1) && curr.Contains((Vector2)d.Key)){
-				min = (float)d.Value;
-				minVec = (Vector2)d.Key;
-			}
-		}
-		
-		return minVec;
-	}
-	
-	// A* algorithm
-	// Uses map cells to detect where walls are
-	// If there is a path, it will be reconstructed at the end of this function
-	// and it will contain the locations of nodes in Map Cell space to follow
-	// Source node is in world coords
-	protected bool aStar(Vector2 sourceNode){
-		
-		Vector2 mapCellIndex = map.getCellIndex (sourceNode);
-		
-		List<Vector2> visited = new List<Vector2> ();
-		List<Vector2> curr = new List<Vector2> ();
-		curr.Add (mapCellIndex);
-		Hashtable from = new Hashtable ();
-		
-		Hashtable gVals = new Hashtable ();
-		gVals.Add (mapCellIndex, 0.0f);
-		Hashtable fVals = new Hashtable ();
-		fVals.Add (mapCellIndex, ((float)gVals [mapCellIndex]) + Vector2.Distance (mapCellIndex, map.getCellIndex(target)));
-		
-		while (curr.Count != 0) {
-			
-			Vector2 currNode = findMin(fVals, curr);
-			
-			// Arrived at the target? Great! Make the path list.
-			if(currNode == map.getCellIndex(target)){
-				//reconstruct path with the from list
-				currPath = new List<Vector2>();
-				currPath = createPath(from, currNode);
-				
-				return true; 
-			}
-			
-			curr.Remove(currNode);
-			visited.Add(currNode);
-			
-			//for each neighbor node, add to curr if unvisited and calculate f and g values
-			for(int i = -1; i < 2; i++){
-				for(int j = -1; j < 2; j++){
-					
-					int x = (int)currNode.x+i;
-					int y = (int)currNode.y+j;
-					
-					//currnode not inbounds, or not moveable to
-					if(!map.inBounds(new Vector2(x, y)) || !map.canMove[x,y])
-						continue;
-					
-					//corner case:if node to move to is diagonal, but perp nodes are nonmoveable, can't go there
-					if(Mathf.Abs(i) == Mathf.Abs(j) && (!map.canMove[x,(int)currNode.y] || !map.canMove[(int)currNode.x,y])){
-						continue;
-					}
-					
-					Vector2 neighbor = new Vector2(x, y);
-					if(visited.Contains(neighbor)){//also covers 0,0 case
-						continue;
-					}
-					
-					float tempG = (float)gVals[currNode] + Vector2.Distance(currNode, neighbor);
-					
-					if(!curr.Contains(neighbor) || tempG < (float)gVals[currNode]){
-						
-						from.Add(neighbor, currNode);
-						gVals.Add(neighbor, tempG);
-						fVals.Add(neighbor, tempG + Vector2.Distance(neighbor, map.getCellIndex(target)));
-						
-						if(!curr.Contains(neighbor))
-							curr.Add(neighbor);
-					}
-				}
-			}
-		}
-		return false;
-	}
-	
-	
-	// If aStar() finds a path, this function creates a List for that path
-	// that the agent can then access
-	private List<Vector2> createPath(Hashtable path,  Vector2 node){
-		
-		if (path.Contains (node)) {
-			List<Vector2> p = new List<Vector2>();
-			p = createPath(path, (Vector2)path[node]);
-			p.Add(node);
-			return p;
-		}
-		else{
-			List<Vector2> p = new List<Vector2>();
-			p.Add(node);
-			return p;
-		}
-		
-	}*/
 
 	protected override bool isControllable(){return false;}
 	

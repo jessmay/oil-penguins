@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class IciclePenguinFSM : FiniteStateMachine{
@@ -11,15 +11,15 @@ public class IciclePenguinFSM : FiniteStateMachine{
 
 	protected override void initialize ()
 	{
-		addState(new ChillinState(this));
-		addState (new SleepState (this));
-		addState (new MoveState (this));
-		addState (new AttackState (this));
+		addState(new IciclePenguinChillinState(this));
+		addState (new IciclePenguinSleepState (this));
+		addState (new IciclePenguinMoveState (this));
+		addState (new IciclePenguinAttackState (this));
 	}
 
 	protected override System.Type getDefaultState ()
 	{
-		return typeof(ChillinState);
+		return typeof(IciclePenguinChillinState);
 	}
 
 }
