@@ -72,7 +72,7 @@ public class IciclePenguins : GameAgent {
 		aStarUpdate ();
 
 		//if health equals 0, then sleep
-		if (IPfsm.penguin.health == 0) {
+		if (IPfsm.penguin.health.currentHealth == 0) {
 			//change state to sleep
 			IPfsm.changeState(typeof(IciclePenguinSleepState));
 		}
