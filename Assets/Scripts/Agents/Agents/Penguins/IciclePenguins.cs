@@ -71,12 +71,7 @@ public class IciclePenguins : GameAgent {
 		//updates A*
 		aStarUpdate ();
 
-		//if health equals 0, then sleep
-		if (IPfsm.penguin.health.currentHealth == 0) {
-			//change state to sleep
-			IPfsm.changeState(typeof(IciclePenguinSleepState));
-		}
-		else if (aStar.hasPath) {
+		if (IPfsm.currentState.GetType() != typeof(IciclePenguinSleepState) && aStar.hasPath) {
 			IPfsm.changeState(typeof(IciclePenguinMoveState));
 		}
 
@@ -99,6 +94,7 @@ public class IciclePenguins : GameAgent {
 	public override void onDeath () {
 		//change state to sleep
 		IPfsm.changeState(typeof(IciclePenguinSleepState));
+		health.restoreToFullHealth();
 	}
 
 

@@ -41,7 +41,7 @@ public class Health {
 
 	public void drawHealthBar() {
 
-		if(currentHealth <= 0)// || currentHealth >= maxHealth
+		if(currentHealth <= 0 || currentHealth >= maxHealth)
 			return;
 
 		float size = agent.getRadiusCameraSpace()*2;
@@ -72,6 +72,10 @@ public class Health {
 
 	public void reduceHealth(float amount) {
 		currentHealth -= amount;
+	}
+
+	public void restoreToFullHealth() {
+		currentHealth = maxHealth;
 	}
 }
 

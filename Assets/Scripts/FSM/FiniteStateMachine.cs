@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public abstract class FiniteStateMachine {
 
-	protected State currentState;
+	public State currentState {get; private set;}
 	protected State previousState;
 
 	//A map to keep track off all states.
