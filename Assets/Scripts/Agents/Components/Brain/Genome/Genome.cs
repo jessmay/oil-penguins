@@ -42,7 +42,7 @@ public abstract class Genome : IComparable<Genome> {
 	public abstract double[] think(Agent agent, double[] senses);
 	public abstract void act(Agent agent, double[] thoughts);
 
-	public abstract void update(TestableAgent agent);
+	public abstract void update(TrainingAgent agent);
 
 	public abstract void OnCollisionEnter(Collision2D collision);
 	public abstract void OnCollisionExit(Collision2D collision);
@@ -55,7 +55,7 @@ public abstract class Genome : IComparable<Genome> {
 	public abstract void endOfTarget();
 	public abstract void endOfTests();
 
-	protected void moveToTestStart(TestableAgent agent) {
+	protected void moveToTestStart(TrainingAgent agent) {
 
 		agent.transform.position = agent.map.cellIndexToWorld(agent.map.HumanSpawnPoints[Options.geneticAlgorithm.currTarget]);//agent.startPosition;//agent.map.cellIndexToWorld(agent.map.getRandomHumanSpawn());
 		Quaternion rotation = Quaternion.LookRotation(agent.transform.forward, Vector3.zero - (agent.transform.position));//agent.map.cellIndexToWorld(agent.transform.position)

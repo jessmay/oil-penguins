@@ -120,7 +120,7 @@ public class BasicGenome : Genome {
 		}
 	}
 
-	public override void update(TestableAgent agent) {
+	public override void update(TrainingAgent agent) {
 
 		++currTick;
 

@@ -139,7 +139,7 @@ public class Explorer2Genome : Genome {
 
 	}
 
-	public override void update(TestableAgent agent) {
+	public override void update(TrainingAgent agent) {
 
 		++currTick;
 

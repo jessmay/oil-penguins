@@ -34,7 +34,7 @@ public class GeneticAlgorithm : MonoBehaviour {
 	//public const int TARGETS_PER_GENOME() { ;
 
 	[HideInInspector]
-	public TestableAgent testSubject;
+	public TrainingAgent testSubject;
 
 	[HideInInspector]
 	public GameMap gameMap;
@@ -84,7 +84,7 @@ public class GeneticAlgorithm : MonoBehaviour {
 		//gameMap.spawnHumanImmediate(gameMap.map.getRandomHumanSpawn(), gameMap.Human.transform.rotation);
 		gameMap.spawnHumanImmediate(gameMap.map.HumanSpawnPoints[currTarget], gameMap.Human.transform.rotation, population[0]);
 		
-		testSubject = gameMap.HumansOnMap[0].GetComponent<TestableAgent>();
+		testSubject = gameMap.HumansOnMap[0].GetComponent<TrainingAgent>();
 
 
 		initialize();

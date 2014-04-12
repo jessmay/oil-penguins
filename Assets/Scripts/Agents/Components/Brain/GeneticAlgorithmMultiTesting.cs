@@ -32,7 +32,7 @@ public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 	//public const int TARGETS_PER_GENOME() { ;
 
 	[HideInInspector]
-	public TestableAgent[] testSubjects;
+	public TrainingAgent[] testSubjects;
 
 	[HideInInspector]
 	public GameMap gameMap;
@@ -73,7 +73,7 @@ public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 
 		prevPopulation = null;
 
-		testSubjects = new TestableAgent[populationSize];
+		testSubjects = new TrainingAgent[populationSize];
 
 		for(int currIndividual = 0; currIndividual < populationSize; ++currIndividual) {
 
@@ -82,7 +82,7 @@ public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 			Quaternion rotation = gameMap.map.getSpawnAngle(currTarget);
 			gameMap.spawnHumanImmediate(gameMap.map.HumanSpawnPoints[currTarget], Options.mapName.Equals("TrainingMap")?gameMap.Human.transform.rotation: rotation, population[currIndividual]);
 			
-			testSubjects[currIndividual] = gameMap.HumansOnMap[currIndividual].GetComponent<TestableAgent>();
+			testSubjects[currIndividual] = gameMap.HumansOnMap[currIndividual].GetComponent<TrainingAgent>();
 		}
 
 
@@ -129,7 +129,7 @@ public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 					//Add fitness to total.
 					totalFitness += population[currIndividual].fitness;
 					
-					Debug.Log("Population["+currIndividual+"] " +population[currIndividual].fitness);
+					//Debug.Log("Population["+currIndividual+"] " +population[currIndividual].fitness);
 					
 					//Save the best fitness for the generation.
 					bestFitness = Math.Max(bestFitness, population[currIndividual].fitness);
@@ -143,7 +143,7 @@ public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 				}
 
 				//End of one generation
-				Debug.Log("Generation "+generation +" completed");
+				//Debug.Log("Generation "+generation +" completed");
 					
 				createNewPopulation();
 				
@@ -153,6 +153,7 @@ public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 
 				for(int currIndividual = 0; currIndividual < populationSize; ++currIndividual) {
 					testSubjects[currIndividual].replaceBrain(population[currIndividual%populationSize]);
+					population[currIndividual%populationSize].initialize(testSubjects[currIndividual]);
 				}
 			}
 			
@@ -352,7 +353,7 @@ public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 			newPopulation[currBest] = Genome.createGenome(population[currBest].GetType(), population[currBest].weights); 
 		}
 		
-		Debug.Log ("Saving these fitness values: "+fittest);
+		//Debug.Log ("Saving these fitness values: "+fittest);
 	}
 	
 	

@@ -228,8 +228,11 @@ public class Map : IDisposable {
 			}
 		}
 
-		map.SetPixel((int)PenguinSpawn.x, (int)PenguinSpawn.y, PenguinSpawnColor);
-		map.SetPixel((int)ICEMachineLocation.x, (int)ICEMachineLocation.y, ICEMachineColor);
+		if(PenguinSpawn != INVALID_LOCATION)
+			map.SetPixel((int)PenguinSpawn.x, (int)PenguinSpawn.y, PenguinSpawnColor);
+
+		if(ICEMachineLocation != INVALID_LOCATION)
+			map.SetPixel((int)ICEMachineLocation.x, (int)ICEMachineLocation.y, ICEMachineColor);
 
 		foreach (Vector2 loc in HumanSpawnPoints) {
 			map.SetPixel((int)loc.x, (int)loc.y, HumanSpawnColor);

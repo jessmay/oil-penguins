@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class TestableAgent : Agent, ITarget {
+public class TrainingAgent : Agent, ITarget {
 	
 	public static GameObject CreateAgent(GameObject agent, Vector3 location, Quaternion rotation, GameMap gameMap, Genome genome) {
 		
 		GameObject newAgent = Agent.CreateAgent(agent, location, rotation, gameMap);
 
-		TestableAgent ta = newAgent.GetComponent<TestableAgent>();
+		TrainingAgent ta = newAgent.GetComponent<TrainingAgent>();
 
 		ta.brain = genome;
 		
@@ -22,7 +22,10 @@ public abstract class TestableAgent : Agent, ITarget {
 	public Vector3 startPosition {get; private set;}
 	public Quaternion startRotation {get; private set;}
 
-	public abstract Vector2 getTarget();
+	
+	public override float getTurnStep() { return turnStep; }
+	public override float getMoveStep() { return 10.0f * transform.localScale.x;}
+
 
 	// Use this for initialization
 	protected override void initializeAgent () {
@@ -53,6 +56,14 @@ public abstract class TestableAgent : Agent, ITarget {
 		if(Options.Testing)
 			brain.update(this);
 	}
+
+	protected override void destroyAgent () {}
+	
+	//Get ICE machine's location from map.
+	public Vector2 getTarget() {
+		return map.cellIndexToWorld(map.ICEMachineLocation);
+	}
+
 
 	protected override void drawStatus () {}
 

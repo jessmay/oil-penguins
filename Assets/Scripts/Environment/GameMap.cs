@@ -127,7 +127,7 @@ public class GameMap : MonoBehaviour{
 		GameObject human;
 
 		if(Options.Testing) {
-			human = TestableAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, this, genome);
+			human = TrainingAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, this, genome);
 		}
 		else {
 			human = HumanAgent.CreateAgent(Human, map.cellIndexToWorld(location), rotation, this, genome);
