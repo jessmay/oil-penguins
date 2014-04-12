@@ -4,12 +4,12 @@ using System.Collections.Generic;
 
 public class WaveManager : MonoBehaviour {
 
-	private int waveNumber;
-	private int timeBetweenWaves = 1;
+	public int waveNumber {get; private set;}
+	public const int timeBetweenWaves = 30;
 	private GameMap gameMap;
 
-	private bool betweenWaves = true;
-	private float waveStartTime;
+	public bool betweenWaves {get; private set;}
+	public float waveStartTime {get; private set;}
 
 	private int expectedTotalHumansSpawned;
 
@@ -18,6 +18,7 @@ public class WaveManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		waveNumber = 1;
+		betweenWaves = true;
 		gameMap = GetComponent<GameMap>();
 
 		waveStartTime = Time.time + timeBetweenWaves;
@@ -45,20 +46,6 @@ public class WaveManager : MonoBehaviour {
 		}
 	}
 
-	void OnGUI() {
-
-		if(betweenWaves) {
-
-			GUI.Label(new Rect(0, 0, 300, 600), "Wave " +waveNumber +" starts in " +Mathf.RoundToInt(waveStartTime - Time.time) +" seconds.");
-		}
-
-		else {
-			GUI.Label(new Rect(0, 0, 300, 600), gameMap.HumansOnMap.Count.ToString() +" human" +(gameMap.HumansOnMap.Count==1?"":"s") +" left.");
-		}
-
-		//Add button to start wave before time.
-	}
-
 	private static int numHumansOnFirstWave = 3;
 	private static int humansPerWave(int waveNumber) {
 		return numHumansOnFirstWave + Mathf.RoundToInt(Mathf.Pow(waveNumber-1, 1.5f));
@@ -66,7 +53,10 @@ public class WaveManager : MonoBehaviour {
 
 
 
-	private void waveStart() {
+	public void waveStart() {
+
+		waveStartTime = Time.time;
+
 		betweenWaves = false;
 
 		//3 starting humans
@@ -112,5 +102,9 @@ public class WaveManager : MonoBehaviour {
 		++waveNumber;
 		betweenWaves = true;
 		waveStartTime = Time.time + timeBetweenWaves;
+
+		//Notify all penguins to wake up.
+
+		gameMap.sleepingPenguins = 0;
 	}
 }

@@ -4,33 +4,44 @@ using System.Collections;
 
 public class CameraController : MonoBehaviour {
 
-	private float minCameraSize = 5;
-	private float maxCameraSize = 125;
+	public static float minCameraSize = 5;
+	public static float maxCameraSize = 125;
 
 	private const float ViewPortEdge = 0.1f;
-	private const float CameraMovementSpeed = 5.0f;
+	private const float CameraMovementSpeed = 0.5f;
 	private const float ViewEdgeDistance = 0.5f;
+
+	
+	private Rect screenDisplay;
+	private const float moveEdgePixels = 100;
 
 	public bool invertedScroll = false;
 	public bool frozen = false;
 
 	private float scrollAmount;
 	private int prevScrollFrame;
+
+
 	// Use this for initialization
 	void Awake () {
 
+
 		DebugRenderer.updateCamera(camera);
-		//Initialize variables from file/options?
 
-		//Set camera location and zoom based on map
-
-		//Update max zoom based on map bounds.
 	}
 
 	void Start() {
 
+		if(Options.play) {
+			camera.rect = new Rect(camera.rect.x, camera.rect.y + PlayGameGUI.GUISize/(float)Screen.height, camera.rect.width, (Screen.height - PlayGameGUI.GUISize)/(float)Screen.height);
+		}
+
+
+		screenDisplay = new Rect(Screen.width * camera.rect.x, Screen.height * camera.rect.y, Screen.width * camera.rect.width, Screen.height * camera.rect.height);;
+
 		prevScrollFrame = Time.frameCount;
 
+		//Set camera location and zoom based on map
 		if(Options.gameMap != null && !Options.Testing) {
 			Vector3 startPos = camera.transform.position;
 			Vector3 penguinPos = Options.gameMap.map.cellIndexToWorld(Options.gameMap.map.PenguinSpawn);
@@ -41,6 +52,12 @@ public class CameraController : MonoBehaviour {
 			camera.orthographicSize = 30;
 			DebugRenderer.updateLineWidth();
 		}
+		
+		//Initialize variables from file/options?
+
+		//Update max zoom based on map bounds.
+		Bounds mapBounds = Options.gameMap.map.getBounds();
+		maxCameraSize = Mathf.Max(mapBounds.extents.x * Screen.height/ Screen.width, mapBounds.extents.y) + 10;
 	}
 
 	float tempScrollAmount = 0;
@@ -115,26 +132,34 @@ public class CameraController : MonoBehaviour {
 		if (!mouseInBounds())
 			return;
 
-		Vector3 mousePosition = camera.ScreenToViewportPoint(Input.mousePosition);
+		Vector3 mousePosition = Input.mousePosition;
 		Vector3 cameraPosition = camera.gameObject.transform.position;
 		Vector2 moveAmount = Vector2.zero;
 
-		if (mousePosition.x < ViewPortEdge && mousePosition.x >= camera.rect.x) {
-			
-			moveAmount.x = -getCameraSpeed(Math.Max(mousePosition.x, camera.rect.x)); //-((CameraMovementSpeed / camera.orthographicSize)* (0.1f - (mousePosition.x)));
+		//Left
+		if (mousePosition.x < screenDisplay.x + moveEdgePixels && mousePosition.x >= screenDisplay.x) {
+
+			float percent = (moveEdgePixels - (mousePosition.x - screenDisplay.xMin))/ moveEdgePixels;
+			moveAmount.x = -CameraMovementSpeed * percent;
 		}
-		else if (mousePosition.x > camera.rect.width - ViewPortEdge && mousePosition.x < camera.rect.width) {
-			
-			moveAmount.x = getCameraSpeed(camera.rect.width - Math.Min(mousePosition.x, camera.rect.width)); //((CameraMovementSpeed / camera.orthographicSize) * (0.1f - (1.0f - mousePosition.x)));
+		//Right
+		else if (mousePosition.x < screenDisplay.x + screenDisplay.width && mousePosition.x >= screenDisplay.x + screenDisplay.width - moveEdgePixels) {
+
+			float percent = (moveEdgePixels - (screenDisplay.xMax - mousePosition.x))/ moveEdgePixels;
+			moveAmount.x = CameraMovementSpeed * percent;
 		}
 
-		if (mousePosition.y < ViewPortEdge && mousePosition.y >= camera.rect.y) {
-			
-			moveAmount.y = -getCameraSpeed(Math.Max(mousePosition.y, camera.rect.y)); 
+		//Down
+		if (mousePosition.y < screenDisplay.y + moveEdgePixels && mousePosition.y >= screenDisplay.y) {
+
+			float percent = (moveEdgePixels - (mousePosition.y - screenDisplay.yMin))/ moveEdgePixels;
+			moveAmount.y = -CameraMovementSpeed * percent;
 		}
-		else if (mousePosition.y > camera.rect.height - ViewPortEdge && mousePosition.y < camera.rect.height) {//
-			
-			moveAmount.y = getCameraSpeed(camera.rect.height - Math.Min(mousePosition.y, camera.rect.height)); 
+		//Up
+		else if (mousePosition.y < screenDisplay.y + screenDisplay.width && mousePosition.y >= screenDisplay.y + screenDisplay.height - moveEdgePixels) {
+
+			float percent = (moveEdgePixels - (screenDisplay.yMax - mousePosition.y))/ moveEdgePixels;
+			moveAmount.y = CameraMovementSpeed * percent;
 		}
 		
 		moveCameraClamped(cameraPosition, moveAmount);
@@ -146,8 +171,8 @@ public class CameraController : MonoBehaviour {
 
 	public bool mouseInBounds() {
 
-		Vector3 mousePosition = camera.ScreenToViewportPoint(Input.mousePosition);
-		return (mousePosition.x >= camera.rect.x && mousePosition.x < camera.rect.width && mousePosition.y >= camera.rect.y && mousePosition.y < camera.rect.height);
+		Vector3 mousePosition = Input.mousePosition;
+		return (mousePosition.x >= screenDisplay.xMin && mousePosition.x < screenDisplay.xMax && mousePosition.y >= screenDisplay.yMin && mousePosition.y < screenDisplay.yMax);
 	}
 
 	public void moveCameraClamped(Vector3 cameraPosition, Vector2 moveAmount) {

@@ -24,7 +24,7 @@ public class TrainingAgent : Agent, ITarget {
 
 	
 	public override float getTurnStep() { return turnStep; }
-	public override float getMoveStep() { return 10.0f * transform.localScale.x;}
+	public override float getMoveStep() { return 20.0f * transform.localScale.x;}
 
 
 	// Use this for initialization

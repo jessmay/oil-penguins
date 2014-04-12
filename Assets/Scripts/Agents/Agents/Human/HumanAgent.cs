@@ -32,7 +32,7 @@ public class HumanAgent : GameAgent, ITarget {
 
 	
 	public override float getTurnStep() { return turnStep; }
-	public override float getMoveStep() { return 3.0f * transform.localScale.x * (holdingICEMachine? 0.6f: 1);}
+	public override float getMoveStep() { return 6.0f * transform.localScale.x * (holdingICEMachine? 0.6f: 1);}
 
 	protected override float getMaxHealth () { return 100; }
 
@@ -86,6 +86,7 @@ public class HumanAgent : GameAgent, ITarget {
 		}
 
 		gameMap.HumansOnMap.Remove (gameObject);
+		++gameMap.humansKilled;
 	}
 
 

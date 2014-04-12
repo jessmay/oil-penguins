@@ -19,6 +19,11 @@ public class GameMap : MonoBehaviour{
 	public List<GameObject> PenguinsOnMap {get; private set;}
 	public GameObject ICEMachineOnMap {get; private set;}
 
+	[HideInInspector]
+	public int humansKilled;
+	[HideInInspector]
+	public int sleepingPenguins;
+
 	void Awake() {
 
 		HumansOnMap = new List<GameObject>();
@@ -35,13 +40,6 @@ public class GameMap : MonoBehaviour{
 
 	void FixedUpdate() {
 
-	}
-
-	void OnGUI() {
-
-		if(Options.play && GUI.Button(new Rect(Screen.width/2 - 100/2, Screen.height - (25 + 50), 100, 50), "Spawn Penguin")) {
-			spawnPenguin();
-		}
 	}
 
 
@@ -111,7 +109,7 @@ public class GameMap : MonoBehaviour{
 		yield return new WaitForSeconds(delay);
 		
 		Debug.Log("Spawning new penguin at "+ map.cellIndexToWorld(location));
-		GameObject penguin = Agent.CreateAgent(Penguin, map.cellIndexToWorld(location), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), this);
+		GameObject penguin = Agent.CreateAgent(Penguin, map.cellIndexToWorld(location) + new Vector3(Random.value*2-1, Random.value*2-1,0), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), this);
 
 		//Initialize penguin specific values
 		//penguin.GetComponent<Penguin>();

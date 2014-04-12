@@ -50,7 +50,7 @@ public class GeneticAlgorithmMultiTesting : MonoBehaviour {
 
 		if(Options.populationName == null){
 
-			Type genome = Type.GetType(Options.genomeType);//FiveLongFeelerGenome//Explorer1Genome
+			Type genome = Type.GetType(Options.genomeType == null? "Explorer1Genome": Options.genomeType);//FiveLongFeelerGenome//Explorer1Genome
 			populationSize = 50;
 
 			population = new Genome[populationSize];

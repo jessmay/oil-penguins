@@ -6,8 +6,8 @@ public abstract class PauseMenu : MonoBehaviour {
 
 	//The GUI skin used to display all graphics and menus for the pause menu
 	public GUISkin skin;
-	public Color skinNormalColor;
-	public Color skinHighlightColor;
+	public static Color skinNormalColor = new Color(41/255.0f, 128/255.0f, 185/255.0f);
+	public static Color skinHighlightColor = new Color(27/255.0f, 85/255.0f, 123/255.0f);
 
 	[HideInInspector]
 	public GUIStyle button;
@@ -107,7 +107,7 @@ public abstract class PauseMenu : MonoBehaviour {
 		box = new GUIStyle(skin.box);
 		label = new GUIStyle(skin.label);
 		
-		setSkinTextures();
+		setSkinTextures(button, box);
 		
 		createBackgroundBox(new Color(0,0,0,0.4f));
 
@@ -187,14 +187,26 @@ public abstract class PauseMenu : MonoBehaviour {
 	}
 
 
-	private void setSkinTextures() {
+//	private void setSkinTextures() {
+//		Texture2D defaultTexture = createDefaultGUITexture(30, 30, 10);
+//		Texture2D normalTexture = DebugRenderer.colorizeTexture(defaultTexture, skinNormalColor);
+//		Texture2D highlightTexture = DebugRenderer.colorizeTexture(defaultTexture, skinHighlightColor);
+//
+//		button.normal.background = normalTexture;
+//		button.hover.background = highlightTexture;
+//
+//		box.normal.background = normalTexture;
+//	}
+
+	public static void setSkinTextures(GUIStyle button, GUIStyle box) {
+
 		Texture2D defaultTexture = createDefaultGUITexture(30, 30, 10);
 		Texture2D normalTexture = DebugRenderer.colorizeTexture(defaultTexture, skinNormalColor);
 		Texture2D highlightTexture = DebugRenderer.colorizeTexture(defaultTexture, skinHighlightColor);
-
+		
 		button.normal.background = normalTexture;
 		button.hover.background = highlightTexture;
-
+		
 		box.normal.background = normalTexture;
 	}
 

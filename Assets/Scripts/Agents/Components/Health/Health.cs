@@ -41,7 +41,7 @@ public class Health {
 
 	public void drawHealthBar() {
 
-		if(currentHealth <= 0 || currentHealth >= maxHealth)
+		if(currentHealth <= 0 || currentHealth >= maxHealth) //TODO: Check if on screen before rendering
 			return;
 
 		float size = agent.getRadiusCameraSpace()*2;
