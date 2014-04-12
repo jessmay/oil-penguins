@@ -21,6 +21,7 @@ public abstract class FiniteStateMachine {
 
 		states = new Dictionary<Type, State>();
 		initialize();
+		changeState(getDefaultState());
 	}
 
 	public void update() {
