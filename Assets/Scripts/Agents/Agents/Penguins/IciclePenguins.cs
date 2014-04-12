@@ -44,10 +44,6 @@ public class IciclePenguins : GameAgent {
 		adjAgents = new AdjacentAgents (this, radius * 2, grid);//TODO play around with radius value; smaller than humans
 
 		aStar = new AStar (map);
-		/*target = new Vector2 (0, 0);
-		targetCell = new Vector2();
-		source = new Vector2 ();
-		sourceCell = new Vector2(0, 0);*/
 		findTarget = false;
 		
 		drawSource = false;
@@ -77,8 +73,6 @@ public class IciclePenguins : GameAgent {
 
 		//Check sensors for adj agents
 		sense ();
-
-
 
 		//checkButtons ();
 		IPfsm.update ();

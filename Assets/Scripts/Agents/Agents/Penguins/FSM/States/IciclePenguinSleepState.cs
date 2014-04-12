@@ -21,9 +21,6 @@ public class IciclePenguinSleepState : State {
 	public override void exit(){
 		//Change back to selectable
 		IPfsm.penguin.selectable = true;
-
-		//Restore health TODO
-		//IPfsm.penguin.health.currentHealth = IPfsm.penguin.health.maxHealth;
 	}
 	
 	//check if need to move to new state
