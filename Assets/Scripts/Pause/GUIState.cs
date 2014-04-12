@@ -130,30 +130,34 @@ public abstract class GUIState {
 		}
 		
 		fileList = fileNames.ToArray();
-		
+
+		return getItemFromList(fileList, message, exit, maxFilesPerScroll);
+	}
+
+	protected string getItemFromList(string[] items, string message, string exit, int maxItemsPerScroll = 4) {
 		
 		label.fontSize = 30;
 		
 		int scrollBarWidth = 16;
-
+		
 		//Menu title
-		GUI.Box(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - (maxFilesPerScroll + 2)*(buttonHeight- button.border.top)/2, sWidth/2, buttonHeight),GUIContent.none, box);
-		GUI.Label(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - maxFilesPerScroll*(buttonHeight- button.border.top)/2 - (buttonHeight- button.border.top) + 20, sWidth/2, buttonHeight), message, label);
+		GUI.Box(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - (maxItemsPerScroll + 2)*(buttonHeight- button.border.top)/2, sWidth/2, buttonHeight),GUIContent.none, box);
+		GUI.Label(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - maxItemsPerScroll*(buttonHeight- button.border.top)/2 - (buttonHeight- button.border.top) + 20, sWidth/2, buttonHeight), message, label);
 		
 		//SrollView background
-		GUI.Box(new Rect (Screen.width/2 - sWidth/4 ,Screen.height/2 - maxFilesPerScroll*(buttonHeight - button.border.top)/2, sWidth/2, (buttonHeight* maxFilesPerScroll) - (button.border.top* (maxFilesPerScroll-1))),GUIContent.none, box);
+		GUI.Box(new Rect (Screen.width/2 - sWidth/4 ,Screen.height/2 - maxItemsPerScroll*(buttonHeight - button.border.top)/2, sWidth/2, (buttonHeight* maxItemsPerScroll) - (button.border.top* (maxItemsPerScroll-1))),GUIContent.none, box);
 		
 		
 		//Scrollable view to display all file options to the user.
-		scrollPosition = GUI.BeginScrollView (new Rect (Screen.width/2 - sWidth/4 ,Screen.height/2 - maxFilesPerScroll*(buttonHeight- button.border.top)/2 + button.border.top, sWidth/2, (buttonHeight* maxFilesPerScroll) - (button.border.top* (maxFilesPerScroll-1)) - 2*button.border.top), scrollPosition, new Rect (0, 0, sWidth/2-scrollBarWidth, (buttonHeight* fileList.Length) - (button.border.top* (fileList.Length-1))- 2*button.border.top ));
+		scrollPosition = GUI.BeginScrollView (new Rect (Screen.width/2 - sWidth/4 ,Screen.height/2 - maxItemsPerScroll*(buttonHeight- button.border.top)/2 + button.border.top, sWidth/2, (buttonHeight* maxItemsPerScroll) - (button.border.top* (maxItemsPerScroll-1)) - 2*button.border.top), scrollPosition, new Rect (0, 0, sWidth/2-scrollBarWidth, (buttonHeight* items.Length) - (button.border.top* (items.Length-1))- 2*button.border.top ));
 		
 		//Button for each file in the directory
-		for (int currFile = 0; currFile < fileList.Length; ++currFile) {
+		for (int currItem = 0; currItem < items.Length; ++currItem) {
 			
 			//Return filename if button is clicked.
-			if(GUI.Button (new Rect(0, currFile*(buttonHeight-button.border.top) -button.border.top, sWidth/2-(fileList.Length> maxFilesPerScroll?scrollBarWidth:0), buttonHeight), fileList[currFile], button)) {
+			if(GUI.Button (new Rect(0, currItem*(buttonHeight-button.border.top) -button.border.top, sWidth/2-(items.Length> maxItemsPerScroll?scrollBarWidth:0), buttonHeight), items[currItem], button)) {
 				
-				return fileList[currFile];
+				return items[currItem];
 			}
 		}
 		
@@ -161,11 +165,12 @@ public abstract class GUIState {
 		GUI.EndScrollView ();
 		
 		//Exit or back button
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + maxFilesPerScroll*(buttonHeight- button.border.top)/2, sWidth/2, buttonHeight), exit, button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + maxItemsPerScroll*(buttonHeight- button.border.top)/2, sWidth/2, buttonHeight), exit, button)) {
 			
 			return null;
 		}
 		
 		return "";
 	}
+
 }

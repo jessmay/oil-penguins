@@ -18,5 +18,7 @@ public class TempMainMenuFSM : GUIFSM {
 		addState(new TempMainMenuStateMapEditorNew(this));
 		addState(new TempMainMenuStateTrainANN(this));
 		addState(new TempMainMenuStateLoadPop(this));
+		addState(new TempMainMenuStateSelectGenome(this));
+
 	}
 }

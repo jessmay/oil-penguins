@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-public class Explorer1Genome : Genome {
+public class Explorer2Genome : Genome {
 	
 	private int currTick;
 
@@ -13,25 +13,23 @@ public class Explorer1Genome : Genome {
 	public int numTimesBackward {get; private set;}
 	public int numTimesRotateLeft {get; private set;}
 	public int numTimesRotateRight {get; private set;}
-	public int numActingTicks {get; private set;}
-
+	
 	public int numTargetsHit {get; private set;}
 	public double targetBonus {get; private set;}
 	public int rotBonus {get; private set;}
 	public int colBonus {get; private set;}
 
-
-	public Explorer1Genome(double[][][] weights) : base(weights) {
+	public Explorer2Genome(double[][][] weights) : base(weights) {
 
 		reset();
 	}
 
-	public Explorer1Genome() {}
+	public Explorer2Genome() {}
 
 	public override int getNumberOfInputs() { return 7; }
 	public override int getNumberOfOutputs() { return 2; }
-	public override int getNumberOfLayers() { return 1; }
-	public override int getNumberOfNeuronsPerLayer() { return 7; }
+	public override int getNumberOfLayers() { return 2; }
+	public override int getNumberOfNeuronsPerLayer() { return 6; }
 
 	
 	public override double getFiredValue() { return 0.7; }
@@ -40,15 +38,16 @@ public class Explorer1Genome : Genome {
 	public override int getNumberOfFeelers(){ return 5; }
 	public override int getViewAngle() { return 270; }
 
+	
 	public Feelers feelers {get; private set;}
 	private LineOfSight lineOfSight;
-
+	
 	public override void initialize (Agent agent) {
 		
 		lineOfSight = new LineOfSight(agent);
 		feelers = new Feelers(agent, getLengthOfFeelers(agent), getNumberOfFeelers(), getViewAngle());
 	}
-
+	
 	public override void reset() {
 
 		currTick = 0;
@@ -62,8 +61,6 @@ public class Explorer1Genome : Genome {
 		targetBonus = 0;
 		rotBonus = 0;
 		colBonus = 0;
-
-		numActingTicks = 0;
 	}
 
 	public override void endOfTarget(){
@@ -83,7 +80,7 @@ public class Explorer1Genome : Genome {
 	}
 
 
-	public override double[] sense<A>(A agent) {
+	public override double[] sense<A>(A agent){
 		
 		feelers.calculate();
 		lineOfSight.calculate();
@@ -95,8 +92,7 @@ public class Explorer1Genome : Genome {
 		double angle = agent.getAngleToPoint(agent.getTarget());
 		
 		senses[0] = angle/180;
-
-
+		
 		senses[1] = lineOfSight.inSight? 1:0;
 		
 		for (int currFeeler = 0; currFeeler < feelers.numFeelers; ++currFeeler) {
@@ -112,60 +108,31 @@ public class Explorer1Genome : Genome {
 	}
 
 	public override void act(Agent agent, double[] thoughts) {
-
-		bool act = false;
-
+		
 		//Turn right or clockwise
 		if(thoughts[0] > getFiredValue()) {
-			agent.turn(-(float)((thoughts[0] - getFiredValue())/(1 - getFiredValue()))*agent.getTurnStep());
+			agent.turn(-(float)(thoughts[0]-0.5f)*agent.getTurnStep());
 			++numTimesRotateRight;
-
-			act = true;
 		}
 		
 		//Turn left or counter clockwise
 		else if (thoughts[0] < 1 - getFiredValue()) {
-			agent.turn((float)(thoughts[0]/(1 - getFiredValue()))*agent.getTurnStep());
+			agent.turn((float)(0.5f-thoughts[0])*agent.getTurnStep());
 			++numTimesRotateLeft;
-			
-			act = true;
 		}
-
+		
 		//Move forward
 		if(thoughts[1] > getFiredValue()) {
 			agent.moveTo((float)thoughts[1] * agent.getMoveStep());
 			++numTimesForward;
-
-			act = true;
 		}
 		
 		//Move backward
 		else if (thoughts[1] < 1-getFiredValue()) {
 			agent.moveTo(-(float)thoughts[1] * agent.getMoveStep());
 			++numTimesBackward;
-			
-			act = true;
 		}
 		
-//		//Move forward
-//		if(thoughts[1] > getFiredValue()) {
-//			agent.moveTo((float)((thoughts[1] - getFiredValue())/(1 - getFiredValue())) * agent.getMoveStep());
-//			++numTimesForward;
-//			
-//			act = true;
-//		}
-//		
-//		//Move backward
-//		else if (thoughts[1] < 1-getFiredValue()) {
-//			agent.moveTo(-(float)(thoughts[1]/(1 - getFiredValue())) * agent.getMoveStep());
-//			++numTimesBackward;
-//			
-//			act = true;
-//		}
-
-		if(act) {
-			++numActingTicks;
-		}
 		
 		//TODO Give option to strafe left and right.
 
@@ -181,6 +148,14 @@ public class Explorer1Genome : Genome {
 			targetBonus += numTargetsHit * (GeneticAlgorithm.TICKS_PER_GENOME() - currTick)/(double)GeneticAlgorithm.TICKS_PER_GENOME();
 
 			moveToTestStart(agent);
+
+//			agent.transform.position = agent.map.cellIndexToWorld(agent.map.HumanSpawnPoints[Options.geneticAlgorithm.currTarget]);//agent.startPosition;//agent.map.cellIndexToWorld(agent.map.getRandomHumanSpawn());
+//			Quaternion rotation = Quaternion.LookRotation(agent.transform.forward, Vector3.zero - (agent.transform.position));//agent.map.cellIndexToWorld(agent.transform.position)
+//
+//			if(!Options.mapName.Equals("TrainingMap"))
+//				agent.turn(rotation.eulerAngles.z - agent.transform.rotation.eulerAngles.z);
+//			//agent.transform.rotation = Options.mapName.Equals("TrainingMap")?Options.gameMap.Human.transform.rotation: rotation;
+
 		}
 	}
 
@@ -214,15 +189,16 @@ public class Explorer1Genome : Genome {
 	// of the weights within the neural network.
 	public override double calculateFitness() {
 		
-		if(numActingTicks != GeneticAlgorithm.TICKS_PER_GENOME()) {
-			return .01;
-		}
+//		if(distanceMoved() == 0) {
+//			return .01;
+//		}
 		
-		return    targetBonus 
+		return    targetBonus
 				+ numTargetsHit
 				+ calcRotBonus()
-				+ calcMoveBonus()
 				+ calcCollBonus()
+				+ calcFiredBonus()
+				+ calcRotateBothWaysBonus()
 				;
 	}
 	
@@ -230,43 +206,43 @@ public class Explorer1Genome : Genome {
 	//Calculate the bonus based on how many times the agent rotated.
 	private double calcRotBonus() {
 		
-		if(numTimesRotateLeft == GeneticAlgorithm.TICKS_PER_GENOME() || numTimesRotateRight == GeneticAlgorithm.TICKS_PER_GENOME())
-			return 0.1;
-
-		if(numTimesRotateLeft == 0 || numTimesRotateRight == 0)
-			return 0.1;
-
-		return Mathf.CeilToInt(numTimesRotateLeft/(float)GeneticAlgorithm.TICKS_PER_GENOME())*0.5 + Mathf.CeilToInt(numTimesRotateRight/(float)GeneticAlgorithm.TICKS_PER_GENOME())*0.5;
+		if(numTimesRotateLeft + numTimesRotateRight == 0)
+			return 0;
+		
+		return (1 - Math.Max((numTimesRotateLeft + numTimesRotateRight)-GeneticAlgorithm.TICKS_PER_GENOME()/2.0, 0.0)/((double)GeneticAlgorithm.TICKS_PER_GENOME()/2.0))/2.0;
 	}
-
-	private double calcMoveBonus() {
-
-		if(numTimesForward == GeneticAlgorithm.TICKS_PER_GENOME() || numTimesBackward == GeneticAlgorithm.TICKS_PER_GENOME())
-			return 0.25;
-
-		if(numTimesForward == 0 || numTimesForward <= numTimesBackward || numTimesForward <= GeneticAlgorithm.TICKS_PER_GENOME()/2)
-			return 0.1;
-
-		return Mathf.CeilToInt(numTimesForward/(float)GeneticAlgorithm.TICKS_PER_GENOME())*0.75 + Mathf.CeilToInt(numTimesBackward/(float)GeneticAlgorithm.TICKS_PER_GENOME())*0.25;
-	}
+	
 	
 	//Calculate the bonus based on how many times the agent collided with a wall.
 	private double calcCollBonus() {
+		return Math.Max((GeneticAlgorithm.TICKS_PER_GENOME() - colBonus*2.0)/(double)GeneticAlgorithm.TICKS_PER_GENOME()/2.0, 0);
+	}
+	
+	
+	//Calculate the bonus based on how often the agent moved forward.
+	private double calcFiredBonus() {
+		return (numTimesForward/(double)GeneticAlgorithm.TICKS_PER_GENOME())/2.0;
+	}
 
-		if(colBonus == 0)
-			return 1;
-
-		return 0.5 - colBonus/(double)GeneticAlgorithm.TICKS_PER_GENOME() * 0.5;
+	private double calcBothMoveBonus() {
+		if(numTimesForward == 0 || numTimesBackward == 0)
+			return 0;
+		return .5;
+	}
+	
+	
+	//Calculate the bonus based on rotating in both directions.
+	private double calcRotateBothWaysBonus() {
+		if(numTimesRotateLeft == 0 || numTimesRotateRight == 0)
+			return 0;
+		return .5;
 	}
 
 
-
 	public override string getDebugInformation() {
-
+		
 		feelers.drawDebugInformation();
 		
-		lineOfSight.drawSensor();
-
 		string debugText = "";
 
 		debugText += "Targets: " +numTargetsHit +"\n";

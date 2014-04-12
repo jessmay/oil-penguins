@@ -10,6 +10,7 @@ public class Options {
 	public static GeneticAlgorithmMultiTesting geneticAlgorithm;
 	public static string populationName;
 	public static bool Testing;
+	public static string genomeType;
 	
 	public static Vector2 mapSize;
 

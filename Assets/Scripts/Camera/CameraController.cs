@@ -5,7 +5,7 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
 
 	private float minCameraSize = 5;
-	private float maxCameraSize = 50;
+	private float maxCameraSize = 125;
 
 	private const float ViewPortEdge = 0.1f;
 	private const float CameraMovementSpeed = 5.0f;

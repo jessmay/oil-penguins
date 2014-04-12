@@ -23,7 +23,10 @@ public class TempMainMenuStateTrainANN : GUIState {
 			//Options.mapName = "TrainingMap";
 			//Application.LoadLevel("TestScene");
 			//finiteStateMachine.pauseMenu.unPause();
-			finiteStateMachine.changeState(typeof(TempMainMenuStateLoadMap), TempMainMenuStateLoadMap.FROM_HUMAN_TESTS);
+
+			//finiteStateMachine.changeState(typeof(TempMainMenuStateLoadMap), TempMainMenuStateLoadMap.FROM_HUMAN_TESTS);
+			finiteStateMachine.changeState(typeof(TempMainMenuStateSelectGenome));
+				
 		}
 		
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Load Population", button)) {
