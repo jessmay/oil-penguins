@@ -13,11 +13,9 @@ public class IciclePenguinAttackState : State {
 		return "Attack State";
 	}
 	
-	public override void enter(){
-	}
+	public override void enter(){}
 	
-	public override void exit(){
-	}
+	public override void exit(){}
 	
 	//check if need to move to new state
 	public override void update(){

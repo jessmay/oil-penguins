@@ -26,8 +26,7 @@ public class IciclePenguins : GameAgent {
 	}
 
 	public bool hasPath;
-
-	public int sleepTimer;
+	
 	public bool selectable;
 
 	private AStar aStar;
@@ -43,7 +42,7 @@ public class IciclePenguins : GameAgent {
 
 		adjAgents = new AdjacentAgents (this, radius * 2, grid);//TODO play around with radius value; smaller than humans
 
-		aStar = new AStar (map);
+		aStar = new AStar (this);
 		findTarget = false;
 		
 		drawSource = false;
@@ -53,9 +52,7 @@ public class IciclePenguins : GameAgent {
 		
 		currGoal = map.getCellIndex(transform.position);
 
-		//health = 100;
 		hasPath = false;
-		sleepTimer = 0;
 		selectable = true;
 
 		IPfsm = new IciclePenguinFSM (this);

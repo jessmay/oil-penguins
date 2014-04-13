@@ -4,6 +4,8 @@ using System.Collections;
 public class IciclePenguinSleepState : State {
 
 	private IciclePenguinFSM IPfsm;
+	public float sleepTimer;
+	public float sleepTime = 20;
 	
 	public IciclePenguinSleepState (IciclePenguinFSM fsm) : base(fsm) {
 		IPfsm = fsm;
@@ -16,6 +18,9 @@ public class IciclePenguinSleepState : State {
 	public override void enter(){
 		//cannot select penguin when sleeping
 		IPfsm.penguin.selectable = false;
+
+		//Set sleep timer
+		sleepTimer = Time.time + sleepTime;
 	}
 	
 	public override void exit(){
@@ -32,7 +37,7 @@ public class IciclePenguinSleepState : State {
 	//Sees if there needs to be a state change
 	public void updateState(){
 		//if sleep timer runs out, wake up and go to Chillin State
-		if (IPfsm.penguin.sleepTimer == 0){
+		if(Time.time >= sleepTimer){
 			//Change state to chillin
 			finiteStateMachine.changeState(typeof(IciclePenguinChillinState));
 		}
