@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -13,7 +14,9 @@ public class AdjacentAgents : Sensor {
 	public float adjAgentsRadiusCameraSpace;
 	public float adjAgentsTotalRadiusCameraSpace;
 
-	public AdjacentAgents(Agent me, float radius, Grid grid) : base(me)  {
+	private Type agentType;
+
+	public AdjacentAgents(Agent me, float radius, Grid grid, Type agentType = null) : base(me)  {
 
 		this.adjAgentsRadius = radius;
 		adjAgentsTotalRadius = radius + me.getRadius();
@@ -21,10 +24,12 @@ public class AdjacentAgents : Sensor {
 		this.grid = grid;
 		adjAgentsRadiusCameraSpace = DebugRenderer.worldToCameraLength(radius);
 		adjAgentsTotalRadiusCameraSpace = adjAgentsRadiusCameraSpace + me.getRadiusCameraSpace();
+
+		this.agentType = agentType;
 	}
 
 	public override void calculate() {
-		near = grid.getNear(me, adjAgentsRadius);
+		near = grid.getNear(me, adjAgentsRadius, agentType);
 
 		debugInformation = near.Count +" agents found within adjacent agent sensor.\n";
 	}
@@ -34,7 +39,9 @@ public class AdjacentAgents : Sensor {
 
 		Color color = Color.yellow;
 		color.a = .5f;
-		
-		DebugRenderer.drawCircle(me.getCenterCameraSpace(), adjAgentsTotalRadiusCameraSpace, color);
+
+		float width = DebugRenderer.worldToCameraLength(adjAgentsTotalRadius);
+
+		DebugRenderer.drawCircle(me.getCenterCameraSpace(), width, color);
 	}
 }

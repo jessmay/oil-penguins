@@ -31,7 +31,7 @@ public class IciclePenguins : GameAgent {
 
 	private AStar aStar;
 
-	private IciclePenguinFSM IPfsm;
+	public IciclePenguinFSM IPfsm {get; private set;}
 
 	//Sensor
 	public AdjacentAgents adjAgents {get; private set;}

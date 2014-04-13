@@ -26,8 +26,8 @@ public class HumanAgent : GameAgent, ITarget {
 	
 	public Genome brain {get; private set;}
 	
-	protected double[] thoughts;
-	protected double[] senses;
+	public double[] thoughts;
+	public double[] senses;
 	
 	public Vector3 startPosition {get; private set;}
 
@@ -41,7 +41,7 @@ public class HumanAgent : GameAgent, ITarget {
 	public AdjacentAgents adjAgents {get; private set;}
 
 	//FSM
-
+	public HumanFSM humanFSM {get; private set;}
 
 	// Use this for initialization
 	protected override void initializeAgent () {
@@ -53,25 +53,27 @@ public class HumanAgent : GameAgent, ITarget {
 
 		brain.initialize(this);
 
-		adjAgents = new AdjacentAgents(this, radius * 3, grid);
+		adjAgents = new AdjacentAgents(this, radius * 8, grid, typeof(IciclePenguins));
+		adjAgents.toggleDisplay();
 
 		GetComponent<SpriteRenderer>().sprite = humanSprites[Random.Range(0, humanSprites.Length)];
+
+		humanFSM = new HumanFSM(this);
 	}
 
 	// Update is called once per frame
 	protected override void updateAgent () {
 		base.updateAgent();
-		
+
 		//Calculate information for each sensor.
 		sense();
-		senses = brain.sense(this);
-		
-		//think about the information collected by the sensors.
-		thoughts = brain.think(this, senses);
-		
-		//act on ANN output.
-		brain.act(this, thoughts);
-		
+
+		//Check for change of state if not holding the ICE Machine.
+		if(!holdingICEMachine)
+			checkForStateChange();
+
+		//Update finite state machine
+		humanFSM.update();
 		
 		//Check for win situation.
 		if(holdingICEMachine && map.getCellIndex(transform.position) == map.getCellIndex(startPosition)) {
@@ -80,10 +82,56 @@ public class HumanAgent : GameAgent, ITarget {
 		}
 	}
 
-	
+
+	private void checkForStateChange() {
+
+		//Find closest unobstructed penguin
+		Agent closestAgent = null;
+		float distance = float.MaxValue;
+
+		//Loop though all agents within range
+		foreach(Agent agent in adjAgents.near) {
+
+			//Calculate the vector between this human and the penguin.
+			Vector2 direction = agent.transform.position - transform.position;
+
+			//if the penguin is not in the sleep state or is not closer than what has already been found, ignore.
+			if(((IciclePenguins)agent).IPfsm.currentState.GetType() == typeof(IciclePenguinSleepState) || distance < direction.magnitude)
+				continue;
+
+			//Raycast to see if there is line of sight to the penguin.
+			RaycastHit2D hit = Physics2D.Raycast((Vector2)transform.position + (direction.normalized * radius * 1.01f), direction.normalized, direction.magnitude);
+
+			//If the object found is the same as the penguin we are considering, set as the current closest agent.
+			if(hit.collider.gameObject.GetInstanceID().Equals(agent.gameObject.GetInstanceID())) {
+				closestAgent = agent;
+				distance = direction.magnitude;
+			}
+		}
+
+		if(humanFSM.currentState.GetType() == typeof(HumanAttackState)) {
+
+			//If in the attack state, and no penguins found, change back to the move state.
+			if(closestAgent == null) {
+				humanFSM.changeState(typeof(HumanMoveState));
+			}
+			//If in the attack state, and a penguin was found, update target to that penguin.
+			else {
+				((HumanAttackState)humanFSM.currentState).targetAgent = closestAgent;
+			}
+		}
+
+		//If in the move state and there is a penguin within range, change to the attack state with it as the target.
+		else if(humanFSM.currentState.GetType() == typeof(HumanMoveState) && closestAgent != null) {
+
+			humanFSM.changeState(typeof(HumanAttackState));
+			((HumanAttackState)humanFSM.currentState).targetAgent = closestAgent;
+		}
+	}
+
 	protected override void destroyAgent() {
 
-		//Notify ICEMachine of death if holding the ICEMachine
+		//If holding the ICEMachine, notify of death.
 		if(holdingICEMachine) {
 			gameMap.ICEMachineOnMap.GetComponent<ICEMachine>().drop();
 		}
@@ -92,12 +140,16 @@ public class HumanAgent : GameAgent, ITarget {
 		++gameMap.humansKilled;
 	}
 
+	
+	public void shoot() {
+		Instantiate(Tranquilizer, transform.position + transform.up*(radius + Tranquilizer.renderer.bounds.extents.y), transform.rotation);
+	}
 
 	protected override void checkButtons (){
 		
-		if(Input.GetKeyDown(KeyCode.Space)) {
-			Instantiate(Tranquilizer, transform.position + transform.up*(radius + Tranquilizer.renderer.bounds.extents.y), transform.rotation);
-		}
+//		if(Input.GetKeyDown(KeyCode.Space)) {
+//			shoot();
+//		}
 	}
 
 	public override void onDeath () {
@@ -153,6 +205,10 @@ public class HumanAgent : GameAgent, ITarget {
 
 	public void pickUp() {
 		holdingICEMachine = true;
+
+		//In case human was pushed into the ICE Machine.
+		if(humanFSM.currentState.GetType() != typeof(HumanMoveState))
+			humanFSM.changeState(typeof(HumanMoveState));
 	}
 
 	public void drop() {
@@ -176,7 +232,7 @@ public class HumanAgent : GameAgent, ITarget {
 		//Draw sensors to the screen.
 		{
 			//Draw circle for nearest agents
-			//adjAgents.drawSensor();
+			adjAgents.drawSensor();
 		}
 
 		//Draw debug text to the screen
@@ -207,7 +263,7 @@ public class HumanAgent : GameAgent, ITarget {
 			
 			
 			//Get sensor information
-			//debugText += adjAgents.getDebugInformation()+ "\n";
+			debugText += adjAgents.getDebugInformation()+ "\n";
 			
 			GUI.color = Color.black;
 			GUI.Label(new Rect(0, 0, 300, 800), debugText);

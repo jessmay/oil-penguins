@@ -43,7 +43,7 @@ public class Tranquilizer : MonoBehaviour {
 		}
 		//Move forward
 		else {
-			transform.position = transform.position + transform.up* 0.5f ;
+			transform.position = transform.position + transform.up* 0.35f ;
 		}
 
 	}
@@ -71,7 +71,7 @@ public class Tranquilizer : MonoBehaviour {
 		//Deal damage
 		GameAgent gameAgent = target.GetComponent<GameAgent>();
 		if(gameAgent != null) {
-			gameAgent.addInfliction(new Infliction(100, 0.30f));
+			gameAgent.addInfliction(new Infliction(200, 0.10f));
 		}
 
 	}
