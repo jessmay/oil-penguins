@@ -15,6 +15,7 @@ public class HumanAgent : GameAgent, ITarget {
 		return newAgent;
 	}
 
+	public Sprite[] humanSprites;
 
 	public GameObject Tranquilizer;
 	
@@ -53,6 +54,8 @@ public class HumanAgent : GameAgent, ITarget {
 		brain.initialize(this);
 
 		adjAgents = new AdjacentAgents(this, radius * 3, grid);
+
+		GetComponent<SpriteRenderer>().sprite = humanSprites[Random.Range(0, humanSprites.Length)];
 	}
 
 	// Update is called once per frame
