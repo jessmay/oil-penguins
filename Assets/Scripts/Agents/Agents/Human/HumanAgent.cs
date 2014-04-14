@@ -77,8 +77,9 @@ public class HumanAgent : GameAgent, ITarget {
 		
 		//Check for win situation.
 		if(holdingICEMachine && map.getCellIndex(transform.position) == map.getCellIndex(startPosition)) {
-			
-			Debug.Log("Humans Win");
+
+			gameMap.pauseMenu.pause(typeof(PlayGamePauseStateGameOver));
+			//Debug.Log("Humans Win");
 		}
 	}
 

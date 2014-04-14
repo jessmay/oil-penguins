@@ -16,8 +16,12 @@ public class MiniMap : MonoBehaviour {
 
 	public bool display = true;
 
+	private PauseMenu pauseMenu;
+
 	// Use this for initialization
 	void Start () {
+
+		pauseMenu = GetComponent<PauseMenu>();
 
 		mapBounds = gameMap.map.getBounds();
 
@@ -94,8 +98,11 @@ public class MiniMap : MonoBehaviour {
 		Vector2 coord = locationOnScreen - onScreenSize;
 		//coord.y = Screen.height - coord.y;
 
-		
+		GUI.enabled = !pauseMenu.isPaused();
+
 		DebugRenderer.currentCamera.orthographicSize = GUI.VerticalSlider( new Rect(coord.x - 15, coord.y, 10, onScreenSize.y), DebugRenderer.currentCamera.orthographicSize, CameraController.minCameraSize, CameraController.maxCameraSize);
+
+		GUI.enabled = true;
 
 		DebugRenderer.drawBox(coord.x, coord.y, onScreenSize.x, onScreenSize.y, 0, Vector3.zero, Color.white);
 

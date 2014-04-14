@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class GameMap : MonoBehaviour{
+
+	public PauseMenu pauseMenu;
 	
 	public GameObject Wall;
 	public GameObject Human;

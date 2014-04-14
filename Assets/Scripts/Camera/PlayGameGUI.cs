@@ -19,6 +19,7 @@ public class PlayGameGUI : MonoBehaviour {
 	public GameMap gameMap;
 	public WaveManager waveManager;
 	private MiniMap miniMap;
+	private PauseMenu pauseMenu;
 
 	void Awake() {
 		Options.play = true;
@@ -36,6 +37,7 @@ public class PlayGameGUI : MonoBehaviour {
 		PauseMenu.setSkinTextures(button, box);
 
 		miniMap = GetComponent<MiniMap>();
+		pauseMenu = GetComponent<PauseMenu>();
 	}
 	
 	// Update is called once per frame
@@ -50,9 +52,14 @@ public class PlayGameGUI : MonoBehaviour {
 		miniMap.DisplayMiniMap();
 
 		button.fontSize = 20;
+
+		GUI.enabled = !pauseMenu.isPaused();
 		if(GUI.Button(new Rect(Screen.width/2 - 100/2, Screen.height - GUISize/2 - 50/2, PauseMenu.width, 50), "Spawn Penguin", button)) {
 			gameMap.spawnPenguin();
 		}
+
+		GUI.enabled = true;
+
 		button.fontSize = 25;
 
 		label.fontSize = 20;
@@ -66,9 +73,14 @@ public class PlayGameGUI : MonoBehaviour {
 			GUI.Label(new Rect(20, Screen.height - GUISize + 10, 160, 200), "Wave " +waveManager.waveNumber +" starts in " +Mathf.RoundToInt(waveManager.waveStartTime - Time.time) +" seconds.", label);
 
 			button.fontSize = 15;
+
+			GUI.enabled = !pauseMenu.isPaused();
+
 			if(GUI.Button(new Rect(20 + 20, Screen.height - PauseMenu.buttonHeight/2 - 20, 120, PauseMenu.buttonHeight/2), "Start Wave", button)) {
 				waveManager.waveStart();
 			}
+
+			GUI.enabled = true;
 
 			button.fontSize = 25;
 		}
