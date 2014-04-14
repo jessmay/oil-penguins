@@ -23,7 +23,9 @@ public class HumanAttackState : HumanState {
 			nextShotTime = Time.time;
 	}
 	
-	public override void exit(){}
+	public override void exit(){
+		humanFSM.humanAgent.hit = false;
+	}
 	
 	public override void update(){
 
@@ -32,7 +34,7 @@ public class HumanAttackState : HumanState {
 
 		//If not facing the target, turn towards it.
 		if(angleToTarget != 0) {
-			humanFSM.humanAgent.turn(Math.Min(humanFSM.humanAgent.getTurnStep(), (float)angleToTarget));
+			humanFSM.humanAgent.turn(Mathf.Clamp((float)angleToTarget, -1.0f, 1.0f));
 		}
 		//If facing the target and cooldown time has passed, shoot penguin.
 		else if(nextShotTime <= Time.time){
