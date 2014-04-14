@@ -16,6 +16,9 @@ public class IciclePenguinSleepState : State {
 	}
 	
 	public override void enter(){
+		//Updates the penguin sprite
+		IPfsm.penguin.GetComponent<SpriteRenderer>().sprite = IPfsm.penguin.penguinSprites [2];
+
 		//cannot select penguin when sleeping
 		IPfsm.penguin.selectable = false;
 

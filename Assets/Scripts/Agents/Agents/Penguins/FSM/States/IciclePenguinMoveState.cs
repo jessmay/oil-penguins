@@ -13,7 +13,10 @@ public class IciclePenguinMoveState : State {
 		return "Move State";
 	}
 	
-	public override void enter(){}
+	public override void enter(){
+		//updates the penguins sprite
+		IPfsm.penguin.GetComponent<SpriteRenderer>().sprite = IPfsm.penguin.penguinSprites [0];
+	}
 	
 	public override void exit(){}
 	

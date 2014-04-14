@@ -20,6 +20,8 @@ public class IciclePenguins : GameAgent {
 	
 	protected Vector2 currGoal;
 
+	public Sprite[] penguinSprites;
+
 	//public int health;
 	protected override float getMaxHealth () {
 		return 100;
@@ -40,7 +42,7 @@ public class IciclePenguins : GameAgent {
 	protected override void initializeAgent(){
 		base.initializeAgent();
 
-		adjAgents = new AdjacentAgents (this, radius * 2, grid);//TODO play around with radius value; smaller than humans
+		adjAgents = new AdjacentAgents (this, radius * 2, grid, typeof(HumanAgent));//TODO play around with radius value; smaller than humans
 
 		aStar = new AStar (this);
 		findTarget = false;
@@ -222,6 +224,12 @@ public class IciclePenguins : GameAgent {
 		}
 
 	}
+
+	// TODO start of the selection stuff
+	private void onMouseClick(){
+
+	}
+
 
 	protected override bool isControllable(){return false;}
 	

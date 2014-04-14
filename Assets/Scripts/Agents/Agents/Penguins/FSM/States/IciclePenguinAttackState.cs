@@ -13,7 +13,10 @@ public class IciclePenguinAttackState : State {
 		return "Attack State";
 	}
 	
-	public override void enter(){}
+	public override void enter(){
+		//update the penguin sprite
+		IPfsm.penguin.GetComponent<SpriteRenderer>().sprite = IPfsm.penguin.penguinSprites [1];
+	}
 	
 	public override void exit(){}
 	

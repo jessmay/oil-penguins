@@ -13,7 +13,11 @@ public class IciclePenguinChillinState : State {
 		return "Chillin State";
 	}
 
-	public override void enter(){}
+	public override void enter(){
+		//update the penguin sprite
+		if(IPfsm.penguin != null)
+			IPfsm.penguin.GetComponent<SpriteRenderer>().sprite = IPfsm.penguin.penguinSprites [0];
+	}
 
 	public override void exit(){}
 
