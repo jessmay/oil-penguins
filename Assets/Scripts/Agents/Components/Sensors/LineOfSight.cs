@@ -48,7 +48,17 @@ public class LineOfSight : Sensor {
 
 		float hitLength = DebugRenderer.worldToCameraLength(direction.magnitude * (inSight?1:raycast.fraction));
 
-		DebugRenderer.drawBox (center.x-width/2, center.y+radius, width, hitLength, -Vector2.Angle(-Vector2.up, direction), center, color);
+		DebugRenderer.drawBox (center.x-width/2, center.y+radius, width, hitLength, angle (), center, color);
+	}
+
+	private float angle() {
+		
+		float angle = Vector2.Angle(Vector2.up, direction);
+		if(Vector3.Cross(Vector2.up, direction).z < 0){
+			angle = -angle;
+		}
+		
+		return 180 - angle;
 	}
 
 }

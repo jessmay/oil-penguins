@@ -18,6 +18,9 @@ public class Explorer2Genome : Genome {
 	public double targetBonus {get; private set;}
 	public int rotBonus {get; private set;}
 	public int colBonus {get; private set;}
+		
+	public int numTicksInSight {get; private set;}
+	public int numTicksMovingToTargetInSight {get; private set;}
 
 	public Explorer2Genome(double[][][] weights) : base(weights) {
 
@@ -61,6 +64,9 @@ public class Explorer2Genome : Genome {
 		targetBonus = 0;
 		rotBonus = 0;
 		colBonus = 0;
+		
+		numTicksInSight = 0;
+		numTicksMovingToTargetInSight = 0;
 	}
 
 	public override void endOfTarget(){
@@ -125,6 +131,9 @@ public class Explorer2Genome : Genome {
 		if(thoughts[1] > getFiredValue()) {
 			agent.moveTo((float)thoughts[1] * agent.getMoveStep());
 			++numTimesForward;
+
+			if(lineOfSight.inSight && Math.Abs(agent.getAngleToPoint(((ITarget)agent).getTarget())) < 15)
+				++numTicksMovingToTargetInSight;
 		}
 		
 		//Move backward
@@ -199,6 +208,7 @@ public class Explorer2Genome : Genome {
 				+ calcCollBonus()
 				+ calcFiredBonus()
 				+ calcRotateBothWaysBonus()
+				+ calcLineOfSightBonus()
 				;
 	}
 	
@@ -238,11 +248,17 @@ public class Explorer2Genome : Genome {
 		return .5;
 	}
 
+	
+	private double calcLineOfSightBonus() {
+		return 0.5 * numTicksInSight/(double)GeneticAlgorithm.TICKS_PER_GENOME() + 1.0 * numTicksMovingToTargetInSight/(double)GeneticAlgorithm.TICKS_PER_GENOME();
+	}
 
 	public override string getDebugInformation() {
 		
 		feelers.drawDebugInformation();
-		
+
+		lineOfSight.drawSensor();
+
 		string debugText = "";
 
 		debugText += "Targets: " +numTargetsHit +"\n";
