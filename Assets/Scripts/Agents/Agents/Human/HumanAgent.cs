@@ -147,7 +147,7 @@ public class HumanAgent : GameAgent, ITarget {
 
 	
 	public void shoot() {
-		Instantiate(Tranquilizer, transform.position + transform.up*(radius + Tranquilizer.renderer.bounds.extents.y), transform.rotation);
+		Instantiate(Tranquilizer, transform.position + transform.up*(radius), transform.rotation);// + Tranquilizer.renderer.bounds.extents.y
 	}
 
 	protected override void checkButtons (){

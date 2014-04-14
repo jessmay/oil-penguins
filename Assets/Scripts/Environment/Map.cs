@@ -76,8 +76,13 @@ public class Map : IDisposable {
 		createBoard(width, height);
 
 		center = Vector3.zero;
-		xSize = wall.renderer.bounds.size.x;
-		ySize = wall.renderer.bounds.size.y;
+
+		BoxCollider2D box = wall.GetComponent<BoxCollider2D>();
+		xSize = box.size.x * wall.transform.localScale.x;
+		ySize = box.size.y * wall.transform.localScale.y;
+
+//		xSize = wall.renderer.bounds.size.x;
+//		ySize = wall.renderer.bounds.size.y;
 
 
 		//bounds = b;

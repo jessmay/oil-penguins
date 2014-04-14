@@ -51,7 +51,10 @@ public class Tranquilizer : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D collider) {
 
-		if(hit || collider.gameObject.GetComponent<Tranquilizer>() != null)
+		//Ignore other objects if already hit something,
+		// if collision is with another tranquilizer
+		// or if collision is with human agent.
+		if(hit || collider.gameObject.GetComponent<Tranquilizer>() != null || collider.gameObject.GetComponent<HumanAgent>() != null)
 			return;
 		
 		hit = true;
