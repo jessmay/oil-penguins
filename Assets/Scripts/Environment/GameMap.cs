@@ -141,13 +141,13 @@ public class GameMap : MonoBehaviour{
 	}
 
 	//Given a human spawn point on the map, spawn the amount of humans. 
-	public List<GameObject> spawnHuman(Vector2 location, int amount = 1) {
-
+	public List<GameObject> spawnHuman(Vector2 location, int amount, SpawnBoat spawnBoat) {
+		
 		List<GameObject> humans = new List<GameObject>(amount);
-
+		
 		for (int currHuman = 0; currHuman < amount; ++currHuman) {
-
-			StartCoroutine(spawnHuman (currHuman * 3.0f, location, humans));
+			
+			StartCoroutine(spawnHuman (currHuman * 3.0f, location, humans, spawnBoat));
 		}
 
 		return humans;
@@ -155,7 +155,7 @@ public class GameMap : MonoBehaviour{
 
 	//Spawns a human at the given location after a delay.
 	// Humans face towards the center of the map.
-	IEnumerator spawnHuman(float delay, Vector2 location, List<GameObject> humansList) {
+	IEnumerator spawnHuman(float delay, Vector2 location, List<GameObject> humansList, SpawnBoat spawnBoat = null) {
 
 		yield return new WaitForSeconds(delay);
 
@@ -186,8 +186,15 @@ public class GameMap : MonoBehaviour{
 			genome = new FiveFeelerGenome();
 		}
 
-		//Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location))
-		humansList.Add (spawnHumanImmediate(location, map.getSpawnAngle(location), genome));
 
+		GameObject human = spawnHumanImmediate(location, map.getSpawnAngle(location), genome);
+
+		//Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location))
+		humansList.Add (human);
+
+		if(spawnBoat != null){
+			human.GetComponent<HumanAgent>().spawnBoat = spawnBoat;
+			spawnBoat.incrementNumSpawned();
+		}
 	}
 }

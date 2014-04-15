@@ -18,7 +18,11 @@ public class HumanAgent : GameAgent, ITarget {
 
 	public Sprite[] humanSprites;
 
+	private float deathFade;
+
 	public GameObject Tranquilizer;
+
+	public SpawnBoat spawnBoat;
 	
 	private bool holdingICEMachine;
 
@@ -63,10 +67,25 @@ public class HumanAgent : GameAgent, ITarget {
 		GetComponent<SpriteRenderer>().sprite = humanSprites[UnityEngine.Random.Range(0, humanSprites.Length)];
 
 		humanFSM = new HumanFSM(this);
+
+		deathFade = 2;
 	}
 
 	// Update is called once per frame
 	protected override void updateAgent () {
+
+		//Agent has died, fade sprite
+		if(deathFade <= 1) {
+			GetComponent<SpriteRenderer>().color = new Color(1,1,1,deathFade);
+			deathFade -= .01f;
+
+			//Sprite fully faded, destroy agent.
+			if(deathFade <= 0)
+				Destroy(gameObject);
+			return;
+		}
+
+
 		base.updateAgent();
 
 		//Calculate information for each sensor.
@@ -143,6 +162,8 @@ public class HumanAgent : GameAgent, ITarget {
 
 		gameMap.HumansOnMap.Remove (gameObject);
 		++gameMap.humansKilled;
+
+		spawnBoat.humans.Remove(gameObject);
 	}
 
 	
@@ -150,22 +171,16 @@ public class HumanAgent : GameAgent, ITarget {
 		Instantiate(Tranquilizer, transform.position + transform.up*(radius), transform.rotation);// + Tranquilizer.renderer.bounds.extents.y
 	}
 
-	protected override void checkButtons (){
-		
-//		if(Input.GetKeyDown(KeyCode.Space)) {
-//			shoot();
-//		}
-	}
+	protected override void checkButtons (){}
 
 	public override void onDeath () {
-		Destroy(gameObject);
+		deathFade = 1;
 	}
 
 	private void sense() {
 		
 		//Get list of nearest agents
 		adjAgents.calculate();
-
 	}
 
 	//Get ICE machine's location from map.

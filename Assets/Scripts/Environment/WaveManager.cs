@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class WaveManager : MonoBehaviour {
 
+	public GameObject SpawnBoat;
+
 	public int waveNumber {get; private set;}
 	public const int timeBetweenWaves = 30;
 	private GameMap gameMap;
@@ -12,16 +14,19 @@ public class WaveManager : MonoBehaviour {
 	public float waveStartTime {get; private set;}
 
 	private int expectedTotalHumansSpawned;
-
-	//public GameObject Ship;
+	
+	private GameObject[] spawnBoats;
+	public int activeSpawns;
 
 	// Use this for initialization
 	void Start () {
-		waveNumber = 1;
-		betweenWaves = true;
+
 		gameMap = GetComponent<GameMap>();
 
-		waveStartTime = Time.time + timeBetweenWaves;
+		spawnBoats = new GameObject[gameMap.map.HumanSpawnPoints.Count];
+		waveNumber = 0;
+
+		waveEnd();
 	}
 
 	void Update() {
@@ -29,9 +34,8 @@ public class WaveManager : MonoBehaviour {
 		if(Input.GetKeyUp(KeyCode.K)) {
 
 			foreach(GameObject human in gameMap.HumansOnMap) {
-				Destroy(human);
+				human.GetComponent<HumanAgent>().onDeath();
 			}
-			gameMap.HumansOnMap.Clear();
 		}
 	}
 
@@ -41,7 +45,7 @@ public class WaveManager : MonoBehaviour {
 		if(betweenWaves && Time.time >= waveStartTime){
 			waveStart();
 		}
-		else if(!betweenWaves && expectedTotalHumansSpawned == gameMap.totalHumansSpawned &&  gameMap.HumansOnMap.Count == 0) {
+		else if(!betweenWaves && expectedTotalHumansSpawned == gameMap.totalHumansSpawned && gameMap.HumansOnMap.Count == 0 && activeSpawns == 0) {
 			waveEnd();
 		}
 	}
@@ -59,41 +63,10 @@ public class WaveManager : MonoBehaviour {
 
 		betweenWaves = false;
 
-		//3 starting humans
-		int numHumansToSpawn = humansPerWave(waveNumber);
-
-		expectedTotalHumansSpawned = gameMap.totalHumansSpawned + numHumansToSpawn;
-
-		Debug.Log(numHumansToSpawn +" humans for wave "+waveNumber);
-
-		List<Vector2> allSpawns = new List<Vector2>(gameMap.map.HumanSpawnPoints);
-
-		int numSpawnPoints = Mathf.Min(Mathf.CeilToInt(waveNumber/2.0f), allSpawns.Count);
-
-		Vector2[] waveSpawns = new Vector2[numSpawnPoints];
-		int[] humansPerSpawn = new int[numSpawnPoints];
-
-		for(int currSpawn = 0; currSpawn < numSpawnPoints; ++currSpawn) {
-
-			int index = Mathf.FloorToInt(UnityEngine.Random.value*allSpawns.Count);
-			waveSpawns[currSpawn] = allSpawns[index];
-			allSpawns.RemoveAt(index);
-
-			humansPerSpawn[currSpawn] = numHumansToSpawn/(numSpawnPoints - currSpawn);
-
-			numHumansToSpawn -= humansPerSpawn[currSpawn];
-
-			//List<GameObject> spawnedHumans = 
-			gameMap.spawnHuman(waveSpawns[currSpawn], humansPerSpawn[currSpawn]);
-
-			Debug.Log(humansPerSpawn[currSpawn] +" humans at "+ waveSpawns[currSpawn]);
-
-			//Get and use a ship from a pool? Initialize to the number of spawn points on the map?
-			//Ship.createShip(waveSpawns[currSpawn], humansPerSpawn[currSpawn]);
-			//New spawnpoint(waveSpawns[currSpawn], humansPerSpawn[currSpawn]);
-			//spawnPoint.spawn();
-			//the spawn method should call gameMap.spawnHuman
+		for (int currSpawn = 0; currSpawn < gameMap.map.HumanSpawnPoints.Count && spawnBoats[currSpawn] != null; ++currSpawn) {
+			spawnBoats[currSpawn].GetComponent<SpawnBoat>().spawn();
 		}
+
 	}
 
 	// If wanting to have animation for incoming human waves (Ships arriving at shore)
@@ -105,6 +78,46 @@ public class WaveManager : MonoBehaviour {
 
 		//Notify all penguins to wake up.
 
-		gameMap.sleepingPenguins = 0;
+		//gameMap.sleepingPenguins = 0;
+
+
+
+
+		
+		//3 starting humans
+		int numHumansToSpawn = humansPerWave(waveNumber);
+		
+		expectedTotalHumansSpawned = gameMap.totalHumansSpawned + numHumansToSpawn;
+		
+		Debug.Log(numHumansToSpawn +" humans for wave "+waveNumber);
+		
+		List<Vector2> allSpawns = new List<Vector2>(gameMap.map.HumanSpawnPoints);
+		
+		int numSpawnPoints = Mathf.Min(Mathf.CeilToInt(waveNumber/2.0f), allSpawns.Count);
+		
+		Vector2[] waveSpawns = new Vector2[numSpawnPoints];
+		int[] humansPerSpawn = new int[numSpawnPoints];
+
+		activeSpawns = numSpawnPoints;
+
+		for(int currSpawn = 0; currSpawn < numSpawnPoints; ++currSpawn) {
+			
+			int index = Mathf.FloorToInt(UnityEngine.Random.value*allSpawns.Count);
+			waveSpawns[currSpawn] = allSpawns[index];
+			allSpawns.RemoveAt(index);
+			
+			humansPerSpawn[currSpawn] = numHumansToSpawn/(numSpawnPoints - currSpawn);
+			
+			numHumansToSpawn -= humansPerSpawn[currSpawn];
+			
+			//Debug.Log(humansPerSpawn[currSpawn] +" humans at "+ waveSpawns[currSpawn]);
+
+			if(spawnBoats[currSpawn] == null) {
+				spawnBoats[currSpawn] = Instantiate(SpawnBoat, -1 * Vector3.forward, gameMap.map.getSpawnAngle(waveSpawns[currSpawn])) as GameObject;
+				spawnBoats[currSpawn].GetComponent<SpawnBoat>().setComponents(gameMap, this);
+			}
+
+			spawnBoats[currSpawn].GetComponent<SpawnBoat>().setSpawn(waveSpawns[currSpawn], humansPerSpawn[currSpawn]);
+		}
 	}
 }
