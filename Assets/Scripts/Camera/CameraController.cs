@@ -56,8 +56,10 @@ public class CameraController : MonoBehaviour {
 		//Initialize variables from file/options?
 
 		//Update max zoom based on map bounds.
-		Bounds mapBounds = Options.gameMap.map.getBounds();
-		maxCameraSize = Mathf.Max(mapBounds.extents.x * Screen.height/ Screen.width, mapBounds.extents.y) + 10;
+		if(Options.gameMap != null) {
+			Bounds mapBounds = Options.gameMap.map.getBounds();
+			maxCameraSize = Mathf.Max(mapBounds.extents.x * Screen.height/ Screen.width, mapBounds.extents.y) + 10;
+		}
 	}
 
 	float tempScrollAmount = 0;

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections;
 
 public class HumanAgent : GameAgent, ITarget {
@@ -17,9 +18,15 @@ public class HumanAgent : GameAgent, ITarget {
 
 	public Sprite[] humanSprites;
 
+	private float deathFade;
+
 	public GameObject Tranquilizer;
+
+	public SpawnBoat spawnBoat;
 	
 	private bool holdingICEMachine;
+
+	public bool hit;
 
 	private static float minDistanceToHolder = 5;
 
@@ -50,19 +57,35 @@ public class HumanAgent : GameAgent, ITarget {
 		startPosition = transform.position;
 
 		holdingICEMachine = false;
+		hit = false;
 
 		brain.initialize(this);
 
 		adjAgents = new AdjacentAgents(this, radius * 8, grid, typeof(IciclePenguins));
 		adjAgents.toggleDisplay();
 
-		GetComponent<SpriteRenderer>().sprite = humanSprites[Random.Range(0, humanSprites.Length)];
+		GetComponent<SpriteRenderer>().sprite = humanSprites[UnityEngine.Random.Range(0, humanSprites.Length)];
 
 		humanFSM = new HumanFSM(this);
+
+		deathFade = 2;
 	}
 
 	// Update is called once per frame
 	protected override void updateAgent () {
+
+		//Agent has died, fade sprite
+		if(deathFade <= 1) {
+			GetComponent<SpriteRenderer>().color = new Color(1,1,1,deathFade);
+			deathFade -= .01f;
+
+			//Sprite fully faded, destroy agent.
+			if(deathFade <= 0)
+				Destroy(gameObject);
+			return;
+		}
+
+
 		base.updateAgent();
 
 		//Calculate information for each sensor.
@@ -97,14 +120,14 @@ public class HumanAgent : GameAgent, ITarget {
 			Vector2 direction = agent.transform.position - transform.position;
 
 			//if the penguin is not in the sleep state or is not closer than what has already been found, ignore.
-			if(((IciclePenguins)agent).IPfsm.currentState.GetType() == typeof(IciclePenguinSleepState) || distance < direction.magnitude)
+			if(((IciclePenguins)agent).IPfsm.currentState.GetType() == typeof(IciclePenguinSleepState) || distance < direction.magnitude || (!hit && Math.Abs(getAngleToPoint(agent.transform.position)) > 90))
 				continue;
 
 			//Raycast to see if there is line of sight to the penguin.
-			RaycastHit2D hit = Physics2D.Raycast((Vector2)transform.position + (direction.normalized * radius * 1.01f), direction.normalized, direction.magnitude);
+			RaycastHit2D rayCastHit = Physics2D.Raycast((Vector2)transform.position + (direction.normalized * radius * 1.01f), direction.normalized, direction.magnitude);
 
 			//If the object found is the same as the penguin we are considering, set as the current closest agent.
-			if(hit.collider.gameObject.GetInstanceID().Equals(agent.gameObject.GetInstanceID())) {
+			if(rayCastHit.collider.gameObject.GetInstanceID().Equals(agent.gameObject.GetInstanceID())) {
 				closestAgent = agent;
 				distance = direction.magnitude;
 			}
@@ -139,29 +162,25 @@ public class HumanAgent : GameAgent, ITarget {
 
 		gameMap.HumansOnMap.Remove (gameObject);
 		++gameMap.humansKilled;
+
+		spawnBoat.humans.Remove(gameObject);
 	}
 
 	
 	public void shoot() {
-		Instantiate(Tranquilizer, transform.position + transform.up*(radius + Tranquilizer.renderer.bounds.extents.y), transform.rotation);
+		Instantiate(Tranquilizer, transform.position + transform.up*(radius), transform.rotation);// + Tranquilizer.renderer.bounds.extents.y
 	}
 
-	protected override void checkButtons (){
-		
-//		if(Input.GetKeyDown(KeyCode.Space)) {
-//			shoot();
-//		}
-	}
+	protected override void checkButtons (){}
 
 	public override void onDeath () {
-		Destroy(gameObject);
+		deathFade = 1;
 	}
 
 	private void sense() {
 		
 		//Get list of nearest agents
 		adjAgents.calculate();
-
 	}
 
 	//Get ICE machine's location from map.
@@ -219,6 +238,15 @@ public class HumanAgent : GameAgent, ITarget {
 	protected override void drawStatus() {
 		base.drawStatus();
 	}
+
+
+	public new void addInfliction(Infliction infliction) {
+		base.addInfliction(infliction);
+		hit = true;
+	}
+
+
+	/*				Debug 				*/
 
 	//Returns when the agent is controllable.
 	protected override bool isControllable(){
