@@ -109,29 +109,54 @@ public abstract class Agent : MonoBehaviour {
 
 		//Get the angle to the target.
 		double angle = getAngleToPoint(target);
-
+		
 		//Get the distance to the target.
 		double distance = distanceBetweenPoint(target);
-
+		
 		//Turn to the target if not facing.
 		if(Math.Abs(angle) > .0) {
 			turn(Mathf.Clamp((float)angle, -getTurnStep(), getTurnStep()));
-			if (Math.Abs(angle) > 30)
-				return;
 		}
-
+		
 		//If far from the target, move towards the target.
 		if (distance > .1 * transform.localScale.x) {//
-
+			
 			//If arrive, slow the approach as the agent gets closer to the target.
 			if(arrive)
 				moveTo(Mathf.Clamp((float)(distance), 0.0f, getMoveStep()));
-
+			
 			//Else, move to target at set speed.
 			else
-				moveTo (getMoveStep());
+				moveTo (Mathf.Max(getMoveStep() * Mathf.Abs(Mathf.Cos((float)angle)), 0));
 			return;
 		}
+
+
+//		//Get the angle to the target.
+//		double angle = getAngleToPoint(target);
+//		
+//		//Get the distance to the target.
+//		double distance = distanceBetweenPoint(target);
+//		
+//		//Turn to the target if not facing.
+//		if(Math.Abs(angle) > .0) {
+//			turn(Mathf.Clamp((float)angle, -getTurnStep(), getTurnStep()));
+//			if (Math.Abs(angle) > 30)
+//				return;
+//		}
+//		
+//		//If far from the target, move towards the target.
+//		if (distance > .1 * transform.localScale.x) {//
+//			
+//			//If arrive, slow the approach as the agent gets closer to the target.
+//			if(arrive)
+//				moveTo(Mathf.Clamp((float)(distance), 0.0f, getMoveStep()));
+//			
+//			//Else, move to target at set speed.
+//			else
+//				moveTo (getMoveStep());
+//			return;
+//		}
 	}
 
 	//Update the agent's velocity by the given move amount.

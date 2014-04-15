@@ -13,20 +13,20 @@ public class PlayGamePauseStateMain : PlayGamePauseState {
 
 	public override void displayGraphics () {
 
-		//TODO: Center based on screen.height - PlayGameGUI.GUISize
+		Vector2 center = new Vector2(Screen.width/2, (Screen.height - PlayGameGUI.GUISize)/2);
 
 		label.fontSize = 30;
-		GUI.Box(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - (buttonHeight - button.border.top)*2, sWidth/2, buttonHeight), GUIContent.none, box);
+		GUI.Box(new Rect(center.x - sWidth/4, center.y - (buttonHeight - button.border.top)*2, sWidth/2, buttonHeight), GUIContent.none, box);
 
-		GUI.Label(new Rect(Screen.width/2 - width, Screen.height/2 - buttonHeight*3/2, width*2, buttonHeight),"Paused", label);
+		GUI.Label(new Rect(center.x - width, center.y - buttonHeight*3/2, width*2, buttonHeight),"Paused", label);
 		
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2- buttonHeight + button.border.top, sWidth/2, buttonHeight),"Resume", button)) {
+		if(GUI.Button(new Rect(center.x - sWidth/4, center.y - buttonHeight + button.border.top, sWidth/2, buttonHeight),"Resume", button)) {
 			
 			finiteStateMachine.pauseMenu.unPause();
 		}
 
 		GUI.enabled = false;
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Save", button)) {
+		if(GUI.Button(new Rect(center.x - sWidth/4, center.y, sWidth/2, buttonHeight),"Save", button)) {
 			
 			//finiteStateMachine.pauseMenu.unPause();
 			//Application.LoadLevel("PlayGame");
@@ -35,7 +35,7 @@ public class PlayGamePauseStateMain : PlayGamePauseState {
 		}
 		GUI.enabled = true;
 
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Return to Main Menu", button)) {
+		if(GUI.Button(new Rect(center.x - sWidth/4, center.y + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Return to Main Menu", button)) {
 
 			Application.LoadLevel("StartMenu");
 			finiteStateMachine.pauseMenu.unPause();

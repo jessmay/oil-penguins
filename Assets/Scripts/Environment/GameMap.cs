@@ -26,6 +26,8 @@ public class GameMap : MonoBehaviour{
 	[HideInInspector]
 	public int sleepingPenguins;
 
+	public float gameStartTime {get; private set;}
+
 	void Awake() {
 
 		HumansOnMap = new List<GameObject>();
@@ -38,6 +40,8 @@ public class GameMap : MonoBehaviour{
 			createMap(Options.mapName, Options.mapSize);
 		}
 		Options.gameMap = this;
+
+		gameStartTime = Time.time;
 	}
 
 	void FixedUpdate() {

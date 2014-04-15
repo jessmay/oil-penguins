@@ -13,19 +13,41 @@ public class PlayGamePauseStateGameOver : PlayGamePauseState {
 
 	public override void displayGraphics () {
 
-		//TODO: Center based on screen.height - PlayGameGUI.GUISize
+		int wWidth = 350;
+		int wHeight = 380;
+
+		Vector2 center = new Vector2(Screen.width/2, (Screen.height - PlayGameGUI.GUISize)/2);
+
 		//Background box
-		GUI.Box (new Rect(Screen.width/2 - sWidth/2, Screen.height/2 - sHeight/2, sWidth, sHeight), GUIContent.none, box);
+		GUI.Box (new Rect(center.x - wWidth/2, center.y - wHeight/2, wWidth, wHeight), GUIContent.none, box);
 		
 		//Title
 		label.fontSize = 60;
-		GUI.Label(new Rect(Screen.width/2 - sWidth/2, Screen.height/2 - sHeight/2 + 20, sWidth, 70), "Game Over", label);
+		GUI.Label(new Rect(center.x - wWidth/2, center.y - wHeight/2 + 20, wWidth, 70), "Game Over", label);
 		//Sub title
 		label.fontSize = 40;
-		GUI.Label(new Rect(Screen.width/2 - sWidth/2, Screen.height/2 - sHeight/2 + 70, sWidth, 70), "Humans Win", label);
+		GUI.Label(new Rect(center.x - wWidth/2, center.y - wHeight/2 + 90, wWidth, 70), "Humans Win", label);
+
+		label.fontSize = 25;
+
+		label.alignment = TextAnchor.UpperLeft;
+		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 160, wWidth*4/5, 70), "Waves completed:", label);
+		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 200, wWidth*4/5, 70), "Humans killed:", label);
+		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 240, wWidth*4/5, 70), "Time played:", label);
+
+		float playTime = (Time.time - gameMap.gameStartTime);
+
+
+		label.alignment = TextAnchor.UpperRight;
+		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 160, wWidth*4/5, 70), (waveManager.waveNumber-1).ToString(), label);
+		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 200, wWidth*4/5, 70), gameMap.humansKilled.ToString(), label);
+		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 240, wWidth*4/5, 70), string.Format("{0:00}:{1:00}", ((int)playTime)/60, Mathf.Round (playTime)%60), label);
+
+
+		label.alignment = TextAnchor.UpperCenter;
 
 		// Back to menu button
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/2, Screen.height/2 + sHeight/2 - buttonHeight, sWidth, buttonHeight),"Return to Main Menu", button)) {
+		if(GUI.Button(new Rect(center.x - wWidth/2, center.y + wHeight/2 - buttonHeight, wWidth, buttonHeight),"Return to Main Menu", button)) {
 			
 			Application.LoadLevel("StartMenu");
 			finiteStateMachine.pauseMenu.unPause();

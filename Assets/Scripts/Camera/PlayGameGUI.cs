@@ -93,7 +93,9 @@ public class PlayGameGUI : MonoBehaviour {
 
 			label.fontSize = 20;
 
-			GUI.Label(new Rect(20, Screen.height - GUISize + 60, 160, 30), Mathf.RoundToInt(Time.time - waveManager.waveStartTime) +" seconds", label);
+			float playTime = Time.time - waveManager.waveStartTime;
+
+			GUI.Label(new Rect(20, Screen.height - GUISize + 60, 160, 30), string.Format("{0:00}:{1:00}", ((int)playTime)/60, Mathf.Round (playTime)%60), label);
 
 			//GUI.Label(new Rect(20, Screen.height - GUISize + 10, 160, 200), "Time since start of wave:\n" +Mathf.RoundToInt(Time.time - waveManager.waveStartTime) +" seconds", label);
 

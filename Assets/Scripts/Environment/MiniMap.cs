@@ -116,19 +116,6 @@ public class MiniMap : MonoBehaviour {
 			}
 		}
 
-		//Draw ICE machine
-		{
-			Vector3 ICECoord = (gameMap.ICEMachineOnMap != null? gameMap.ICEMachineOnMap.transform.position : gameMap.map.cellIndexToWorld(gameMap.map.ICEMachineLocation));
-			ICECoord = (ICECoord + mapBounds.size/2.0f);
-			
-			ICECoord.x = ICECoord.x/mapBounds.size.x * onScreenSize.x;
-			ICECoord.y = onScreenSize.y - ICECoord.y/mapBounds.size.y * onScreenSize.y;
-
-			Vector2 newCoord = coord + (Vector2)ICECoord;
-			
-			DebugRenderer.drawBox(new Rect(newCoord.x - wallSize/2, newCoord.y - wallSize/2, wallSize, wallSize), Map.ICEMachineColor);
-		}
-
 		if(!Application.loadedLevelName.Equals("MapEditor")) {
 
 			//Draw humans
@@ -187,6 +174,19 @@ public class MiniMap : MonoBehaviour {
 				
 				DebugRenderer.drawBox(new Rect(newCoord.x - wallSize/2, newCoord.y - wallSize/2, wallSize, wallSize), Map.PenguinSpawnColor);
 			}
+		}
+		
+		//Draw ICE machine
+		{
+			Vector3 ICECoord = (gameMap.ICEMachineOnMap != null? gameMap.ICEMachineOnMap.transform.position : gameMap.map.cellIndexToWorld(gameMap.map.ICEMachineLocation));
+			ICECoord = (ICECoord + mapBounds.size/2.0f);
+			
+			ICECoord.x = ICECoord.x/mapBounds.size.x * onScreenSize.x;
+			ICECoord.y = onScreenSize.y - ICECoord.y/mapBounds.size.y * onScreenSize.y;
+			
+			Vector2 newCoord = coord + (Vector2)ICECoord;
+			
+			DebugRenderer.drawBox(new Rect(newCoord.x - wallSize/2, newCoord.y - wallSize/2, wallSize, wallSize), Map.ICEMachineColor);
 		}
 
 		//Draw view rectangle
