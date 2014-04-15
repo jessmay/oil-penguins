@@ -7,18 +7,20 @@ public class IciclePenguins : GameAgent {
 	/*protected Vector2 target;
 	protected Vector2 targetCell;
 	protected Vector2 source;
-	protected Vector2 sourceCell;*/
-	protected bool findTarget;
+	protected Vector2 sourceCell;
+	protected bool findTarget;*/
 	
 	//protected List<Vector2> currPath;
-	protected int pathIndex;
+//	protected int pathIndex;
 	
 	protected bool drawSource;
 	protected bool drawTarget;
 	protected bool drawPath;
 	protected bool drawNodes;
 	
-	protected Vector2 currGoal;
+//	protected Vector2 currGoal;
+
+	private bool selected;
 
 	public Sprite[] penguinSprites;
 
@@ -27,11 +29,11 @@ public class IciclePenguins : GameAgent {
 		return 100;
 	}
 
-	public bool hasPath;
+	//public bool hasPath;
 	
 	public bool selectable;
 
-	private AStar aStar;
+	public AStar aStar;
 
 	public IciclePenguinFSM IPfsm {get; private set;}
 
@@ -45,17 +47,14 @@ public class IciclePenguins : GameAgent {
 		adjAgents = new AdjacentAgents (this, radius * 2, grid, typeof(HumanAgent));//TODO play around with radius value; smaller than humans
 
 		aStar = new AStar (this);
-		findTarget = false;
 		
 		drawSource = false;
 		drawTarget = false;
 		drawPath = false;
 		drawNodes = false;
-		
-		currGoal = map.getCellIndex(transform.position);
 
-		hasPath = false;
 		selectable = true;
+		selected = false;
 
 		IPfsm = new IciclePenguinFSM (this);
 	}
@@ -64,11 +63,28 @@ public class IciclePenguins : GameAgent {
 	protected override void updateAgent(){
 		base.updateAgent();
 		//updates A*
-		aStarUpdate ();
+		//aStarUpdate ();
 
-		if (IPfsm.currentState.GetType() != typeof(IciclePenguinSleepState) && aStar.hasPath) {
+		if (IPfsm.currentState.GetType() != typeof(IciclePenguinSleepState) 
+		    	&& IPfsm.currentState.GetType() != typeof(IciclePenguinMoveState) 
+		    	&& aStar.hasPath) {
 			IPfsm.changeState(typeof(IciclePenguinMoveState));
 		}
+
+		if(selected && Input.GetMouseButtonDown (0)){
+			//Position of the second mouse click
+			Vector2 pos = DebugRenderer.currentCamera.ScreenToWorldPoint (Input.mousePosition);
+			
+			// if there is an AStar path, FSM will change state to move state
+			// otherwise the penguin will stay in its current state
+			aStar.setSource (transform.position);
+			aStar.setTarget (pos);
+			bool a = aStar.aStar();
+
+			Debug.Log(a);
+
+			selected = false;
+        }
 
 		//Check sensors for adj agents
 		sense ();
@@ -107,91 +123,6 @@ public class IciclePenguins : GameAgent {
 	}
 
 	//A* info
-	private void aStarUpdate(){
-
-		// If the source node or target node change, the aStar path needs to be updated
-		bool sourceChange = false;
-		bool targetChange = false;
-
-		//Designate source location; shift + left click
-		if (Input.GetKey (KeyCode.LeftShift) && Input.GetMouseButtonDown (0)) {
-			Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
-			
-			//if new source location, sets values of source to mouse position
-			if((int)pos.x != aStar.source.x || (int)pos.y != aStar.source.y){
-				aStar.setSource(pos);
-				sourceChange = true;
-			}
-		}
-
-		//Designate target location; left control+right click
-		if(Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(1)){
-			Vector2 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
-			
-			//if new target location, sets values of target to mouse position
-			if((int)pos.x != aStar.target.x || (int)pos.y != aStar.target.y){
-				aStar.setTarget(pos);
-				targetChange = true;
-			}
-			
-		}
-
-		//if there has been a change in the findTarget value during this call of update
-		bool findChange = false;
-		//tells the player whether or not to perform A* and seek the target
-		if(Input.GetKeyDown(KeyCode.F2)){
-			findTarget = !findTarget;
-			findChange = true;
-		}
-
-		//Get list of close nodes, gets the closest, seeks, and calculates astar path
-		if((findChange || targetChange || sourceChange) && findTarget && aStar.source != aStar.target){
-			
-			// Gets the closest node from the list of close nodes and sets it as the source node and the currGoal
-			currGoal = new Vector2();
-			currGoal = map.getCellIndex(transform.position);
-			aStar.setSource(map.cellIndexToWorld(currGoal));//source = new Vector2();
-			//source = map.cellIndexToWorld(currGoal);
-			
-			//gets aStar path if there is one, otherwise turns target seeking off
-			if(!aStar.aStar()){
-				findTarget = false;
-			}
-			else{
-				hasPath = true;
-			}
-			
-			pathIndex = 0;
-		}
-
-		//Seeks along A* path if findTarget is true
-		if(findTarget){
-			
-			//If the player is at the target, no more need to find the target
-			if(map.getCellIndex(transform.position) == aStar.targetCell){//distanceBetweenPoint(map.cellIndexToWorld(target)) <= (.5 * transform.localScale.x)
-				pathIndex = 0;
-				findTarget = false;
-				hasPath = false;
-			}
-			//Otherwise seek towards the current goal location in the aStar path
-			else {
-				
-				//If in the cell index of current goal and not on target, close enough, check next location to seek
-				if (distanceBetweenPoint(map.cellIndexToWorld(currGoal)) <= (.5 * transform.localScale.x) && pathIndex < aStar.currPath.Count-1)
-				{
-					pathIndex++;
-					currGoal = new Vector2();
-					currGoal = (Vector2)aStar.currPath[pathIndex];
-					seek (map.cellIndexToWorld(currGoal));
-				}
-				//If not in the cell index of current goal, keep seeking to that current goal
-				else if (distanceBetweenPoint(map.cellIndexToWorld(currGoal)) > (.5 * transform.localScale.x))
-				{
-					seek(map.cellIndexToWorld(currGoal));
-				}
-			}
-		}
-	}
 
 	//Check for button presses (or mouse clicks) here
 
@@ -226,8 +157,9 @@ public class IciclePenguins : GameAgent {
 	}
 
 	// TODO start of the selection stuff
-	private void onMouseClick(){
-
+	// When an individual is clicked, it is selected using this function
+	void OnMouseUpAsButton(){
+		selected = true;
 	}
 
 
@@ -296,7 +228,7 @@ public class IciclePenguins : GameAgent {
 		GUI.color = Color.black;
 		GUI.Label(new Rect(0, 0, 300, 800), debugText);
 		
-		Vector2 goal = DebugRenderer.currentCamera.WorldToScreenPoint (map.cellIndexToWorld(currGoal));
+		Vector2 goal = DebugRenderer.currentCamera.WorldToScreenPoint (map.cellIndexToWorld(aStar.currGoal));
 		DebugRenderer.drawCircle (new Vector2 (goal.x, Screen.height - goal.y), 2 * getRadiusCameraSpace ());
 	}
 }
