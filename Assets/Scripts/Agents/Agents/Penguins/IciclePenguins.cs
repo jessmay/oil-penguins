@@ -4,21 +4,10 @@ using System.Collections.Generic;
 
 public class IciclePenguins : GameAgent {
 	
-	/*protected Vector2 target;
-	protected Vector2 targetCell;
-	protected Vector2 source;
-	protected Vector2 sourceCell;
-	protected bool findTarget;*/
-	
-	//protected List<Vector2> currPath;
-//	protected int pathIndex;
-	
 	protected bool drawSource;
 	protected bool drawTarget;
 	protected bool drawPath;
 	protected bool drawNodes;
-	
-//	protected Vector2 currGoal;
 
 	private bool selected;
 
@@ -62,8 +51,6 @@ public class IciclePenguins : GameAgent {
 	//Update agent
 	protected override void updateAgent(){
 		base.updateAgent();
-		//updates A*
-		//aStarUpdate ();
 
 		if (IPfsm.currentState.GetType() != typeof(IciclePenguinSleepState) 
 		    	&& IPfsm.currentState.GetType() != typeof(IciclePenguinMoveState) 
@@ -210,6 +197,10 @@ public class IciclePenguins : GameAgent {
 				node.y*=-1;*/
 				DebugRenderer.drawCircleWorld(node, 1.0f, Color.red);
 			}
+			for(int j = 0; j < aStar.prevPath.Count; j++){
+				Vector2 node = aStar.prevPath[j];
+				DebugRenderer.drawCircleWorld(node, 1.5f, Color.green);
+			}
 		}
 
 		//Draw circle for nearest agents
@@ -227,7 +218,7 @@ public class IciclePenguins : GameAgent {
 		GUI.color = Color.black;
 		GUI.Label(new Rect(0, 0, 300, 800), debugText);
 		
-		Vector2 goal = DebugRenderer.currentCamera.WorldToScreenPoint (map.cellIndexToWorld(aStar.currGoal));
+		Vector2 goal = DebugRenderer.currentCamera.WorldToScreenPoint (aStar.currGoal);
 		DebugRenderer.drawCircle (new Vector2 (goal.x, Screen.height - goal.y), 2 * getRadiusCameraSpace ());
 	}
 }

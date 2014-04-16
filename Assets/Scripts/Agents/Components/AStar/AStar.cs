@@ -12,6 +12,7 @@ public class AStar {
 	public Vector2 sourceCell;
 	public Vector2 targetCell;
 
+	public List<Vector2> prevPath;
 	public List<Vector2> currPath;
 	public bool hasPath;
 
@@ -22,7 +23,7 @@ public class AStar {
 	public AStar(Agent a){
 		agent = a;
 		findTarget = false;
-		currGoal = agent.map.getCellIndex(agent.transform.position);
+		currGoal = agent.transform.position;
 		hasPath = false;
 	}
 
@@ -77,11 +78,12 @@ public class AStar {
 				//reconstruct path with the from list
 				currPath = new List<Vector2>();
 				currPath = createPath(from, currNode);
+				prevPath = currPath;
 
 				currPath.Insert(0, source);
 				currPath.Add(target);
 
-				pathSmoothQuick();//TODO test if want to use quick or precise
+				//pathSmoothQuick();//TODO test if want to use quick or precise
 				hasPath = true;
 				return true; 
 			}
@@ -224,73 +226,17 @@ public class AStar {
 
 	public void aStarUpdate(){
 		
-		// If the source node or target node change, the aStar path needs to be updated
-		bool sourceChange = false;
-		bool targetChange = false;
-		
-		//Designate source location; shift + left click
-		if (Input.GetKey (KeyCode.LeftShift) && Input.GetMouseButtonDown (0)) {
-			Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
-			
-			//if new source location, sets values of source to mouse position
-			if((int)pos.x != source.x || (int)pos.y != source.y){
-				setSource(pos);
-				sourceChange = true;
-			}
-		}
-		
-		//Designate target location; left control+right click
-		if(Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButtonDown(1)){
-			Vector2 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
-			
-			//if new target location, sets values of target to mouse position
-			if((int)pos.x != target.x || (int)pos.y != target.y){
-				setTarget(pos);
-				targetChange = true;
-			}
-			
-		}
-		
-		//if there has been a change in the findTarget value during this call of update
-		bool findChange = false;
-		//tells the player whether or not to perform A* and seek the target
-		if(Input.GetKeyDown(KeyCode.F2)){
-			findTarget = !findTarget;
-			findChange = true;
-		}
-		
-		//Get list of close nodes, gets the closest, seeks, and calculates astar path
-		if((findChange || targetChange || sourceChange) && findTarget && source != target){
-			
-			// Gets the closest node from the list of close nodes and sets it as the source node and the currGoal
-			currGoal = new Vector2();
-			currGoal = agent.map.getCellIndex(agent.transform.position);
-			setSource(agent.map.cellIndexToWorld(currGoal));//source = new Vector2();
-			//source = map.cellIndexToWorld(currGoal);
-
-			//gets aStar path if there is one, otherwise turns target seeking off
-			if(!aStar()){
-				findTarget = false;
-			}
-			else{
-				hasPath = true;
-			}
-			
-			pathIndex = 0;
-		}
-		
 		//Seeks along A* path if findTarget is true
 		if(findTarget){
 			
 			//If the player is at the target, no more need to find the target
-			if((Vector2)agent.transform.position == target){//distanceBetweenPoint(map.cellIndexToWorld(target)) <= (.5 * transform.localScale.x)
+			if(agent.distanceBetweenPoint(target) <= (.5 * agent.transform.localScale.x)){//(Vector2)agent.transform.position == target
 				pathIndex = 0;
 				findTarget = false;
 				hasPath = false;
 			}
 			//Otherwise seek towards the current goal location in the aStar path
-			else {
-				
+			else {	
 				//If in the cell index of current goal and not on target, close enough, check next location to seek
 				if (agent.distanceBetweenPoint(currGoal) <= (.5 * agent.transform.localScale.x) && pathIndex < currPath.Count-1)
 				{
