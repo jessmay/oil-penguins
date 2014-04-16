@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.IO;
 using System.Collections;
 
 public class Options {
@@ -18,10 +19,21 @@ public class Options {
 	public static string GADirectory = Application.dataPath + "/../GA";
 	public static string GenomeDirectory = GADirectory +"/Genomes";
 
+	public static string HighScoresDirectory = Application.dataPath + "/../HS";
+	public static HighScores highScores;
+
+
 	static Options() {
 		mapName = "NewMap";
 		Testing = false;
 		play = false;
+
+		if(File.Exists(HighScoresDirectory +"/"+ HighScores.HighScoresFileName))
+			highScores = HighScores.load (HighScoresDirectory +"/"+ HighScores.HighScoresFileName);
+		else {
+			highScores = new HighScores();
+			Directory.CreateDirectory(HighScoresDirectory);
+		}
 	}
 
 }

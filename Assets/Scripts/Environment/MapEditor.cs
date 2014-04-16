@@ -25,7 +25,7 @@ public class MapEditor : MonoBehaviour {
 
 
 		//Place/remove item at the given mouse location
-		if (Input.GetMouseButtonDown (0)) {
+		if (Input.GetMouseButtonDown (0) && !(Input.mousePosition.x > Screen.width - PlayGameGUI.GUISize && Input.mousePosition.y < PlayGameGUI.GUISize)) {
 			Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			pos.z = 0;
 
@@ -76,14 +76,13 @@ public class MapEditor : MonoBehaviour {
 		}
 
 		//Right click to remove item from location
-		if(Input.GetMouseButtonDown(1)) {
+		if(Input.GetMouseButtonDown(1) && !(Input.mousePosition.x > Screen.width - PlayGameGUI.GUISize && Input.mousePosition.y < PlayGameGUI.GUISize)) {
 			Vector3 pos = DebugRenderer.currentCamera.ScreenToWorldPoint(Input.mousePosition);
 			pos.z = 0;
-			
+
 			Vector2 mapPos = gameMap.map.getCellIndex(pos);
 
 			removeItems(mapPos);
-
 		}
 
 		for (int i = 0; i < 4; ++i) {

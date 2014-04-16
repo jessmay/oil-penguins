@@ -70,7 +70,7 @@ public class PlayGameGUI : MonoBehaviour {
 		GUI.Box(new Rect( 0, Screen.height - GUISize , 200, GUISize), GUIContent.none, box);
 
 		if(waveManager.betweenWaves) {
-			GUI.Label(new Rect(20, Screen.height - GUISize + 10, 160, 200), "Wave " +waveManager.waveNumber +" starts in " +Mathf.RoundToInt(waveManager.waveStartTime - Time.time) +" seconds.", label);
+			GUI.Label(new Rect(20, Screen.height - GUISize + 10, 160, 200), "Wave " +waveManager.waveNumber +" starts in\n" +Mathf.RoundToInt(waveManager.waveStartTime - Time.time) +" seconds.", label);
 
 			button.fontSize = 15;
 
@@ -95,9 +95,7 @@ public class PlayGameGUI : MonoBehaviour {
 
 			float playTime = Time.time - waveManager.waveStartTime;
 
-			GUI.Label(new Rect(20, Screen.height - GUISize + 60, 160, 30), string.Format("{0:00}:{1:00}", ((int)playTime)/60, Mathf.Round (playTime)%60), label);
-
-			//GUI.Label(new Rect(20, Screen.height - GUISize + 10, 160, 200), "Time since start of wave:\n" +Mathf.RoundToInt(Time.time - waveManager.waveStartTime) +" seconds", label);
+			GUI.Label(new Rect(20, Screen.height - GUISize + 60, 160, 30), string.Format("{0:00}:{1:00}", ((int)playTime)/60, ((int)playTime)%60), label);
 
 			label.alignment = TextAnchor.UpperLeft;
 		}

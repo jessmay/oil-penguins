@@ -12,6 +12,7 @@ public class WaveManager : MonoBehaviour {
 
 	public bool betweenWaves {get; private set;}
 	public float waveStartTime {get; private set;}
+	public float previousWaveFinishTime {get; private set;}
 
 	private int expectedTotalHumansSpawned;
 	
@@ -75,6 +76,8 @@ public class WaveManager : MonoBehaviour {
 		++waveNumber;
 		betweenWaves = true;
 		waveStartTime = Time.time + timeBetweenWaves;
+
+		previousWaveFinishTime = Time.time;
 
 		//Notify all penguins to wake up.
 

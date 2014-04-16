@@ -37,12 +37,10 @@ public class PlayGamePauseStateGameOver : PlayGamePauseState {
 
 		float playTime = (Time.time - gameMap.gameStartTime);
 
-
 		label.alignment = TextAnchor.UpperRight;
 		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 160, wWidth*4/5, 70), (waveManager.waveNumber-1).ToString(), label);
 		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 200, wWidth*4/5, 70), gameMap.humansKilled.ToString(), label);
-		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 240, wWidth*4/5, 70), string.Format("{0:00}:{1:00}", ((int)playTime)/60, Mathf.Round (playTime)%60), label);
-
+		GUI.Label(new Rect(center.x - wWidth*4/10, center.y - wHeight/2 + 240, wWidth*4/5, 70), string.Format("{0:00}:{1:00}", ((int)playTime)/60, ((int)playTime)%60), label);
 
 		label.alignment = TextAnchor.UpperCenter;
 
@@ -87,7 +85,12 @@ public class PlayGamePauseStateGameOver : PlayGamePauseState {
 
 	}
 
-	public override void enter () {}
+	public override void enter () {
+
+		//Add score to the high scores list.
+		Options.highScores.addScore(new Score(waveManager.waveNumber, gameMap.humansKilled, Time.time - gameMap.gameStartTime, System.DateTime.Now));
+
+	}
 
 	public override void exit () {}
 

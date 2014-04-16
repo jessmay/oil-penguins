@@ -42,6 +42,10 @@ public class GameMap : MonoBehaviour{
 		Options.gameMap = this;
 
 		gameStartTime = Time.time;
+
+//		for(int currPenguin = 0; currPenguin < 5; ++currPenguin) {
+//			spawnPenguin();
+//		}
 	}
 
 	void FixedUpdate() {
