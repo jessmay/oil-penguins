@@ -54,7 +54,7 @@ public class AStar {
 	// A* algorithm
 	// Uses map cells to detect where walls are
 	// If there is a path, it will be reconstructed at the end of this function
-	// and it will contain the locations of nodes in Map Cell space to follow
+	// and it will contain the locations of nodes in World space to follow; the nodes will be the centers of open map cells
 	// Source node and target node are in world coords
 	public bool aStar(){
 		
@@ -66,7 +66,7 @@ public class AStar {
 		Hashtable gVals = new Hashtable ();
 		gVals.Add (sourceCell, 0.0f);
 		Hashtable fVals = new Hashtable ();
-		fVals.Add (sourceCell, ((float)gVals [sourceCell]) + Vector2.Distance (sourceCell, targetCell));
+		fVals.Add (sourceCell, Vector2.Distance (sourceCell, targetCell));
 		
 		while (curr.Count != 0) {
 			
@@ -77,7 +77,11 @@ public class AStar {
 				//reconstruct path with the from list
 				currPath = new List<Vector2>();
 				currPath = createPath(from, currNode);
-				pathSmoothPrecise();//TODO test if want to use quick or precise
+
+				currPath.Insert(0, source);
+				currPath.Add(target);
+
+				pathSmoothQuick();//TODO test if want to use quick or precise
 				hasPath = true;
 				return true; 
 			}
@@ -128,15 +132,15 @@ public class AStar {
 	// that the agent can then access
 	private List<Vector2> createPath(Hashtable path,  Vector2 node){
 		
-		if (path.Contains (node)) {
+		if (path.Contains(node)) {
 			List<Vector2> p = new List<Vector2>();
 			p = createPath(path, (Vector2)path[node]);
-			p.Add(node);
+			p.Add(agent.map.cellIndexToWorld(node));
 			return p;
 		}
 		else{
 			List<Vector2> p = new List<Vector2>();
-			p.Add(node);
+			p.Add(agent.map.cellIndexToWorld(node));
 			return p;
 		}
 		
@@ -191,15 +195,11 @@ public class AStar {
 
 	// Checks if an agent can walk between two given points
 	// This takes the agents radius into account and uses ray-casting
-	// Points should be given in Map coordinates, they will be converted to world
+	// Points should be given in world coordinates
 	private bool canWalkBetween(Vector2 startPoint, Vector2 endPoint){
 
-		//Converts given map coordinates to world coordinates
-		Vector2 startWorld = agent.map.cellIndexToWorld (startPoint);
-		Vector2 endWorld = agent.map.cellIndexToWorld (endPoint);
-
 		//Get the vector between the 2 given points
-		Vector3 pointPath = endWorld - startWorld;
+		Vector3 pointPath = endPoint - startPoint;
 
 		//Find the vector in the direction of the radius
 		Vector3 radDirection = Vector3.Cross (pointPath, agent.transform.forward);
@@ -211,8 +211,8 @@ public class AStar {
 		radDirection = radDirection * agent.getRadius ();
 
 		//Get the points we will ray cast from
-		Vector2 rightStart = startWorld + (Vector2)radDirection;
-		Vector2 leftStart = startWorld - (Vector2)radDirection;
+		Vector2 rightStart = startPoint + (Vector2)radDirection;
+		Vector2 leftStart = startPoint - (Vector2)radDirection;
 
 		//Raycast to see if there are any collisions before the end point
 		RaycastHit2D ray1 = Physics2D.Raycast (rightStart, pointPath, pointPath.magnitude, (1 << LayerMask.NameToLayer("Wall")));
@@ -283,7 +283,7 @@ public class AStar {
 		if(findTarget){
 			
 			//If the player is at the target, no more need to find the target
-			if(agent.map.getCellIndex(agent.transform.position) == targetCell){//distanceBetweenPoint(map.cellIndexToWorld(target)) <= (.5 * transform.localScale.x)
+			if((Vector2)agent.transform.position == target){//distanceBetweenPoint(map.cellIndexToWorld(target)) <= (.5 * transform.localScale.x)
 				pathIndex = 0;
 				findTarget = false;
 				hasPath = false;
@@ -292,17 +292,17 @@ public class AStar {
 			else {
 				
 				//If in the cell index of current goal and not on target, close enough, check next location to seek
-				if (agent.distanceBetweenPoint(agent.map.cellIndexToWorld(currGoal)) <= (.5 * agent.transform.localScale.x) && pathIndex < currPath.Count-1)
+				if (agent.distanceBetweenPoint(currGoal) <= (.5 * agent.transform.localScale.x) && pathIndex < currPath.Count-1)
 				{
 					pathIndex++;
 					currGoal = new Vector2();
 					currGoal = (Vector2)currPath[pathIndex];
-					agent.seek (agent.map.cellIndexToWorld(currGoal));
+					agent.seek (currGoal);
 				}
 				//If not in the cell index of current goal, keep seeking to that current goal
-				else if (agent.distanceBetweenPoint(agent.map.cellIndexToWorld(currGoal)) > (.5 * agent.transform.localScale.x))
+				else if (agent.distanceBetweenPoint(currGoal) > (.5 * agent.transform.localScale.x))
 				{
-					agent.seek(agent.map.cellIndexToWorld(currGoal));
+					agent.seek(currGoal);
 				}
 			}
 		}

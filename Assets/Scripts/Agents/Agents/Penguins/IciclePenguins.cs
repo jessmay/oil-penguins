@@ -79,9 +79,7 @@ public class IciclePenguins : GameAgent {
 			// otherwise the penguin will stay in its current state
 			aStar.setSource (transform.position);
 			aStar.setTarget (pos);
-			bool a = aStar.aStar();
-
-			Debug.Log(a);
+			aStar.aStar();
 
 			selected = false;
         }
@@ -206,10 +204,11 @@ public class IciclePenguins : GameAgent {
 		// Debug code, if there exists an A* path currently and drawPath is true, will draw the nodes of the path on screen
 		if (drawPath && aStar.currPath != null) {
 			for(int i = 0; i < aStar.currPath.Count; i++){
-				Vector2 node = map.cellIndexToWorld(aStar.currPath[i]);
-				node.y*=-1;
+				Vector2 node = aStar.currPath[i];
+				/*node.y*=-1;
 				DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
-				node.y*=-1;
+				node.y*=-1;*/
+				DebugRenderer.drawCircleWorld(node, 1.0f, Color.red);
 			}
 		}
 
