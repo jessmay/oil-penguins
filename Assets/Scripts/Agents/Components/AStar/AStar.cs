@@ -78,12 +78,24 @@ public class AStar {
 				//reconstruct path with the from list
 				currPath = new List<Vector2>();
 				currPath = createPath(from, currNode);
+				
+				currPath.Insert(0, source);
+                currPath.Add(target);
+
 				prevPath = currPath;
 
-				currPath.Insert(0, source);
-				currPath.Add(target);
+				/*Debug.Log ("PREVPATH");
+				for(int i = 0; i < prevPath.Count;i++)
+					Debug.Log(prevPath[i].ToString());*/
 
+				// TODO FIX THE PATH SMOOTHS
 				//pathSmoothQuick();//TODO test if want to use quick or precise
+
+				/*Debug.Log("currpath");
+				for(int i = 0; i < currPath.Count;i++)
+					Debug.Log(currPath[i].ToString());*/
+                
+
 				hasPath = true;
 				return true; 
 			}
@@ -234,6 +246,8 @@ public class AStar {
 				pathIndex = 0;
 				findTarget = false;
 				hasPath = false;
+
+				//Debug.Log("FALSE");
 			}
 			//Otherwise seek towards the current goal location in the aStar path
 			else {	

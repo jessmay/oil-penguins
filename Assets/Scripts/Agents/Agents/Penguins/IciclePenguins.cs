@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class IciclePenguins : GameAgent {
 	
@@ -29,6 +30,7 @@ public class IciclePenguins : GameAgent {
 	//Sensor
 	public AdjacentAgents adjAgents {get; private set;}
 	
+
 	//Initialize the agent
 	protected override void initializeAgent(){
 		base.initializeAgent();
@@ -73,6 +75,7 @@ public class IciclePenguins : GameAgent {
 
 		//Check sensors for adj agents
 		sense ();
+		getClosestAttackable ();
 
 		//checkButtons ();
 		IPfsm.update ();
@@ -145,6 +148,44 @@ public class IciclePenguins : GameAgent {
 	// When an individual is clicked, it is selected using this function
 	void OnMouseUpAsButton(){
 		selected = true;
+	}
+
+	private void getClosestAttackable(){
+		//Find closest unobstructed human
+		Agent closestAgent = null;
+		float distance = float.MaxValue;
+		
+		//Loop though all agents within range
+		foreach(Agent agent in adjAgents.near) {
+			
+			//Calculate the vector between this penguin and the human.
+			Vector2 direction = agent.transform.position - transform.position;
+			
+			//if the human is not closer than what has already been found, ignore.
+			if(distance < direction.magnitude)
+				continue;
+			
+			//Raycast to see if there is line of sight to the human.
+			RaycastHit2D rayCastHit = Physics2D.Raycast((Vector2)transform.position + (direction.normalized * radius * 1.01f), direction.normalized, direction.magnitude);
+			
+			//If the object found is the same as the human we are considering, set as the current closest agent.
+			if(rayCastHit.collider.gameObject.GetInstanceID().Equals(agent.gameObject.GetInstanceID())) {
+				closestAgent = agent;
+				distance = direction.magnitude;
+			}
+		}
+
+		if(IPfsm.currentState.GetType() == typeof(IciclePenguinAttackState)) {
+			
+			//If in the attack state, and no penguins found, change back to the move state.
+			if(closestAgent == null) {
+				IPfsm.changeState(typeof(IciclePenguinChillinState));
+			}
+			//If in the attack state, and a penguin was found, update target to that penguin.
+			else {
+				((IciclePenguinAttackState)IPfsm.currentState).target = (HumanAgent)closestAgent;
+			}
+		}
 	}
 
 
