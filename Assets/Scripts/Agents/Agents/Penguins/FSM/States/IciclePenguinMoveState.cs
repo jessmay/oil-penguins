@@ -15,7 +15,7 @@ public class IciclePenguinMoveState : State {
 	
 	public override void enter(){
 		//updates the penguins sprite
-		IPfsm.penguin.GetComponent<SpriteRenderer>().sprite = IPfsm.penguin.penguinSprites [2];
+		IPfsm.penguin.GetComponent<SpriteRenderer>().sprite = IPfsm.penguin.penguinSprites [0];
 
 		IPfsm.penguin.aStar.findTarget = true;
 	}
