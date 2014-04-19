@@ -16,24 +16,24 @@ public class MainMenuStateMain : MainMenuState {
 
 		label.fontSize = 30;
 		
-		GUI.Label(new Rect(Screen.width/2 - width, Screen.height/2 - buttonHeight*3/2, width*2, buttonHeight),"Intellectual Penguins", label); //Change to logo
+		//GUI.Label(new Rect(Screen.width/2 - width, Screen.height/2 - buttonHeight*3/2, width*2, buttonHeight),"Intellectual Penguins", label); //Change to logo
 		
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2- buttonHeight + button.border.top, sWidth/2, buttonHeight),"Play", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - 2 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Play", button)) {
 
 			finiteStateMachine.changeState(typeof(MainMenuStateLoadMap), MainMenuStateLoadMap.FROM_PLAY_GAME);
 		}
 
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"High Scores", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - 1 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"High Scores", button)) {
 
 			//finiteStateMachine.changeState(typeof(MainMenuStateHighScores));
 		}
 
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Map Editor", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + 0 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Map Editor", button)) {
 
 			finiteStateMachine.changeState(typeof(MainMenuStateMapEditor));
 		}
 
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top) *2, sWidth/2, buttonHeight),"Train ANN", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + 1 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Train ANN", button)) {
 
 			finiteStateMachine.changeState(typeof(MainMenuStateTrainANN));
 		}

@@ -14,18 +14,18 @@ public class MainMenuStateMapEditor : MainMenuState {
 	public override void displayGraphics () {
 		base.displayGraphics();
 
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2- buttonHeight + button.border.top, sWidth/2, buttonHeight),"Create New", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - 2 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Create New", button)) {
 
 			finiteStateMachine.changeState(typeof(MainMenuStateMapEditorNew));
 		}
 		
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Load Map", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - 1 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Load Map", button)) {
 
 			finiteStateMachine.changeState(typeof(MainMenuStateLoadMap), MainMenuStateLoadMap.FROM_MAP_EDITOR);
 		}
 		
 		
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Back", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + 0 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Back", button)) {
 
 			finiteStateMachine.changeState(typeof(MainMenuStateMain));
 		}

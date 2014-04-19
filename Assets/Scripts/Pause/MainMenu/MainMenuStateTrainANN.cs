@@ -18,19 +18,19 @@ public class MainMenuStateTrainANN : MainMenuState {
 		base.displayGraphics();
 		
 		
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2- buttonHeight + button.border.top, sWidth/2, buttonHeight),"Create New Population", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - 2 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Create New Population", button)) {
 
 			finiteStateMachine.changeState(typeof(MainMenuStateSelectGenome));
 				
 		}
 		
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Load Population", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - 1 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Load Population", button)) {
 			
 			finiteStateMachine.changeState(typeof(MainMenuStateLoadPop));
 		}
 		
 		
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Back", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + 0 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Back", button)) {
 			
 			finiteStateMachine.changeState(typeof(MainMenuStateMain));
 		}
