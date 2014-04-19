@@ -35,7 +35,7 @@ public class IciclePenguins : GameAgent {
 	protected override void initializeAgent(){
 		base.initializeAgent();
 
-		adjAgents = new AdjacentAgents (this, radius * 2, grid, typeof(HumanAgent));//TODO play around with radius value; smaller than humans
+		adjAgents = new AdjacentAgents (this, radius * 8, grid, typeof(HumanAgent));//TODO play around with radius value; smaller than humans
 
 		aStar = new AStar (this);
 		
@@ -187,9 +187,8 @@ public class IciclePenguins : GameAgent {
 			}
 		}
 	}
-
-
-	protected override bool isControllable(){return false;}
+    
+    protected override bool isControllable(){return false;}
 	
 	protected override void DrawDebugInformation(){
 		//Debug code, if drawSource is true, an 'S' will be drawn on the background where the source node is located

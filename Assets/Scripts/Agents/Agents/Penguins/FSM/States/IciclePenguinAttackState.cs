@@ -31,6 +31,9 @@ public class IciclePenguinAttackState : State {
 		//(Does this mean we should make an abstract attack state?)
 		if(nextShotTime == -1)
 			nextShotTime = Time.time;
+
+		if(target != null)
+			IPfsm.penguin.seek(target.transform.position);
 	}
 	
 	public override void exit(){}
@@ -39,18 +42,13 @@ public class IciclePenguinAttackState : State {
 	public override void update(){
 		//attack hoomans
 
-		IPfsm.penguin.seek ((Vector2)target.transform.position);
+		double distanceToTarget = IPfsm.penguin.distanceBetweenPoint (target.transform.position);
 
-		//Find the angle between the penguin's heading and the target human.
-		double angleToTarget = IPfsm.penguin.getAngleToPoint(target.transform.position);
-		
-		//If not facing the target, turn towards it.
-		if(angleToTarget != 0) {
-			IPfsm.penguin.turn(Mathf.Clamp((float)angleToTarget, -1.0f, 1.0f));
-		}
+		if (distanceToTarget > target.getRadius () + IPfsm.penguin.getRadius() + IPfsm.penguin.getRadius())
+			IPfsm.penguin.seek (target.transform.position);
 		//If facing the target and cooldown time has passed, shoot penguin.
 		else if(nextShotTime <= Time.time){
-			//IPfsm.penguin.club();
+			club();
 			nextShotTime = Time.time + shotCoolDownTime;
 		}
 
@@ -69,5 +67,16 @@ public class IciclePenguinAttackState : State {
 	protected override bool isValidStatus(int statusCode){
 		return (statusCode == DEFAULT_CODE);
 	}
-	
+
+	public void club() {
+		IPfsm.penguin.turn (IPfsm.penguin.getTurnStep());
+		
+		//Deal damage
+		GameAgent gameAgent = target.GetComponent<GameAgent>();
+		if(gameAgent != null) {
+			gameAgent.addInfliction(new Infliction(200, 0.10f));
+        }
+        
+		IPfsm.penguin.turn (-IPfsm.penguin.getTurnStep());
+    }
 }
