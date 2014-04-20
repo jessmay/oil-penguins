@@ -102,6 +102,10 @@ public class IciclePenguins : GameAgent {
 	//Render non debug information here
 	protected override void drawStatus () {
 		base.drawStatus();
+
+		if (selected) {
+			DebugRenderer.drawCircle(getCenterCameraSpace(), getRadiusCameraSpace(), Color.white);
+		}
 	}
 
 	//Get information about the environment.
@@ -110,9 +114,6 @@ public class IciclePenguins : GameAgent {
 		adjAgents.calculate();
 	}
 
-	//A* info
-
-	//Check for button presses (or mouse clicks) here
 
 	//Check for debug button presses
 	protected override void checkButtons () {

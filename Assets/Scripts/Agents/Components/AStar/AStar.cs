@@ -84,17 +84,7 @@ public class AStar {
 
 				prevPath = currPath;
 
-				/*Debug.Log ("PREVPATH");
-				for(int i = 0; i < prevPath.Count;i++)
-					Debug.Log(prevPath[i].ToString());*/
-
-				// TODO FIX THE PATH SMOOTHS
-				//pathSmoothQuick();//TODO test if want to use quick or precise
-
-				/*Debug.Log("currpath");
-				for(int i = 0; i < currPath.Count;i++)
-					Debug.Log(currPath[i].ToString());*/
-                
+				pathSmoothPrecise();
 
 				hasPath = true;
 				return true; 
@@ -161,44 +151,36 @@ public class AStar {
 	}
 
 	private void pathSmoothQuick(){
-		List<Vector2> newPath = new List<Vector2> ();
 		int index1 = 0;
-		int index2 = 1;
-
-		newPath.Add (currPath [index1]);
+		int index2 = 2;
 
 		while (index2 < currPath.Count) {
 			if(canWalkBetween(currPath[index1], currPath[index2])){
 				//don't put the item at index2 in the path, look at next item
-				index2++;
+				currPath.RemoveAt(index2-1);
 			}
 			else{
-				newPath.Add(currPath[index2]);
-				index1 = index2;
+				index1++;
 				index2++;
 			}
 		}
-
-		currPath = newPath;
 	}
 
 	private void pathSmoothPrecise(){
-		List<Vector2> newPath = new List<Vector2> ();
 		int index1 = 0;
 		int index2 = 0;
 
-		newPath.Add (currPath [index1]);
-
 		while (index1 < currPath.Count-1) {
-			index2 = index1+1;
+			index2 = index1+2;
 
-			while(index2 < currPath.Count-1){
+			while(index2 < currPath.Count){
 
 				if(canWalkBetween(currPath[index1], currPath[index2])){
-					index1 = index2-1;
+					//currPath.RemoveAt(index2-1);
+					currPath.RemoveRange(index1+1, index2-index1-1);
+					index2 = index1+2;
 				}
 				else{
-					newPath.Add(currPath[index2]);
 					index2++;
 				}
 			}
@@ -219,7 +201,7 @@ public class AStar {
 		Vector3 radDirection = Vector3.Cross (pointPath, agent.transform.forward);
 
 		//Normalize the vector
-		Vector3.Normalize (radDirection);
+		radDirection = Vector3.Normalize (radDirection);
 
 		//Multiply by the radius of the agent
 		radDirection = radDirection * agent.getRadius ();
@@ -242,12 +224,10 @@ public class AStar {
 		if(findTarget){
 			
 			//If the player is at the target, no more need to find the target
-			if(agent.distanceBetweenPoint(target) <= (.5 * agent.transform.localScale.x)){//(Vector2)agent.transform.position == target
+			if(agent.distanceBetweenPoint(target) <= (.5 * agent.transform.localScale.x) || pathIndex == currPath.Count){//(Vector2)agent.transform.position == target
 				pathIndex = 0;
 				findTarget = false;
 				hasPath = false;
-
-				//Debug.Log("FALSE");
 			}
 			//Otherwise seek towards the current goal location in the aStar path
 			else {	
