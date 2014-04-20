@@ -29,7 +29,7 @@ public class Options {
 		play = false;
 
 		if(File.Exists(HighScoresDirectory +"/"+ HighScores.HighScoresFileName))
-			highScores = HighScores.load (HighScoresDirectory +"/"+ HighScores.HighScoresFileName);
+			highScores = HighScores.load (File.ReadAllText(HighScoresDirectory +"/"+ HighScores.HighScoresFileName));
 		else {
 			highScores = new HighScores();
 			Directory.CreateDirectory(HighScoresDirectory);

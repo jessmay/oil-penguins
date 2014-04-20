@@ -28,6 +28,8 @@ public class GameMap : MonoBehaviour{
 
 	public float gameStartTime {get; private set;}
 
+	public int numPenguinsSpawnable = 3;
+
 	void Awake() {
 
 		HumansOnMap = new List<GameObject>();
@@ -41,11 +43,19 @@ public class GameMap : MonoBehaviour{
 		}
 		Options.gameMap = this;
 
+	}
+
+	void Start() {
+
+		if(!Options.play)
+			return;
+
+
 		gameStartTime = Time.time;
 
-//		for(int currPenguin = 0; currPenguin < 5; ++currPenguin) {
-//			spawnPenguin();
-//		}
+		while(numPenguinsSpawnable > 0) {
+			spawnPenguin();
+		}
 	}
 
 	void FixedUpdate() {
@@ -115,7 +125,9 @@ public class GameMap : MonoBehaviour{
 	//Spawns a penguin at the given location after a delay.
 	// Penguins face towards the center of the map.
 	IEnumerator spawnPenguin(float delay, Vector2 location) {
-		
+
+		--numPenguinsSpawnable;
+
 		yield return new WaitForSeconds(delay);
 		
 		Debug.Log("Spawning new penguin at "+ map.cellIndexToWorld(location));

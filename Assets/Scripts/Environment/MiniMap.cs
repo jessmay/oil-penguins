@@ -33,7 +33,8 @@ public class MiniMap : MonoBehaviour {
 		onScreenSize = new Vector2(max * (maxPixelSize/(float)Screen.width) * size.x, max * (maxPixelSize/(float)Screen.width) * size.y);
 		//onScreenSize = new Vector2((max*percentOfScreen*size.x), (max*percentOfScreen*size.y));
 		
-		locationOnScreen = new Vector2(Screen.width - 10 - (maxPixelSize/2 - Mathf.Min(onScreenSize.x/2, maxPixelSize/2)), Screen.height - 10 + maxPixelSize/2 - Mathf.Min(onScreenSize.y/2, maxPixelSize/2));
+		//locationOnScreen = new Vector2(Screen.width - 10 - (maxPixelSize/2 - Mathf.Min(onScreenSize.x/2, maxPixelSize/2)), Screen.height - 10 + maxPixelSize/2 - Mathf.Min(onScreenSize.y/2, maxPixelSize/2));
+		locationOnScreen = getLocationOnScreen(new Vector2(Screen.width, Screen.height));
 	}
 
 	void Update() {
@@ -84,18 +85,23 @@ public class MiniMap : MonoBehaviour {
 		return location.x < locationOnScreen.x && location.x > locationOnScreen.x - onScreenSize.x && Screen.height - location.y < locationOnScreen.y && Screen.height - location.y > locationOnScreen.y - onScreenSize.y;
 	}
 
+	public Vector2 getLocationOnScreen(Vector2 bottomCorner) {
+
+		return new Vector2(bottomCorner.x - 10 - (maxPixelSize/2 - Mathf.Min(onScreenSize.x/2, maxPixelSize/2)), bottomCorner.y - 10 + maxPixelSize/2 - Mathf.Min(onScreenSize.y/2, maxPixelSize/2));
+	}
+
 	public void OnGUI() {
 
 		if(!Options.play)
-			DisplayMiniMap();
+			DisplayMiniMap(locationOnScreen);
 	}
 
-	public void DisplayMiniMap() {
+	public void DisplayMiniMap(Vector2 coord) {
 
 		if(!display)
 			return;
 
-		Vector2 coord = locationOnScreen - onScreenSize;
+		coord -= onScreenSize;
 		//coord.y = Screen.height - coord.y;
 
 		GUI.enabled = !pauseMenu.isPaused();

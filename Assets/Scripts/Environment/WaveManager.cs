@@ -79,15 +79,15 @@ public class WaveManager : MonoBehaviour {
 
 		previousWaveFinishTime = Time.time;
 
-		//Notify all penguins to wake up.
+		++gameMap.numPenguinsSpawnable;
 
+		//Notify all penguins to wake up.
 		//gameMap.sleepingPenguins = 0;
 
 
 
 
 		
-		//3 starting humans
 		int numHumansToSpawn = humansPerWave(waveNumber);
 		
 		expectedTotalHumansSpawned = gameMap.totalHumansSpawned + numHumansToSpawn;

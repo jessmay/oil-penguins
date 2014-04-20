@@ -49,7 +49,7 @@ public class MapMakerMenuState : GUIState {
 		}
 
 		//Back to main menu
-		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top) *3, sWidth/2, buttonHeight),"Back to menu", button)) {
+		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top) *3, sWidth/2, buttonHeight),"Back to Menu", button)) {
 			
 			finiteStateMachine.pauseMenu.unPause();
 			Application.LoadLevel("StartMenu");

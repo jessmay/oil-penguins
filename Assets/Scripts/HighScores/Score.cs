@@ -8,12 +8,14 @@ public class Score : IComparable<Score> {
 	public int killedHumans {get; private set;}
 	public float timePlayed {get; private set;}
 	private DateTime dayScored;
+	public string mapName {get; private set;}
 
-	public Score(int waveReached, int killedHumans, float timePlayed, DateTime dayScored) {
+	public Score(int waveReached, int killedHumans, float timePlayed, string mapName, DateTime dayScored) {
 
 		this.waveReached = waveReached;
 		this.killedHumans = killedHumans;
 		this.timePlayed = timePlayed;
+		this.mapName = mapName;
 		this.dayScored = dayScored;
 	}
 	
@@ -41,11 +43,11 @@ public class Score : IComparable<Score> {
 	}
 	
 	public string save() {
-		return waveReached +" " +killedHumans +" " + timePlayed + " " + dayScored.Ticks;
+		return waveReached +" " +killedHumans +" " + timePlayed + " " + mapName +" " + dayScored.Ticks;
 	}
 
 	public static Score load(string contents) {
 		string[] values = contents.Split(new char[] {' '});
-		return new Score(Convert.ToInt32(values[0]), Convert.ToInt32(values[1]), Convert.ToSingle(values[2]), new DateTime(Convert.ToInt64(values[3]))); 
+		return new Score(Convert.ToInt32(values[0]), Convert.ToInt32(values[1]), Convert.ToSingle(values[2]),values[3] , new DateTime(Convert.ToInt64(values[4]))); 
 	}
 }

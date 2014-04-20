@@ -88,7 +88,7 @@ public class PlayGamePauseStateGameOver : PlayGamePauseState {
 	public override void enter () {
 
 		//Add score to the high scores list.
-		Options.highScores.addScore(new Score(waveManager.waveNumber, gameMap.humansKilled, Time.time - gameMap.gameStartTime, System.DateTime.Now));
+		Options.highScores.addScore(new Score(waveManager.waveNumber, gameMap.humansKilled, Time.time - gameMap.gameStartTime, gameMap.map.name, System.DateTime.Now));
 
 	}
 
