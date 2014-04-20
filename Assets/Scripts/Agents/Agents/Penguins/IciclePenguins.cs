@@ -60,7 +60,7 @@ public class IciclePenguins : GameAgent {
 			IPfsm.changeState(typeof(IciclePenguinMoveState));
 		}
 
-		if(selected && Input.GetMouseButtonDown (0)){
+		if(selected && Input.GetMouseButtonDown (0) && DebugRenderer.currentCamera.GetComponent<CameraController>().mouseInBounds()){
 			//Position of the second mouse click
 			Vector2 pos = DebugRenderer.currentCamera.ScreenToWorldPoint (Input.mousePosition);
 
@@ -70,9 +70,7 @@ public class IciclePenguins : GameAgent {
 			// otherwise the penguin will stay in its current state
 			aStar.setSource (transform.position);
 			aStar.setTarget (pos);
-			aStar.aStar();
-
-			selected = false;
+			selected = !aStar.aStar();
         }
 
 		//Right mouse click deselects
