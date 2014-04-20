@@ -11,6 +11,8 @@ public class IciclePenguinAttackState : State {
 
 	public Agent targetAgent;
 
+	private float turnAngle;
+
 	private IciclePenguinFSM IPfsm;
 	
 	public IciclePenguinAttackState (IciclePenguinFSM fsm) : base(fsm) {
@@ -34,6 +36,8 @@ public class IciclePenguinAttackState : State {
 
 		if(target != null)
 			IPfsm.penguin.seek(target.transform.position);
+
+		turnAngle = 3*IPfsm.penguin.getTurnStep ();
 	}
 	
 	public override void exit(){}
@@ -46,9 +50,19 @@ public class IciclePenguinAttackState : State {
 
 		if (distanceToTarget > target.getRadius () + IPfsm.penguin.getRadius() + IPfsm.penguin.getRadius())
 			IPfsm.penguin.seek (target.transform.position);
+
+		//Find the angle between the human's heading and the target penguin.
+		double angleToTarget = IPfsm.penguin.getAngleToPoint(target.transform.position);
+		
+		//If not facing the target, turn towards it.
+		if(angleToTarget != 0) {
+			IPfsm.penguin.turn(Mathf.Clamp((float)angleToTarget, -1.0f, 1.0f));
+        }
+
 		//If facing the target and cooldown time has passed, shoot penguin.
 		else if(nextShotTime <= Time.time){
-			club();
+			turnAngle = -1.0f * turnAngle;
+			IPfsm.penguin.turn (turnAngle);
 			nextShotTime = Time.time + shotCoolDownTime;
 		}
 
@@ -67,16 +81,5 @@ public class IciclePenguinAttackState : State {
 	protected override bool isValidStatus(int statusCode){
 		return (statusCode == DEFAULT_CODE);
 	}
-
-	public void club() {
-		IPfsm.penguin.turn (IPfsm.penguin.getTurnStep());
-		
-		//Deal damage
-		GameAgent gameAgent = target.GetComponent<GameAgent>();
-		if(gameAgent != null) {
-			gameAgent.addInfliction(new Infliction(200, 0.10f));
-        }
-        
-		IPfsm.penguin.turn (-IPfsm.penguin.getTurnStep());
-    }
+	
 }
