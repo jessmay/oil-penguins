@@ -346,39 +346,40 @@ public class Map : IDisposable {
 	}
 
 
-	/*// Assignment 2 adjacent node sensor
-	// adjacent node sensor will detect nearby nodes (those nodes within one cell of the given agent)
-	public List<Vector2> getNearNodes(Agent a){
-		List<Vector2> nearNodes = new List<Vector2> ();
 
-		Vector2 myCell = getCellIndex (a.renderer.bounds.center);
+
+	public Vector2 getMovableCoord(Vector2 coord, float radius) {
 		
-		for (int i = -1; i < 2; i++) {
-			for(int j = -1; j < 2; j++){
-				Vector2 newVec = new Vector2(myCell.x+i, myCell.y+j);
-
-				//if the location is not inbounds, ignore it
-				if(!inBounds(newVec))
-					continue;
-
-				//if the location is moveable to, add it to the nearNodes list
-				if(canMove[(int)newVec.x, (int)newVec.y]){
-
-					//Corner case!
-					if(Mathf.Abs(i) == Mathf.Abs(j) && !canMove[(int)newVec.x,(int)myCell.y] && !canMove[(int)myCell.x,(int)newVec.y]){
-						continue;
-					}
-
-					nearNodes.Add(newVec);
-
-				}
+		int[] dx = {0, 1, 0, -1};
+		int[] dy = {1, 0, -1, 0};
+		
+		Vector2 newCoord = coord;
+		Vector2 currCellWorld = cellIndexToWorld(getCellIndex(coord));
+		
+		for (int currDir = 0; currDir < 4; ++currDir) {
+			
+			Vector2 direction = new Vector2(dx[currDir], dy[currDir]);
+			Vector2 testLoc = newCoord + direction * radius;
+			Vector2 testCell = getCellIndex(testLoc);
+			
+			if(testCell == getCellIndex(coord))
+				continue;
+			
+			if(!inBounds(testCell) || !canMove[(int)testCell.x,(int)testCell.y]) {
+				
+				Vector2 edge = new Vector2(currCellWorld.x + direction.x * (xSize/2), currCellWorld.y + direction.y * (ySize/2));
+				
+				Vector2 diff = new Vector2((testLoc.x - edge.x) * Mathf.Abs(dx[currDir]), (testLoc.y - edge.y) * Mathf.Abs(dy[currDir]));
+				newCoord -= diff;
+				
+				//Debug.Log("Diff for direction["+dx[currDir]+"]["+dy[currDir]+"]: "+diff);
 			}
 		}
 		
-		return nearNodes;
-	}*/
-
-
+		//Debug.Log("Original: "+coord +" New: "+newCoord);
+		
+		return newCoord;
+	}
 
 
 

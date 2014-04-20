@@ -63,7 +63,9 @@ public class IciclePenguins : GameAgent {
 		if(selected && Input.GetMouseButtonDown (0)){
 			//Position of the second mouse click
 			Vector2 pos = DebugRenderer.currentCamera.ScreenToWorldPoint (Input.mousePosition);
-			
+
+			pos = map.getMovableCoord(pos, radius);
+
 			// if there is an AStar path, FSM will change state to move state
 			// otherwise the penguin will stay in its current state
 			aStar.setSource (transform.position);
