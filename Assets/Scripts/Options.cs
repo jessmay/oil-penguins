@@ -28,8 +28,9 @@ public class Options {
 		Testing = false;
 		play = false;
 
-		if(File.Exists(HighScoresDirectory +"/"+ HighScores.HighScoresFileName))
+		if(File.Exists(HighScoresDirectory +"/"+ HighScores.HighScoresFileName)) {
 			highScores = HighScores.load (File.ReadAllText(HighScoresDirectory +"/"+ HighScores.HighScoresFileName));
+		}
 		else {
 			highScores = new HighScores();
 			Directory.CreateDirectory(HighScoresDirectory);

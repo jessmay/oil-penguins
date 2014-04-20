@@ -25,7 +25,7 @@ public class MainMenuStateMain : MainMenuState {
 
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 - 1 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"High Scores", button)) {
 
-			//finiteStateMachine.changeState(typeof(MainMenuStateHighScores));
+			finiteStateMachine.changeState(typeof(MainMenuStateHighScores));
 		}
 
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + 0 * (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Map Editor", button)) {

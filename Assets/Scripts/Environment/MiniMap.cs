@@ -87,7 +87,7 @@ public class MiniMap : MonoBehaviour {
 
 	public Vector2 getLocationOnScreen(Vector2 bottomCorner) {
 
-		return new Vector2(bottomCorner.x - 10 - (maxPixelSize/2 - Mathf.Min(onScreenSize.x/2, maxPixelSize/2)), bottomCorner.y - 10 + maxPixelSize/2 - Mathf.Min(onScreenSize.y/2, maxPixelSize/2));
+		return locationOnScreen = new Vector2(bottomCorner.x - 10 - (maxPixelSize/2 - Mathf.Min(onScreenSize.x/2, maxPixelSize/2)), bottomCorner.y - 10 + maxPixelSize/2 - Mathf.Min(onScreenSize.y/2, maxPixelSize/2));
 	}
 
 	public void OnGUI() {

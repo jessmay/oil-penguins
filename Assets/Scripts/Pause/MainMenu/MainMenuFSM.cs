@@ -23,5 +23,7 @@ public class MainMenuFSM : GUIFSM {
 		addState(new MainMenuStateTrainANN(this));
 		addState(new MainMenuStateLoadPop(this));
 		addState(new MainMenuStateSelectGenome(this));
+
+		addState(new MainMenuStateHighScores(this));
 	}
 }

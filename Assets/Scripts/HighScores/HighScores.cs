@@ -55,7 +55,7 @@ public class HighScores {
 			scores[currScore] = Score.load(scoresText[currScore]);
 		}
 
-		return new HighScores();
+		return new HighScores(scores);
 	}
 
 }

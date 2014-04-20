@@ -58,9 +58,7 @@ public class GameMap : MonoBehaviour{
 		}
 	}
 
-	void FixedUpdate() {
-
-	}
+	void Update() {}
 
 
 	private void createMap(string mapName, Vector2 mapSize) {
@@ -130,7 +128,7 @@ public class GameMap : MonoBehaviour{
 
 		yield return new WaitForSeconds(delay);
 		
-		Debug.Log("Spawning new penguin at "+ map.cellIndexToWorld(location));
+		//Debug.Log("Spawning new penguin at "+ map.cellIndexToWorld(location));
 		GameObject penguin = Agent.CreateAgent(Penguin, map.cellIndexToWorld(location) + new Vector3(Random.value*2-1, Random.value*2-1,0), Quaternion.LookRotation(transform.forward, Vector3.zero - map.cellIndexToWorld(location)), this);
 
 		//Initialize penguin specific values

@@ -32,12 +32,12 @@ public class WaveManager : MonoBehaviour {
 
 	void Update() {
 		
-		if(Input.GetKeyUp(KeyCode.K)) {
-
-			foreach(GameObject human in gameMap.HumansOnMap) {
-				human.GetComponent<HumanAgent>().onDeath();
-			}
-		}
+//		if(Input.GetKeyUp(KeyCode.K)) {
+//
+//			foreach(GameObject human in gameMap.HumansOnMap) {
+//				human.GetComponent<HumanAgent>().onDeath();
+//			}
+//		}
 	}
 
 	// Update is called once per frame
