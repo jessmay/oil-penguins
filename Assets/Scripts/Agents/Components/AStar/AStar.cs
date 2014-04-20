@@ -86,7 +86,8 @@ public class AStar {
 
 				pathSmoothPrecise();
 
-				currGoal = currPath[1];
+				currPath.RemoveAt(0);
+				currGoal = currPath[0];
 
 				hasPath = true;
 				return true; 
