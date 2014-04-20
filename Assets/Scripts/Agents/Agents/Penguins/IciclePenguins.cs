@@ -35,7 +35,7 @@ public class IciclePenguins : GameAgent {
 	protected override void initializeAgent(){
 		base.initializeAgent();
 
-		adjAgents = new AdjacentAgents (this, radius * 8, grid, typeof(HumanAgent));//TODO play around with radius value; smaller than humans
+		adjAgents = new AdjacentAgents (this, radius * 11, grid, typeof(HumanAgent));//TODO play around with radius value; smaller than humans
 
 		aStar = new AStar (this);
 		
@@ -170,7 +170,7 @@ public class IciclePenguins : GameAgent {
 			RaycastHit2D rayCastHit = Physics2D.Raycast((Vector2)transform.position + (direction.normalized * radius * 1.01f), direction.normalized, direction.magnitude);
 			
 			//If the object found is the same as the human we are considering, set as the current closest agent.
-			if(rayCastHit.collider.gameObject.GetInstanceID().Equals(agent.gameObject.GetInstanceID())) {
+			if(rayCastHit.collider != null && rayCastHit.collider.gameObject.GetInstanceID().Equals(agent.gameObject.GetInstanceID())) {
 				closestAgent = agent;
 				distance = direction.magnitude;
 			}
@@ -233,9 +233,6 @@ public class IciclePenguins : GameAgent {
 		if (drawPath && aStar.currPath != null) {
 			for(int i = 0; i < aStar.currPath.Count; i++){
 				Vector2 node = aStar.currPath[i];
-				/*node.y*=-1;
-				DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
-				node.y*=-1;*/
 				DebugRenderer.drawCircleWorld(node, 1.0f, Color.red);
 			}
 			for(int j = 0; j < aStar.prevPath.Count; j++){

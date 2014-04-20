@@ -24,7 +24,7 @@ public class IcicleClub : MonoBehaviour {
 		//Deal damage
 		GameAgent gameAgent = target.GetComponent<GameAgent>();
 		if(gameAgent != null) {
-			gameAgent.addInfliction(new Infliction(200, 0.10f));
+			gameAgent.addInfliction(new Infliction(10, 2.5f));
 		}
 		
 	}

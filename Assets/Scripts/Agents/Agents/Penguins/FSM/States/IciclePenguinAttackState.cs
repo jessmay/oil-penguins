@@ -12,6 +12,7 @@ public class IciclePenguinAttackState : State {
 	public Agent targetAgent;
 
 	private float turnAngle;
+	private int turnCount;
 
 	private IciclePenguinFSM IPfsm;
 	
@@ -37,7 +38,8 @@ public class IciclePenguinAttackState : State {
 		if(target != null)
 			IPfsm.penguin.seek(target.transform.position);
 
-		turnAngle = 3*IPfsm.penguin.getTurnStep ();
+		turnAngle = IPfsm.penguin.getTurnStep ();
+		turnCount = 0;
 	}
 	
 	public override void exit(){}
@@ -45,24 +47,43 @@ public class IciclePenguinAttackState : State {
 	//check if need to move to new state
 	public override void update(){
 		//attack hoomans
-
 		double distanceToTarget = IPfsm.penguin.distanceBetweenPoint (target.transform.position);
 
-		if (distanceToTarget > target.getRadius () + IPfsm.penguin.getRadius() + IPfsm.penguin.getRadius())
+		if (distanceToTarget > target.getRadius () + IPfsm.penguin.getRadius () * 1.5) {
+			Debug.Log("seeking");
 			IPfsm.penguin.seek (target.transform.position);
+			return;
+		}
+		else{
+			if (turnCount < 20 && turnCount > 0) {
+				Debug.Log("attacking one way" + turnCount);
+				IPfsm.penguin.turn (turnAngle);
+				turnCount++;
+			}
+			else if(turnCount >= 20){
+				Debug.Log("need to attack da other way" + turnCount);
+				IPfsm.penguin.turn (-turnAngle);
+				turnCount++;
+				if(turnCount >= 40){
+					turnCount = 0;
+				}
+			}
+		}
 
 		//Find the angle between the human's heading and the target penguin.
 		double angleToTarget = IPfsm.penguin.getAngleToPoint(target.transform.position);
 		
 		//If not facing the target, turn towards it.
-		if(angleToTarget != 0) {
-			IPfsm.penguin.turn(Mathf.Clamp((float)angleToTarget, -1.0f, 1.0f));
+		if(angleToTarget != 0 && turnCount == 0) {
+			Debug.Log("turn to human");
+			IPfsm.penguin.turn(Mathf.Clamp((float)angleToTarget, -IPfsm.penguin.getTurnStep(), IPfsm.penguin.getTurnStep()));
         }
 
-		//If facing the target and cooldown time has passed, shoot penguin.
-		else if(nextShotTime <= Time.time){
-			turnAngle = -1.0f * turnAngle;
+		//If facing the target and cooldown time has passed, club human
+		else if(nextShotTime <= Time.time && turnCount == 0){
+			Debug.Log("Begin attack at time " + Time.time);
 			IPfsm.penguin.turn (turnAngle);
+			turnCount++;
 			nextShotTime = Time.time + shotCoolDownTime;
 		}
 

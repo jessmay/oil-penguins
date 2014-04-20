@@ -86,6 +86,8 @@ public class AStar {
 
 				pathSmoothPrecise();
 
+				currGoal = currPath[1];
+
 				hasPath = true;
 				return true; 
 			}
