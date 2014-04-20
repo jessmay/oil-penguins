@@ -111,7 +111,9 @@ public class IciclePenguins : GameAgent {
 		base.drawStatus();
 
 		if (selected) {
-			DebugRenderer.drawCircle(getCenterCameraSpace(), getRadiusCameraSpace(), Color.white);
+			Vector3 center = getCenterCameraSpace();
+			float camRadius = getRadiusCameraSpace();
+			DebugRenderer.drawLineRect(new Rect(center.x-camRadius*1.5f, center.y-camRadius*1.5f, camRadius*3.0f, camRadius*3.0f), 2.0f, Color.green);
 		}
 	}
 
