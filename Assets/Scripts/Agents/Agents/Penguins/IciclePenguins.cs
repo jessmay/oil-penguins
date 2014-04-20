@@ -73,6 +73,11 @@ public class IciclePenguins : GameAgent {
 			selected = false;
         }
 
+		//Right mouse click deselects
+		if (selected && Input.GetMouseButtonDown (1)) {
+			selected = false;
+		}
+
 		//Check sensors for adj agents
 		sense ();
 		getClosestAttackable ();
@@ -187,6 +192,11 @@ public class IciclePenguins : GameAgent {
 				((IciclePenguinAttackState)IPfsm.currentState).target = (HumanAgent)closestAgent;
 			}
 		}
+	}
+
+	public new void addInfliction(Infliction infliction) {
+		if(IPfsm.currentState.GetType() != typeof(IciclePenguinSleepState))
+			base.addInfliction(infliction);
 	}
     
     protected override bool isControllable(){return false;}

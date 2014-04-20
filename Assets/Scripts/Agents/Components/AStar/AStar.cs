@@ -169,17 +169,19 @@ public class AStar {
 	}
 
 	private void pathSmoothPrecise(){
+		List<Vector2> newPath = new List<Vector2> (currPath);
+
 		int index1 = 0;
 		int index2 = 0;
 
-		while (index1 < currPath.Count-1) {
+		while (index1 < newPath.Count-1) {
 			index2 = index1+2;
 
-			while(index2 < currPath.Count){
+			while(index2 < newPath.Count){
 
-				if(canWalkBetween(currPath[index1], currPath[index2])){
+				if(canWalkBetween(newPath[index1], newPath[index2])){
 					//currPath.RemoveAt(index2-1);
-					currPath.RemoveRange(index1+1, index2-index1-1);
+					newPath.RemoveRange(index1+1, index2-index1-1);
 					index2 = index1+2;
 				}
 				else{
@@ -189,6 +191,8 @@ public class AStar {
 
 			index1++;
 		}
+
+		currPath = newPath;
 	}
 
 	// Checks if an agent can walk between two given points
