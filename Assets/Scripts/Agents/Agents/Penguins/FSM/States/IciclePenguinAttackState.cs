@@ -13,6 +13,7 @@ public class IciclePenguinAttackState : State {
 
 	private float turnAngle;
 	private int turnCount;
+	public bool rotating;
 
 	private IciclePenguinFSM IPfsm;
 	
@@ -40,16 +41,19 @@ public class IciclePenguinAttackState : State {
 
 		turnAngle = IPfsm.penguin.getTurnStep ();
 		turnCount = 0;
+		rotating = false;
 	}
 	
-	public override void exit(){}
+	public override void exit(){
+		rotating = false;
+	}
 	
 	//check if need to move to new state
 	public override void update(){
 		//attack hoomans
 		double distanceToTarget = IPfsm.penguin.distanceBetweenPoint (target.transform.position);
 
-		if (distanceToTarget > target.getRadius () + IPfsm.penguin.getRadius () * 1.5) {
+		if (distanceToTarget > target.getRadius () + IPfsm.penguin.getRadius () * 1.3) {
 			IPfsm.penguin.seek (target.transform.position);
 			return;
 		}
@@ -63,6 +67,7 @@ public class IciclePenguinAttackState : State {
 				turnCount++;
 				if(turnCount >= 40){
 					turnCount = 0;
+					rotating = false;
 				}
 			}
 		}
@@ -80,6 +85,7 @@ public class IciclePenguinAttackState : State {
 			IPfsm.penguin.turn (turnAngle);
 			turnCount++;
 			nextShotTime = Time.time + shotCoolDownTime;
+			rotating = true;
 		}
 
 		//Changes state if needed

@@ -3,20 +3,12 @@ using System.Collections;
 
 public class IcicleClub : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+	public IciclePenguins penguin;
 
 	void OnTriggerEnter2D(Collider2D collider) {
 
 		// Ignore if collision is with icicle penguin.
-		if(collider.gameObject.GetComponent<IciclePenguins>() != null)
+		if(collider.gameObject.GetComponent<IciclePenguins>() != null || !((IciclePenguinAttackState)penguin.IPfsm.getState(typeof(IciclePenguinAttackState))).rotating)
 			return;
 
 		GameObject target = collider.gameObject;
