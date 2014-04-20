@@ -31,7 +31,9 @@ public class MapMakerMenuState : GUIState {
 			
 			finiteStateMachine.changeState(typeof(MapMakerMenuStateSave));
 		}
-		
+
+
+		GUI.enabled = false;
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2, sWidth/2, buttonHeight),"Create New Map", button)) {
 
 		}
@@ -41,6 +43,8 @@ public class MapMakerMenuState : GUIState {
 			
 			//finiteStateMachine.changeState(typeof(TempMainMenuStateMapEditor));
 		}
+
+		GUI.enabled = true;
 
 		//Unpause
 		if(GUI.Button(new Rect(Screen.width/2 - sWidth/4, Screen.height/2 + (buttonHeight - button.border.top) *2, sWidth/2, buttonHeight),"Resume", button)) {
