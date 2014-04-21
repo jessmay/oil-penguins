@@ -87,7 +87,7 @@ public class MiniMap : MonoBehaviour {
 
 	public Vector2 getLocationOnScreen(Vector2 bottomCorner) {
 
-		return locationOnScreen = new Vector2(bottomCorner.x - 10 - (maxPixelSize/2 - Mathf.Min(onScreenSize.x/2, maxPixelSize/2)), bottomCorner.y - 10 + maxPixelSize/2 - Mathf.Min(onScreenSize.y/2, maxPixelSize/2));
+		return locationOnScreen = new Vector2(bottomCorner.x - 10 - (maxPixelSize/2 - Mathf.Min(onScreenSize.x/2, maxPixelSize/2)), bottomCorner.y - 10 - (maxPixelSize/2 - Mathf.Min(onScreenSize.y/2, maxPixelSize/2)));
 	}
 
 	public void OnGUI() {
@@ -102,11 +102,10 @@ public class MiniMap : MonoBehaviour {
 			return;
 
 		coord -= onScreenSize;
-		//coord.y = Screen.height - coord.y;
 
-		GUI.enabled = !pauseMenu.isPaused();
+		GUI.enabled = Options.Testing || !pauseMenu.isPaused();
 
-		DebugRenderer.currentCamera.orthographicSize = GUI.VerticalSlider( new Rect(coord.x - 15, coord.y, 10, onScreenSize.y), DebugRenderer.currentCamera.orthographicSize, CameraController.minCameraSize, CameraController.maxCameraSize);
+		DebugRenderer.currentCamera.orthographicSize = GUI.VerticalSlider( new Rect(coord.x - 15, coord.y - (maxPixelSize - onScreenSize.y)/2, 10, maxPixelSize), DebugRenderer.currentCamera.orthographicSize, CameraController.minCameraSize, CameraController.maxCameraSize);
 
 		GUI.enabled = true;
 
