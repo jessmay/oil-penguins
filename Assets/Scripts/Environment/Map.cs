@@ -350,20 +350,25 @@ public class Map : IDisposable {
 
 	public Vector2 getMovableCoord(Vector2 coord, float radius) {
 		
-		int[] dx = {0, 1, 0, -1};
-		int[] dy = {1, 0, -1, 0};
+		int[] dx = {0, 1, 0, -1, 1, 1, -1, -1};
+		int[] dy = {1, 0, -1, 0, 1, -1, 1, -1};
 		
 		Vector2 newCoord = coord;
 		Vector2 currCellWorld = cellIndexToWorld(getCellIndex(coord));
+
+		HashSet<Vector2> cellSeen = new HashSet<Vector2>();
+		cellSeen.Add(getCellIndex(coord));
 		
-		for (int currDir = 0; currDir < 4; ++currDir) {
+		for (int currDir = 0; currDir < dx.Length; ++currDir) {
 			
 			Vector2 direction = new Vector2(dx[currDir], dy[currDir]);
 			Vector2 testLoc = newCoord + direction * radius;
 			Vector2 testCell = getCellIndex(testLoc);
 			
-			if(testCell == getCellIndex(coord))
+			if(cellSeen.Contains(testCell))
 				continue;
+
+			cellSeen.Add(testCell);
 			
 			if(!inBounds(testCell) || !canMove[(int)testCell.x,(int)testCell.y]) {
 				
