@@ -43,11 +43,11 @@ public class Score : IComparable<Score> {
 	}
 	
 	public string save() {
-		return waveReached +" " +killedHumans +" " + timePlayed + " " + mapName +" " + dayScored.Ticks;
+		return waveReached +"|" +killedHumans +"|" + timePlayed + "|" + mapName +"|" + dayScored.Ticks;
 	}
 
 	public static Score load(string contents) {
-		string[] values = contents.Split(new char[] {' '});
+		string[] values = contents.Split(new char[] {'|'});
 		return new Score(Convert.ToInt32(values[0]), Convert.ToInt32(values[1]), Convert.ToSingle(values[2]),values[3] , new DateTime(Convert.ToInt64(values[4]))); 
 	}
 }

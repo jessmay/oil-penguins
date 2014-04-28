@@ -38,6 +38,10 @@ public class PlayGamePauseStateMain : PlayGamePauseState {
 		if(GUI.Button(new Rect(center.x - sWidth/4, center.y + (buttonHeight - button.border.top), sWidth/2, buttonHeight),"Return to Main Menu", button)) {
 
 			Application.LoadLevel("StartMenu");
+
+			if(gameMap.humansKilled > 0)
+				Options.highScores.addScore(new Score(waveManager.waveNumber, gameMap.humansKilled, Time.time - gameMap.gameStartTime, gameMap.map.name, System.DateTime.Now));
+
 			finiteStateMachine.pauseMenu.unPause();
 		}
 
