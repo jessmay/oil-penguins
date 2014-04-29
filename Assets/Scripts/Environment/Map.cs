@@ -61,9 +61,10 @@ public class Map : IDisposable {
 	//Construct a map based on the given image
 	public Map(string n, GameObject w, Texture2D map) {
 
-		init (n, w, map.width, map.height);
-
-		readMap(map);
+		//if(Options.play)
+			readMap(n, w, map);
+		//else
+		//	readMapForEditor(n, w, map);
 	}
 
 	//Initialize variables
@@ -109,25 +110,31 @@ public class Map : IDisposable {
 		return HumanSpawnPoints[Mathf.FloorToInt(UnityEngine.Random.value*HumanSpawnPoints.Count)];
 	}
 
+
+	public Vector2 getEdgeDirectionVector(Vector2 spawnPoint) {
+
+		Vector2 direction = Vector2.zero;
+		
+		if(spawnPoint.x < 1)
+			direction.x += 1;
+		else if (spawnPoint.x > mapWidth-2)
+			direction.x -= 1;
+		
+		if(spawnPoint.y < 1)
+			direction.y += 1;
+		else if (spawnPoint.y > mapHeight-2)
+			direction.y -= 1;
+
+		return direction;
+	}
+
 	public Quaternion getSpawnAngle(int spawnIndex) {
 		return getSpawnAngle(HumanSpawnPoints[spawnIndex]);
 	}
 
 	public Quaternion getSpawnAngle(Vector2 spawnPoint) {
 
-		Vector2 direction = Vector2.zero;
-
-		if(spawnPoint.x == 0)
-			direction.x += 1;
-		else if (spawnPoint.x == mapWidth-1)
-			direction.x -= 1;
-
-		if(spawnPoint.y == 0)
-			direction.y += 1;
-		else if (spawnPoint.y == mapHeight-1)
-			direction.y -= 1;
-		
-		return Quaternion.LookRotation(Vector3.forward, direction);
+		return Quaternion.LookRotation(Vector3.forward, getEdgeDirectionVector(spawnPoint));
 	}
 
 
@@ -137,7 +144,7 @@ public class Map : IDisposable {
 		mapHeight = height;
 
 		//Board to hold all walls
-		board = new GameObject[mapHeight,mapWidth];
+		board = new GameObject[mapHeight/2,mapWidth/2];
 
 		//contains whether or not a cell can be moved into based on walls
 		canMove = new bool[mapWidth, mapHeight];
@@ -171,29 +178,36 @@ public class Map : IDisposable {
 	}
 
 	//Place walls based off given map texture
-	private void readMap(Texture2D map) {
+	private void readMap(string n, GameObject w, Texture2D map) {
 
 		removeAllWalls();
 
-		createBoard(map.width, map.height);
+		w.transform.localScale = Vector3.one*0.5f;
 
+		init (n, w, map.width*2, map.height*2);
+
+		w.transform.localScale = Vector3.one;
+		
 		for (int x = 0; x < map.width; ++x) {
 			for (int y = 0; y < map.height; ++y) {
 
 				Color pixel = map.GetPixel(x,y);
 
 				if (pixel == WallColor) {
-					addWall(new Vector2(x, y));
+					addWall(new Vector2(2*x +0.5f, 2*y +0.5f));
+//					addWall(new Vector2(2*x +1, 2*y));
+//					addWall(new Vector2(2*x, 2*y +1));
+//					addWall(new Vector2(2*x +1, 2*y +1));
 				}
 
 				else if (pixel == HumanSpawnColor) {
 
 					//Not on the edge of the map
-					if((x != 0 && x != mapWidth-1 && y != 0 && y != mapHeight-1) && !Options.Testing) {
+					if((x != 0 && x != map.width-1 && y != 0 && y != map.height-1) && !Options.Testing) {
 						//throw new Exception("Invalid map. Human spawn location not on the edge. ("+x +", "+y +")");
 					}
 
-					HumanSpawnPoints.Add(new Vector2(x,y));
+					HumanSpawnPoints.Add(new Vector2(2*x+0.5f,2*y+0.5f));
 				}
 
 				else if (pixel == PenguinSpawnColor) {
@@ -202,9 +216,60 @@ public class Map : IDisposable {
 						throw new Exception("Invalid map. Multiple penguin spawn points. ("+PenguinSpawn.x +", "+PenguinSpawn.y +") ("+x +", "+y +")");
 					}
 
-					PenguinSpawn = new Vector2(x,y);
+					PenguinSpawn = new Vector2(2*x+0.5f,2*y+0.5f);
 				}
 
+				else if (pixel == ICEMachineColor) {
+					
+					if(ICEMachineLocation != INVALID_LOCATION) {
+						throw new Exception("Invalid map. Multiple ICE Machine locations. ("+ICEMachineLocation.x +", "+ICEMachineLocation.y +") ("+x +", "+y +")");
+					}
+					
+					ICEMachineLocation = new Vector2(2*x+0.5f,2*y+0.5f);
+				}
+			}
+		}
+	}
+
+	//Place walls based off given map texture
+	private void readMapForEditor(string n, GameObject w, Texture2D map) {
+		
+		removeAllWalls();
+		
+		w.transform.localScale = Vector3.one*0.5f;
+
+		init (n, w, map.width, map.height);
+		
+		//createBoard(map.width, map.height);
+		
+		for (int x = 0; x < map.width; ++x) {
+			for (int y = 0; y < map.height; ++y) {
+				
+				Color pixel = map.GetPixel(x,y);
+				
+				if (pixel == WallColor) {
+					addWall(new Vector2(x, y));
+				}
+				
+				else if (pixel == HumanSpawnColor) {
+					
+					//Not on the edge of the map
+					if((x != 0 && x != map.width-1 && y != 0 && y != map.height-1) && !Options.Testing) {
+						//throw new Exception("Invalid map. Human spawn location not on the edge. ("+x +", "+y +")");
+					}
+					
+					HumanSpawnPoints.Add(new Vector2(x,y));
+				}
+				
+				else if (pixel == PenguinSpawnColor) {
+					
+					if(PenguinSpawn != INVALID_LOCATION) {
+						throw new Exception("Invalid map. Multiple penguin spawn points. ("+PenguinSpawn.x +", "+PenguinSpawn.y +") ("+x +", "+y +")");
+					}
+					
+					PenguinSpawn = new Vector2(x,y);
+				}
+				
 				else if (pixel == ICEMachineColor) {
 					
 					if(ICEMachineLocation != INVALID_LOCATION) {
@@ -219,7 +284,7 @@ public class Map : IDisposable {
 
 	public Texture2D saveMap () {
 
-		Texture2D map = new Texture2D(mapWidth, mapHeight);
+		Texture2D map = new Texture2D(mapWidth/2, mapHeight/2);
 
 		for (int x = 0; x < map.width; ++x) {
 			for (int y = 0; y < map.height; ++y) {
@@ -234,13 +299,13 @@ public class Map : IDisposable {
 		}
 
 		if(PenguinSpawn != INVALID_LOCATION)
-			map.SetPixel((int)PenguinSpawn.x, (int)PenguinSpawn.y, PenguinSpawnColor);
+			map.SetPixel((int)PenguinSpawn.x/2, (int)PenguinSpawn.y/2, PenguinSpawnColor);
 
 		if(ICEMachineLocation != INVALID_LOCATION)
-			map.SetPixel((int)ICEMachineLocation.x, (int)ICEMachineLocation.y, ICEMachineColor);
+			map.SetPixel((int)ICEMachineLocation.x/2, (int)ICEMachineLocation.y/2, ICEMachineColor);
 
 		foreach (Vector2 loc in HumanSpawnPoints) {
-			map.SetPixel((int)loc.x, (int)loc.y, HumanSpawnColor);
+			map.SetPixel((int)loc.x/2, (int)loc.y/2, HumanSpawnColor);
 		}
 
 		map.Apply();
@@ -287,7 +352,7 @@ public class Map : IDisposable {
 	public bool addWall(Vector2 coord) {
 
 		//Location out of bounds or already has a wall placed.
-		if(!inBounds(coord) || board[(int)coord.y,(int)coord.x] != null)
+		if(!inBounds(coord) || board[(int)coord.y/2,(int)coord.x/2] != null)
 			return false;
 
 		placeWall(coord);
@@ -298,8 +363,14 @@ public class Map : IDisposable {
 	private void placeWall(Vector2 coord) {
 		Vector3 placeLocation = cellIndexToWorld(coord);
 		GameObject w = GameObject.Instantiate (wall, placeLocation, wall.transform.rotation) as GameObject;
-		board[(int)coord.y,(int)coord.x] = w;
-		canMove [(int)coord.x, (int)coord.y] = false;
+		board[(int)coord.y/2,(int)coord.x/2] = w;
+
+
+		canMove [Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.y)] = false;
+		canMove [Mathf.FloorToInt(coord.x), Mathf.CeilToInt(coord.y)] = false;
+		canMove [Mathf.CeilToInt(coord.x), Mathf.FloorToInt(coord.y)] = false;
+		canMove [Mathf.CeilToInt(coord.x), Mathf.CeilToInt(coord.y)] = false;
+
         //Debug.Log((int)coord.y + " " + (int)coord.x);
 	}
 
@@ -326,15 +397,23 @@ public class Map : IDisposable {
 	public bool removeWall(Vector2 coord) {
 
 		//Location out of bounds or does not contain a wall
-		if (!inBounds(coord) || board[(int)coord.y,(int)coord.x] == null) {
+		if (!inBounds(coord) || board[(int)coord.y/2,(int)coord.x/2] == null) {
 			return false;
 		}
-		GameObject w = board[(int)coord.y,(int)coord.x];
+		GameObject w = board[(int)coord.y/2,(int)coord.x/2];
 		GameObject.Destroy(w);
 
-		board[(int)coord.y,(int)coord.x] = null;
+		board[(int)coord.y/2,(int)coord.x/2] = null;
 		canMove [(int)coord.x, (int)coord.y] = true;
 		return true;
+	}
+
+	public bool hasWall(Vector3 coord) {
+		return hasWall (getCellIndex(coord));
+	}
+
+	public bool hasWall(Vector2 coord) {
+		return board[(int)coord.y/2,(int)coord.x/2] != null;
 	}
 
 	public int getMapWidth(){

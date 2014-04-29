@@ -232,10 +232,10 @@ public class IciclePenguins : GameAgent {
 		if (drawNodes) {
 			for(int i = 0; i < map.getMapWidth(); i++){
 				for(int j = 0; j < map.getMapHeight(); j++){
-					Vector2 node = map.cellIndexToWorld(new Vector2(i, j));
-					node.y*=-1;
+					Vector2 node = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(new Vector2(i, j)));
+					node.y = Screen.height - node.y;
 					if(map.canMove[i, j]){
-						DebugRenderer.drawCircle(DebugRenderer.currentCamera.WorldToScreenPoint(node), 5.0f);
+						DebugRenderer.drawCircle(node, 5.0f);
 					}
 				}
 			}

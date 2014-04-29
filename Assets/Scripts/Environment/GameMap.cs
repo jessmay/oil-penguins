@@ -58,7 +58,15 @@ public class GameMap : MonoBehaviour{
 		}
 	}
 
-	void Update() {}
+	void Update() {
+
+//		if(Input.GetKeyDown(KeyCode.K)) {
+//			foreach(GameObject human in HumansOnMap) {
+//				human.GetComponent<HumanAgent>().onDeath();
+//			}
+//		}
+
+	}
 
 
 	private void createMap(string mapName, Vector2 mapSize) {
@@ -94,7 +102,8 @@ public class GameMap : MonoBehaviour{
 		if (grid != null)
 			grid.Dispose();
 		
-		grid = new Grid (map.getMapWidth(), map.getMapHeight(), mapBounds);
+		//grid = new Grid (map.getMapWidth(), map.getMapHeight(), mapBounds);
+		grid = new Grid (map);
 		
 		transform.localScale = new Vector3(mapBounds.size.x/renderer.bounds.size.x*transform.localScale.x, mapBounds.size.y/renderer.bounds.size.y*transform.localScale.y, transform.localScale.z);
 

@@ -217,9 +217,28 @@ public class AStar {
 		Vector2 rightStart = startPoint + (Vector2)radDirection;
 		Vector2 leftStart = startPoint - (Vector2)radDirection;
 
+
+		// Save current object layer
+		int oldLayer = agent.gameObject.layer;
+		
+		int layerToIgnore = ~((1 << agent.gameObject.layer) | (1 << LayerMask.NameToLayer("Ignore Raycast")));
+		
+		if(!Options.Testing) {
+			//Change object layer to a layer it will be alone
+			agent.gameObject.layer = LayerMask.NameToLayer("RayCast");
+			
+			layerToIgnore = (1 << agent.gameObject.layer) | (1 << LayerMask.NameToLayer("Ignore Raycast"));
+			layerToIgnore = ~layerToIgnore;
+		}
+
+
 		//Raycast to see if there are any collisions before the end point
-		RaycastHit2D ray1 = Physics2D.Raycast (rightStart, pointPath, pointPath.magnitude, (1 << LayerMask.NameToLayer("Wall")));
-		RaycastHit2D ray2 = Physics2D.Raycast (leftStart, pointPath, pointPath.magnitude, (1 << LayerMask.NameToLayer("Wall")));
+		RaycastHit2D ray1 = Physics2D.Raycast (rightStart, pointPath, pointPath.magnitude, layerToIgnore);//, (1 << LayerMask.NameToLayer("Wall"))
+		RaycastHit2D ray2 = Physics2D.Raycast (leftStart, pointPath, pointPath.magnitude, layerToIgnore);//, (1 << LayerMask.NameToLayer("Wall"))
+
+
+		// set the game object back to its original layer
+		agent.gameObject.layer = oldLayer;
 
 		return (ray1.collider == null && ray2.collider == null);
 	}

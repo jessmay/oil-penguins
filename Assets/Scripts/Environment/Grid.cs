@@ -23,24 +23,36 @@ public class Grid : IDisposable {
 
 	private float maxAgentRadius;
 
+	public Map map;
+
 	List<Agent>[,] grid;
 
-	public Grid(int w, int h, Bounds b){
+	public Grid (Map map) {
+		this.map = map;
 
+		initialize(map.getMapWidth(), map.getMapHeight(), map.getBounds());
+	}
+
+	public Grid(int w, int h, Bounds b){
+		initialize(w, h, b);
+	}
+
+	private void initialize(int w, int h, Bounds b) {
+		
 		width = w;
 		height = h;
 		bounds = b;
 		center = b.center;
-
+		
 		maxAgentRadius = 0;
-
+		
 		grid = new List<Agent>[height,width];
 		for (int i = 0; i < height; i++) {
 			for(int j = 0; j < width; j++){
 				grid[i,j] = new List<Agent>();
 			}
 		}
-
+		
 		xSize = bounds.size.x/width;
 		ySize = bounds.size.y/height;
 
@@ -88,6 +100,10 @@ public class Grid : IDisposable {
 
 		maxAgentRadius = Mathf.Max(maxAgentRadius, a.getRadius());
 		grid [(int)to.y,(int)to.x].Add (a);
+
+		if(grid [(int)to.y, (int)to.x].Count == 1)
+			map.canMove[(int)to.x,(int)to.y] = false;
+
 		return true;
 	}
 
@@ -104,8 +120,11 @@ public class Grid : IDisposable {
 			return false;
 
 		grid [(int)from.y, (int)from.x].Remove (a);
-		return true;
 
+		if(grid [(int)from.y, (int)from.x].Count == 0)
+			map.canMove[(int)from.x,(int)from.y] = true;
+
+		return true;
 	}
 
 	private void removeAllAgents() {

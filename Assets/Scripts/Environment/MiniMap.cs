@@ -114,10 +114,19 @@ public class MiniMap : MonoBehaviour {
 		float wallSize = onScreenSize.x / gameMap.map.mapWidth;
 
 		//Draw walls
-		for (int row = 0; row < gameMap.map.mapWidth; ++row) {
-			for(int col = 0; col < gameMap.map.mapHeight; ++col) {
-				if(!gameMap.map.canMove[row, col])
-					DebugRenderer.drawBox(coord.x + row*wallSize, coord.y+(onScreenSize.y - col*wallSize) - wallSize, wallSize, wallSize, 0, Vector3.zero, Map.WallColor);
+		for (int row = 0; row < gameMap.map.mapWidth; row+=2) {
+			for(int col = 0; col < gameMap.map.mapHeight; col+=2) {
+//				if(!Application.loadedLevelName.Equals("MapEditor") && gameMap.map.hasWall(new Vector2(row, col))) {
+//					DebugRenderer.drawBox(coord.x + row*wallSize, coord.y+(onScreenSize.y - col*wallSize) - wallSize*2, wallSize*2, wallSize*2, 0, Vector3.zero, Map.WallColor);
+//				}
+//				else if(Application.loadedLevelName.Equals("MapEditor") && gameMap.map.hasWall(new Vector2(row/2, col/2))) {
+//					DebugRenderer.drawBox(coord.x + row*wallSize, coord.y+(onScreenSize.y - col*wallSize) - wallSize, wallSize, wallSize, 0, Vector3.zero, Map.WallColor);
+//				}
+
+				if(gameMap.map.hasWall(new Vector2(row, col))) {
+					DebugRenderer.drawBox(coord.x + row*wallSize, coord.y+(onScreenSize.y - col*wallSize) - wallSize*2, wallSize*2, wallSize*2, 0, Vector3.zero, Map.WallColor);
+				}
+
 			}
 		}
 
@@ -148,7 +157,9 @@ public class MiniMap : MonoBehaviour {
 				
 				Vector2 newCoord = coord + (Vector2)penguinCoord;
 
-				DebugRenderer.drawBox(new Rect(newCoord.x - wallSize/2, newCoord.y - wallSize/2, wallSize, wallSize), Map.PenguinSpawnColor);
+				bool sleeping = penguin.GetComponent<IciclePenguins>().IPfsm.currentState.GetType().Equals(typeof(IciclePenguinSleepState));
+
+				DebugRenderer.drawBox(new Rect(newCoord.x - wallSize/2, newCoord.y - wallSize/2, wallSize, wallSize), sleeping?Color.blue: Color.green);
 			}
 		}
 		else {
