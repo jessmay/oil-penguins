@@ -52,7 +52,7 @@ public class Map : IDisposable {
 
 		init(n, w, width, height);
 
-		createBorder();
+		//createBorder();
 
 		ICEMachineLocation = new Vector2(mapWidth/2, mapHeight/2);
 		PenguinSpawn = new Vector2(mapWidth/2, mapHeight/2+1);
@@ -61,10 +61,7 @@ public class Map : IDisposable {
 	//Construct a map based on the given image
 	public Map(string n, GameObject w, Texture2D map) {
 
-		//if(Options.play)
-			readMap(n, w, map);
-		//else
-		//	readMapForEditor(n, w, map);
+		readMap(n, w, map);
 	}
 
 	//Initialize variables
@@ -79,27 +76,8 @@ public class Map : IDisposable {
 		center = Vector3.zero;
 
 		BoxCollider2D box = wall.GetComponent<BoxCollider2D>();
-		xSize = box.size.x * wall.transform.localScale.x;
-		ySize = box.size.y * wall.transform.localScale.y;
-
-//		xSize = wall.renderer.bounds.size.x;
-//		ySize = wall.renderer.bounds.size.y;
-
-
-		//bounds = b;
-		//center = bounds.center;
-		
-		//The size the wall needs to be to fit mapWidth x mapHeight within the bounds
-		//xSize = bounds.size.x/mapWidth;
-		//ySize = bounds.size.y/mapHeight;
-
-		//The scale value required to change the walls to the required width and height.
-		//float wallX = xSize/(wall.renderer.bounds.size.x/wall.transform.localScale.x);
-		//float wallY = ySize/(wall.renderer.bounds.size.y/wall.transform.localScale.y);
-		
-		//Scale wall to fit
-		//wall.transform.localScale = new Vector3(wallX, wallY, 1);
-
+		xSize = box.size.x * wall.transform.localScale.x/2;
+		ySize = box.size.y * wall.transform.localScale.y/2;
 	}
 
 	public Bounds getBounds() {
@@ -182,11 +160,11 @@ public class Map : IDisposable {
 
 		removeAllWalls();
 
-		w.transform.localScale = Vector3.one*0.5f;
+		//w.transform.localScale = Vector3.one*0.5f;
 
 		init (n, w, map.width*2, map.height*2);
 
-		w.transform.localScale = Vector3.one;
+		//w.transform.localScale = Vector3.one;
 		
 		for (int x = 0; x < map.width; ++x) {
 			for (int y = 0; y < map.height; ++y) {
@@ -195,9 +173,6 @@ public class Map : IDisposable {
 
 				if (pixel == WallColor) {
 					addWall(new Vector2(2*x +0.5f, 2*y +0.5f));
-//					addWall(new Vector2(2*x +1, 2*y));
-//					addWall(new Vector2(2*x, 2*y +1));
-//					addWall(new Vector2(2*x +1, 2*y +1));
 				}
 
 				else if (pixel == HumanSpawnColor) {
@@ -231,56 +206,6 @@ public class Map : IDisposable {
 		}
 	}
 
-	//Place walls based off given map texture
-	private void readMapForEditor(string n, GameObject w, Texture2D map) {
-		
-		removeAllWalls();
-		
-		w.transform.localScale = Vector3.one*0.5f;
-
-		init (n, w, map.width, map.height);
-		
-		//createBoard(map.width, map.height);
-		
-		for (int x = 0; x < map.width; ++x) {
-			for (int y = 0; y < map.height; ++y) {
-				
-				Color pixel = map.GetPixel(x,y);
-				
-				if (pixel == WallColor) {
-					addWall(new Vector2(x, y));
-				}
-				
-				else if (pixel == HumanSpawnColor) {
-					
-					//Not on the edge of the map
-					if((x != 0 && x != map.width-1 && y != 0 && y != map.height-1) && !Options.Testing) {
-						//throw new Exception("Invalid map. Human spawn location not on the edge. ("+x +", "+y +")");
-					}
-					
-					HumanSpawnPoints.Add(new Vector2(x,y));
-				}
-				
-				else if (pixel == PenguinSpawnColor) {
-					
-					if(PenguinSpawn != INVALID_LOCATION) {
-						throw new Exception("Invalid map. Multiple penguin spawn points. ("+PenguinSpawn.x +", "+PenguinSpawn.y +") ("+x +", "+y +")");
-					}
-					
-					PenguinSpawn = new Vector2(x,y);
-				}
-				
-				else if (pixel == ICEMachineColor) {
-					
-					if(ICEMachineLocation != INVALID_LOCATION) {
-						throw new Exception("Invalid map. Multiple ICE Machine locations. ("+ICEMachineLocation.x +", "+ICEMachineLocation.y +") ("+x +", "+y +")");
-					}
-					
-					ICEMachineLocation = new Vector2(x,y);
-				}
-			}
-		}
-	}
 
 	public Texture2D saveMap () {
 
