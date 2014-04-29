@@ -58,6 +58,9 @@ public class AStar {
 	// and it will contain the locations of nodes in World space to follow; the nodes will be the centers of open map cells
 	// Source node and target node are in world coords
 	public bool aStar(){
+
+		if (!agent.map.canMove[(int)targetCell.x, (int)targetCell.y])
+			return false;
 		
 		List<Vector2> visited = new List<Vector2> ();
 		List<Vector2> curr = new List<Vector2> ();
