@@ -101,7 +101,7 @@ public class IciclePenguins : GameAgent {
 
 
 	public override float getTurnStep() { return turnStep; }
-	public override float getMoveStep() { return 10.0f * transform.localScale.x;}//TODO play around with, faster than humans
+	public override float getMoveStep() { return 15.0f * transform.localScale.x;}//TODO play around with, faster than humans
 
 
 	//Render non debug information here
@@ -196,7 +196,7 @@ public class IciclePenguins : GameAgent {
 		}
 	}
 
-	public new void addInfliction(Infliction infliction) {
+	public override void addInfliction(Infliction infliction) {
 		if(IPfsm.currentState.GetType() != typeof(IciclePenguinSleepState))
 			base.addInfliction(infliction);
 	}

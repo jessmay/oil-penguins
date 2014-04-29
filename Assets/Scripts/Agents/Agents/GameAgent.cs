@@ -20,7 +20,7 @@ public abstract class GameAgent : Agent {
 		health.drawHealthBar();
 	}
 
-	public void addInfliction(Infliction infliction) {
+	public virtual void addInfliction(Infliction infliction) {
 		health.addInfliction(infliction);
 	}
 }

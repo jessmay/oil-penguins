@@ -168,7 +168,7 @@ public class HumanAgent : GameAgent, ITarget {
 
 	
 	public void shoot() {
-		Instantiate(Tranquilizer, transform.position + transform.up*(radius), transform.rotation);// + Tranquilizer.renderer.bounds.extents.y
+		Instantiate(Tranquilizer, transform.position, transform.rotation);// + Tranquilizer.renderer.bounds.extents.y // + transform.up*(radius)*0.7f
 	}
 
 	protected override void checkButtons (){}
@@ -240,7 +240,7 @@ public class HumanAgent : GameAgent, ITarget {
 	}
 
 
-	public new void addInfliction(Infliction infliction) {
+	public override void addInfliction(Infliction infliction) {
 		base.addInfliction(infliction);
 		hit = true;
 	}
