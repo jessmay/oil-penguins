@@ -32,7 +32,7 @@ public class CameraController : MonoBehaviour {
 
 	void Start() {
 
-		if(Options.play) {
+		if(Options.play || Options.mapEditing) {
 			camera.rect = new Rect(camera.rect.x, camera.rect.y + PlayGameGUI.GUISize/(float)Screen.height, camera.rect.width, (Screen.height - PlayGameGUI.GUISize)/(float)Screen.height);
 		}
 

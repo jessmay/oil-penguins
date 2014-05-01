@@ -5,18 +5,15 @@ using System.Collections.Generic;
 public class MapEditor : MonoBehaviour {
 
 	GameMap gameMap;
-	Color currColor;
 
-	Color[] mapColors = {Map.WallColor, Map.HumanSpawnColor, Map.PenguinSpawnColor, Map.ICEMachineColor};
-	int colorIndex;
-
+	public int itemIndex;
 	public Texture2D[] PlaceableItems;
+	public PauseMenu pauseMenu;
 
 	// Use this for initialization
 	void Start () {
 		gameMap = GetComponent<GameMap>();
-		currColor = Map.WallColor;
-		colorIndex = 0;
+		itemIndex = 0;
 
 		visitedCells = new HashSet<Vector2>();
 	}
@@ -26,7 +23,7 @@ public class MapEditor : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if(GetComponent<PauseMenu>().isPaused())
+		if(pauseMenu.isPaused())
 			return;
 
 
@@ -42,24 +39,24 @@ public class MapEditor : MonoBehaviour {
 		}
 
 		//Place/remove item at the given mouse location
-		if (Input.GetMouseButton (0) && !(Input.mousePosition.x > Screen.width - PlayGameGUI.GUISize && Input.mousePosition.y < PlayGameGUI.GUISize) && gameMap.map.inBounds(mapPos) && !visitedCells.Contains(mapPos)) {
+		if (Input.GetMouseButton (0) &&  DebugRenderer.currentCamera.GetComponent<CameraController>().mouseInBounds() && gameMap.map.inBounds(mapPos) && !visitedCells.Contains(mapPos)) {
 			//Debug.Log("Click at map position: "+mapPos);
 
 			visitedCells.Add(mapPos);
 
-			if(currColor == Map.WallColor) {
+			if(itemIndex == 0) {
 
-				removeItems(mapPos, colorIndex);
+				removeItems(mapPos, itemIndex);
 
 				//If wall already exists at the location, remove it
 				if(!gameMap.map.addWall(mapPos))
 					gameMap.map.removeWall(mapPos);
 			}
-			else if(currColor == Map.HumanSpawnColor) { //TODO: Force human spawn points to have space in front.
+			else if(itemIndex == 1) { //TODO: Force human spawn points to have space in front.
 
 				if(mapPos.x < 1 || mapPos.x > gameMap.map.getMapWidth()-2 || mapPos.y < 1 || mapPos.y > gameMap.map.getMapHeight() -2) {
 
-					removeItems(mapPos, colorIndex);
+					removeItems(mapPos, itemIndex);
 
 					if(!gameMap.map.HumanSpawnPoints.Contains(mapPos))
 						gameMap.map.HumanSpawnPoints.Add (mapPos);
@@ -69,18 +66,18 @@ public class MapEditor : MonoBehaviour {
 				else
 					Debug.Log("Human spawn points can only be placed on the edges of the map.");
 			}
-			else if (currColor == Map.PenguinSpawnColor) {
+			else if (itemIndex == 2) {
 
-				removeItems(mapPos, colorIndex);
+				removeItems(mapPos, itemIndex);
 
 				if(gameMap.map.PenguinSpawn != mapPos)
 					gameMap.map.PenguinSpawn = mapPos;
 				else
 					gameMap.map.PenguinSpawn = Map.INVALID_LOCATION;
 			}
-			else if (currColor == Map.ICEMachineColor) {
+			else if (itemIndex == 3) {
 
-				removeItems(mapPos, colorIndex);
+				removeItems(mapPos, itemIndex);
 				
 				if(gameMap.map.ICEMachineLocation != mapPos)
 					gameMap.map.ICEMachineLocation = mapPos;
@@ -90,16 +87,15 @@ public class MapEditor : MonoBehaviour {
 		}
 
 		//Right click to remove item from location
-		if(Input.GetMouseButtonDown(1) && !(Input.mousePosition.x > Screen.width - PlayGameGUI.GUISize && Input.mousePosition.y < PlayGameGUI.GUISize) && gameMap.map.inBounds(mapPos)) {
+		if(Input.GetMouseButtonDown(1) && DebugRenderer.currentCamera.GetComponent<CameraController>().mouseInBounds() && gameMap.map.inBounds(mapPos)) {
 
 			removeItems(mapPos);
 		}
 
+		//Change current item based on number keys 1-4
 		for (int i = 0; i < 4; ++i) {
 			if(Input.GetKeyDown(((i+1)).ToString())) {
-				currColor = mapColors[i];
-				colorIndex = i;
-				//Debug.Log("Color changed to index: "+i);
+				itemIndex = i;
 			}
 		}
 	}
@@ -122,10 +118,8 @@ public class MapEditor : MonoBehaviour {
 
 	void OnGUI() {
 
-		if(GetComponent<PauseMenu>().isPaused())
+		if(pauseMenu.isPaused())
 			return;
-
-		DebugRenderer.drawBox(0,0, 50,50, 0, Vector2.zero, currColor);
 
 		Map map = gameMap.map;
 
@@ -193,7 +187,8 @@ public class MapEditor : MonoBehaviour {
 		mapPos -= new Vector2(Mathf.Abs(mapPos.x)%2, Mathf.Abs(mapPos.y)%2);
 		mapPos += Vector2.one * 0.5f;
 
-		if(map.inBounds(mapPos)) {
+		//Display preview on map
+		if(map.inBounds(mapPos) && DebugRenderer.currentCamera.GetComponent<CameraController>().mouseInBounds()) {
 
 			Vector3 cameraCell = DebugRenderer.currentCamera.WorldToScreenPoint(map.cellIndexToWorld(mapPos));
 			cameraCell.y = Screen.height - cameraCell.y;
@@ -210,23 +205,22 @@ public class MapEditor : MonoBehaviour {
 
 
 			//If human spawn, rotate to face inside the map,
-			// Draw human sprite,
-			// unrotate GUI
-			if((colorIndex == 1 && map.getEdgeDirectionVector(mapPos) != Vector2.zero)) {
+			// Draw human sprite, and unrotate GUI
+			if((itemIndex == 1 && map.getEdgeDirectionVector(mapPos) != Vector2.zero)) {
 
 				DebugRenderer.drawBox(rect2, Color.white);
 				//Rotate GUI
 				GUIUtility.RotateAroundPivot(-map.getSpawnAngle(mapPos).eulerAngles.z, cameraCell);
-				GUI.DrawTexture(colorIndex == 0? rect2: rect, PlaceableItems[colorIndex]);
+				GUI.DrawTexture(itemIndex == 0? rect2: rect, PlaceableItems[itemIndex]);
 				GUIUtility.RotateAroundPivot(map.getSpawnAngle(mapPos).eulerAngles.z, cameraCell);
 			}
 
 			//Draw sprite at mouse location.
-			else if(colorIndex != 1) {
+			else if(itemIndex != 1) {
 
 				DebugRenderer.drawBox(rect2, Color.white);
 
-				GUI.DrawTexture(colorIndex == 0? rect2: rect, PlaceableItems[colorIndex]);
+				GUI.DrawTexture(itemIndex == 0? rect2: rect, PlaceableItems[itemIndex]);
 			}
 		}
 	}

@@ -92,7 +92,7 @@ public class MiniMap : MonoBehaviour {
 
 	public void OnGUI() {
 
-		if(!Options.play)
+		if(!Options.play && !Options.mapEditing)
 			DisplayMiniMap(locationOnScreen);
 	}
 

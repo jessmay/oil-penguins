@@ -22,11 +22,13 @@ public class Options {
 	public static string HighScoresDirectory = Application.dataPath + "/../HS";
 	public static HighScores highScores;
 
+	public static bool mapEditing;
 
 	static Options() {
-		mapName = "NewMap";
+		//mapName = "NewMap";
 		Testing = false;
 		play = false;
+		mapEditing = false;
 
 		if(File.Exists(HighScoresDirectory +"/"+ HighScores.HighScoresFileName)) {
 			highScores = HighScores.load (File.ReadAllText(HighScoresDirectory +"/"+ HighScores.HighScoresFileName));

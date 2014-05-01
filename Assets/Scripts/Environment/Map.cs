@@ -52,10 +52,10 @@ public class Map : IDisposable {
 
 		init(n, w, width, height);
 
-		//createBorder();
+		createBorder();
 
-		ICEMachineLocation = new Vector2(mapWidth/2, mapHeight/2);
-		PenguinSpawn = new Vector2(mapWidth/2, mapHeight/2+1);
+		ICEMachineLocation = new Vector2(mapWidth/2+0.5f, mapHeight/2+0.5f);
+		PenguinSpawn = new Vector2(mapWidth/2+0.5f, mapHeight/2+2+0.5f);
 	}
 
 	//Construct a map based on the given image
@@ -143,15 +143,15 @@ public class Map : IDisposable {
 		//Place boundry walls on the top and bottom sides.
 		for (int i = 0; i < mapWidth; ++i) {
 			
-			placeWall(new Vector2(i, 0));
-			placeWall(new Vector2(i, mapHeight-1));
+			addWall(new Vector2(i+0.5f, 0.5f));
+			addWall(new Vector2(i+0.5f, mapHeight-1.5f));
 		}
 
 		//Place boundry walls on the left and right sides.
 		for (int j = 1; j < mapHeight-1; ++j) {
 			
-			placeWall(new Vector2(0, j));
-			placeWall(new Vector2(mapWidth-1, j));
+			addWall(new Vector2(0.5f, j+0.5f));
+			addWall(new Vector2(mapWidth-1.5f, j+0.5f));
 		}
 	}
 
