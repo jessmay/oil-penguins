@@ -10,7 +10,7 @@ public class IciclePenguins : GameAgent {
 	protected bool drawPath;
 	protected bool drawNodes;
 
-	private bool selected;
+	public bool selected;
 
 	public Sprite[] penguinSprites;
 
@@ -76,6 +76,14 @@ public class IciclePenguins : GameAgent {
 		//Right mouse click deselects
 		if (selected && Input.GetMouseButtonDown (1)) {
 			selected = false;
+		}
+
+		if (gameMap.selectedPenguins.Contains (this) && !selected) {
+			gameMap.selectedPenguins.Remove(this);
+		}
+
+		if (!gameMap.selectedPenguins.Contains (this) && selected) {
+			gameMap.selectedPenguins.Add(this);
 		}
 
 		//Check sensors for adj agents
@@ -185,11 +193,11 @@ public class IciclePenguins : GameAgent {
 
 		if(IPfsm.currentState.GetType() == typeof(IciclePenguinAttackState)) {
 			
-			//If in the attack state, and no penguins found, change back to the move state.
+			//If in the attack state, and no humans found, change back to the move state.
 			if(closestAgent == null) {
 				IPfsm.changeState(typeof(IciclePenguinChillinState));
 			}
-			//If in the attack state, and a penguin was found, update target to that penguin.
+			//If in the attack state, and a human was found, update target to that human.
 			else {
 				((IciclePenguinAttackState)IPfsm.currentState).target = (HumanAgent)closestAgent;
 			}

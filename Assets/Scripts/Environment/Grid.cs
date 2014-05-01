@@ -185,6 +185,30 @@ public class Grid : IDisposable {
 	}
 
 
+	// Returns a list of the Icicle Penguins within the drawn selection box
+	public List<IciclePenguins> multiSelectPenguins(Vector3 startBound, Vector3 endBound){
+		List<IciclePenguins> selected = new List<IciclePenguins> ();
+
+		Vector3 center = new Vector3 ((startBound.x+endBound.x)/2.0f, (startBound.y+endBound.y)/2.0f, 0.0f);
+		//size.x is the width, size.y is the height and size.z is the depth of the box.
+		Vector3 size = new Vector3 (Math.Abs(startBound.x-endBound.x), Math.Abs(startBound.y-endBound.y), 0.0f);
+
+		//create box
+		Bounds b = new Bounds (center, size);
+
+		//loop through grid to see what agents are within the box, and on the box's intersecting lines
+		for (int i = 0; i < width; i++) {
+			for(int j = 0; j < height; j++){
+				foreach(Agent a in grid[i,j]){
+					if(a.GetType().Equals(typeof(IciclePenguins)) && b.Intersects(a.renderer.bounds)){
+						selected.Add((IciclePenguins) a);
+					}
+				}
+			}
+		}
+
+		return selected;
+	}
 
 
 	// Flag: Has Dispose already been called? 

@@ -30,6 +30,12 @@ public class GameMap : MonoBehaviour{
 
 	public int numPenguinsSpawnable = 3;
 
+	public List<IciclePenguins> selectedPenguins;
+
+	private bool mouseDrag = false;
+	private Vector3 startDragPosition;
+	private Vector3 stopDragPosition;
+
 	void Awake() {
 
 		HumansOnMap = new List<GameObject>();
@@ -50,6 +56,7 @@ public class GameMap : MonoBehaviour{
 		if(!Options.play)
 			return;
 
+		selectedPenguins = new List<IciclePenguins> ();
 
 		gameStartTime = Time.time;
 
@@ -59,6 +66,41 @@ public class GameMap : MonoBehaviour{
 	}
 
 	void Update() {
+
+		//TODO multi-penguin selection
+		// Research bounding boxes Bounds.intersect() if thats the right method.
+		if (Input.GetMouseButtonDown (0)) {
+			mouseDrag = true;
+			startDragPosition = Input.mousePosition;
+		}
+
+		if (Input.GetMouseButtonUp (0) && mouseDrag) {
+			mouseDrag = false;
+			stopDragPosition = Input.mousePosition;
+
+			//Multi-selecting penguins!
+			if(startDragPosition != stopDragPosition){
+
+				// Deselect any currently selected penguins
+				foreach(IciclePenguins p in selectedPenguins){
+					p.selected = false;
+					selectedPenguins.Remove(p);
+				}
+
+				// Convert mouse positions to world points
+				startDragPosition = DebugRenderer.currentCamera.ScreenToWorldPoint(startDragPosition);
+				stopDragPosition = DebugRenderer.currentCamera.ScreenToWorldPoint(stopDragPosition);
+
+				List<IciclePenguins> selectPenguins = grid.multiSelectPenguins(startDragPosition, stopDragPosition);
+
+				foreach(IciclePenguins p in selectPenguins){
+					p.selected = true;
+				}
+			}
+
+			startDragPosition = new Vector3();
+			stopDragPosition = new Vector3();
+		}
 
 //		if(Input.GetKeyDown(KeyCode.K)) {
 //			foreach(GameObject human in HumansOnMap) {
