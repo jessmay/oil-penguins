@@ -126,8 +126,11 @@ public abstract class Agent : MonoBehaviour {
 				moveTo(Mathf.Clamp((float)(distance), 0.0f, getMoveStep()));
 			
 			//Else, move to target at set speed.
-			else
-				moveTo (Mathf.Max(getMoveStep() * Mathf.Abs(Mathf.Cos((float)angle)), 0));
+			else {
+				moveTo (getMoveStep() * Mathf.Max(Mathf.Cos((float)angle*Mathf.Deg2Rad), 0));
+				//moveTo (getMoveStep() * Mathf.Cos((float)angle*Mathf.Deg2Rad));
+			}
+				
 			return;
 		}
 

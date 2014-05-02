@@ -103,10 +103,6 @@ public class PlayGameGUI : MonoBehaviour {
 
 		GUI.Label(new Rect(GUIStart + 215, Screen.height - GUISize + 10, 220, GUISize - 20), agentInformation, label);
 
-//		GUI.Label(new Rect(210, Screen.height - GUISize + 10, 200, 30), gameMap.HumansOnMap.Count.ToString() +" human" +(gameMap.HumansOnMap.Count==1?"":"s") +" left", label);
-//		GUI.Label(new Rect(210, Screen.height - GUISize + 40, 200, 30), gameMap.PenguinsOnMap.Count.ToString() +" penguin" +(gameMap.PenguinsOnMap.Count==1?"":"s") +" on map", label);
-//		GUI.Label(new Rect(210, Screen.height - GUISize + 70, 200, 30), gameMap.sleepingPenguins.ToString() +" penguin" +(gameMap.sleepingPenguins==1?"":"s") +" sleeping", label);
-		
 		label.alignment = TextAnchor.UpperCenter;
 
 

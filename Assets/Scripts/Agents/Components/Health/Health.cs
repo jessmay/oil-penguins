@@ -41,7 +41,7 @@ public class Health {
 
 	public void drawHealthBar() {
 
-		if(currentHealth <= 0 || currentHealth >= maxHealth) //TODO: Check if on screen before rendering
+		if(currentHealth <= 0 || currentHealth >= maxHealth)
 			return;
 
 		float size = agent.getRadiusCameraSpace()*2;
@@ -50,7 +50,7 @@ public class Health {
 
 		float height = DebugRenderer.worldToCameraLength(0.2f);
 
-		DebugRenderer.drawBox(new Rect(center.x - size/2, center.y - height/2, size * (float)currentHealth / maxHealth, height), getHealthColor());
+		DebugRenderer.drawBox(new Rect(center.x - size/2, center.y - height/2, Mathf.Max(1, size * (float)currentHealth / maxHealth), height), getHealthColor());
 
 	}
 
@@ -71,7 +71,7 @@ public class Health {
 	}
 
 	public void reduceHealth(float amount) {
-		currentHealth -= amount;
+		currentHealth -= amount + 1E-5f;
 	}
 
 	public void restoreToFullHealth() {
