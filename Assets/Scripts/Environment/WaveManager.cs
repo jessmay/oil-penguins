@@ -17,8 +17,12 @@ public class WaveManager : MonoBehaviour {
 	private int expectedTotalHumansSpawned;
 	
 	private GameObject[] spawnBoats;
+
+	[HideInInspector]
 	public int activeSpawns;
 
+	public MusicManager musicManager;
+	
 	// Use this for initialization
 	void Start () {
 
@@ -30,15 +34,7 @@ public class WaveManager : MonoBehaviour {
 		waveEnd();
 	}
 
-	void Update() {
-		
-//		if(Input.GetKeyUp(KeyCode.K)) {
-//
-//			foreach(GameObject human in gameMap.HumansOnMap) {
-//				human.GetComponent<HumanAgent>().onDeath();
-//			}
-//		}
-	}
+	void Update() {}
 
 	// Update is called once per frame
 	void FixedUpdate () {
@@ -60,6 +56,8 @@ public class WaveManager : MonoBehaviour {
 
 	public void waveStart() {
 
+		musicManager.playWaveMusic();
+
 		waveStartTime = Time.time;
 
 		betweenWaves = false;
@@ -70,9 +68,11 @@ public class WaveManager : MonoBehaviour {
 
 	}
 
-	// If wanting to have animation for incoming human waves (Ships arriving at shore)
-	// Generate spawn points at end of each wave, and only spawn at the start of the wave.
+
 	private void waveEnd() {
+
+		musicManager.playBetweenWavesMusic();
+
 		++waveNumber;
 		betweenWaves = true;
 		waveStartTime = Time.time + timeBetweenWaves;
@@ -82,6 +82,7 @@ public class WaveManager : MonoBehaviour {
 		++gameMap.numPenguinsSpawnable;
 
 		//Notify all penguins to wake up.
+
 		//gameMap.sleepingPenguins = 0;
 
 

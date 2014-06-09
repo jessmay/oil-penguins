@@ -24,8 +24,13 @@ public class Options {
 
 	public static bool mapEditing;
 
+	//Mute
+	public static bool playMusic;
+
 	static Options() {
-		//mapName = "NewMap";
+
+		//Default map
+		mapName = "CloseQuarters";
 		Testing = false;
 		play = false;
 		mapEditing = false;
@@ -37,6 +42,8 @@ public class Options {
 			highScores = new HighScores();
 			Directory.CreateDirectory(HighScoresDirectory);
 		}
+
+		playMusic = true;
 	}
 
 }
